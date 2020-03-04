@@ -1,0 +1,17 @@
+## YAML Template.
+---
+spring:
+  cloud:
+    config:
+        uri: http://localhost:8888
+  application:
+    name: session-service
+  profiles:
+    active: local
+server:
+  port: 8082
+  
+#spring:
+#  autoconfigure:
+#    exclude[0]: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+#    exclude[1]: org.springframework.boot.actuate.autoconfigure.security.servlet.ManagementWebSecurityAutoConfiguration
