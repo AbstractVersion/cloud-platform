@@ -1,0 +1,31 @@
+## YAML Template.
+---
+#Actuator refresh endpoint
+management: 
+    endpoints: 
+        web: 
+            exposure:
+                include: refresh
+#Server Specifics
+error:
+    whitelabel:
+      enabled: false
+spring:
+  #Cloud Configurations
+  cloud:
+    #configuration service base uri
+    config:
+        uri: http://localhost:8888
+    #Active profiles
+  profiles:
+    active: local
+  application:
+    #App name
+    name: eureka-server
+
+
+#  client:
+#    registerWithEureka: false
+#    fetchRegistry: false
+#    serviceUrl:
+#      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
