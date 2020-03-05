@@ -9,6 +9,7 @@ package com.micro.env.conf;
  *
  * @author onelove
  */
+import com.micro.env.conf.externalConfig.BaseConfiguration;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Component;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Component
 public class JwtTokenUtil implements Serializable {
@@ -27,8 +29,9 @@ public class JwtTokenUtil implements Serializable {
     private static final long serialVersionUID = -2550185165626007488L;
 //    public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60;
 
-//    @Value("${jwt.secret}")
-    private String secret = "mplampla";
+    //Retrieve Secret Configuration from Cloud Config Server
+    @Autowired
+    private BaseConfiguration config;
     //retrieve username from jwt token
 
     public String getUsernameFromToken(String token) {
@@ -47,7 +50,7 @@ public class JwtTokenUtil implements Serializable {
 
     //for retrieveing any information from token we will need the secret key
     private Claims getAllClaimsFromToken(String token) {
-        return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
+        return Jwts.parser().setSigningKey(config.getJwtSecret()).parseClaimsJws(token).getBody();
     }
 
     //check if the token has expired
@@ -70,7 +73,7 @@ public class JwtTokenUtil implements Serializable {
     private String doGenerateToken(Map<String, Object> claims, String subject, int expiresIn) {
         return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expiresIn * 1000))
-                .signWith(SignatureAlgorithm.HS512, secret).compact();
+                .signWith(SignatureAlgorithm.HS512, config.getJwtSecret()).compact();
     }
 
     //validate token

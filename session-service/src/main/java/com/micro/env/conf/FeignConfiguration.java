@@ -5,6 +5,7 @@
  */
 package com.micro.env.conf;
 
+import com.micro.env.conf.externalConfig.FeignExternalConfig;
 import org.springframework.context.annotation.Bean;
 import feign.Logger;
 import feign.Request;
@@ -12,6 +13,7 @@ import feign.RequestInterceptor;
 import feign.RequestTemplate;
 import feign.Retryer;
 import feign.auth.BasicAuthRequestInterceptor;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  *
@@ -21,6 +23,9 @@ public class FeignConfiguration {
 
     private static final java.util.logging.Logger LOG = java.util.logging.Logger.getLogger(FeignConfiguration.class.getName());
 
+    @Autowired
+    private FeignExternalConfig config;
+
     @Bean
     public Logger.Level configureLogLevel() {
         return Logger.Level.FULL;
@@ -28,7 +33,10 @@ public class FeignConfiguration {
 
     @Bean
     public Request.Options timeoutConfiguration() {
-        return new Request.Options(5000, 30000);
+        return new Request.Options(
+                config.getRequestConnectTimeoutMill(),
+                config.getReadTimeoutMill()
+        );
     }
 
 //    @Bean
@@ -41,7 +49,6 @@ public class FeignConfiguration {
 //            }
 //        };
 //    }
-
 //    BASIC AUTH
 //    @Bean
 //    public BasicAuthRequestInterceptor basicAuthRequestInterceptor() {
@@ -49,6 +56,10 @@ public class FeignConfiguration {
 //    }
     @Bean
     public Retryer retryer() {
-        return new Retryer.Default(1000, 8000, 3);
+        return new Retryer.Default(
+                config.getRetryPeriod(),
+                config.getRetryMaxPeriod(),
+                config.getRetryMaxAttempts()
+        );
     }
 }

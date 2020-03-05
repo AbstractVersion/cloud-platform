@@ -3,11 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.micro.env.conf;
+package com.micro.env.conf.jpa;
 
 import java.util.Properties;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor;
@@ -27,16 +28,17 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement
 public class JpaConfiguration {
 
+    @Autowired
+    private JpaExternalConfiguration jpaConfig;
+
     @Bean
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
 
-        dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
-        dataSource.setUsername("root");
+        dataSource.setDriverClassName(jpaConfig.getDriverClass());
+        dataSource.setUsername("root"); //request from secrets-api
         dataSource.setPassword("InfiNite@KK@");
-        dataSource.setUrl(
-                "jdbc:mysql://192.168.56.101:3306/sessionDB?useUnicode=true&characterEncoding=utf-8");
-
+        dataSource.setUrl(jpaConfig.getUrl());
         return dataSource;
     }
 
