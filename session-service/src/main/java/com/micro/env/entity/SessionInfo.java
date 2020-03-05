@@ -60,7 +60,7 @@ public class SessionInfo implements Serializable, UserDetails {
     @Lob
     @Size(min = 1, max = 65535)
     @Column(name = "access_token")
-    @JsonIgnore
+//    @JsonIgnore
     private String accessToken;
     @Basic(optional = false)
     @NotNull

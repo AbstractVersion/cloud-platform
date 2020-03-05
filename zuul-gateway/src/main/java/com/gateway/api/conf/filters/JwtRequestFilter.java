@@ -11,7 +11,7 @@ package com.gateway.api.conf.filters;
  */
 import com.gateway.api.conf.jwt.JwtTokenUtil;
 import com.gateway.api.conf.jwt.JwtUserDetailsService;
-import com.gateway.api.service.repository.template.SessionWrapper;
+import com.gateway.api.service.repository.template.SessionInfo;
 import java.io.IOException;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -67,8 +67,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         }
         // Once we get the token validate it.
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            SessionWrapper userDetails = this.jwtUserDetailsService.loadUserByUsername(username);
-            System.out.println(userDetails);
+            SessionInfo userDetails = this.jwtUserDetailsService.loadUserByUsername(username);
+            System.out.println(userDetails.getUsername());
             // if token is valid configure Spring Security to manually set
             // authentication
             if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
