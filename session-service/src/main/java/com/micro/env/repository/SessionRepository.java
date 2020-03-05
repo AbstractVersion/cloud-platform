@@ -6,7 +6,6 @@
 package com.micro.env.repository;
 
 import com.micro.env.entity.SessionInfo;
-import com.micro.env.repository.exception.SessionAlreadyExists;
 import com.micro.env.repository.exception.SessionNotFound;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +38,7 @@ public class SessionRepository {
         return token.get();
     }
 
-    public SessionInfo createSession(SessionInfo session) throws SessionAlreadyExists {
+    public SessionInfo createSession(SessionInfo session) {
         sessionRepository.save(session);
         return session;
     }

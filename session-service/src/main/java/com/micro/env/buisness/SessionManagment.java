@@ -54,12 +54,19 @@ public class SessionManagment {
             throw new AADAuthenticationInformationNonSetException("The authentication informations where not found");
         }
         //        Requesting user information based on givven token
+        // Microsoft token validation. If the token provided is valid,
+        // Microsoft Graph will return the user's information.
         MicrosoftTeamsUser user = null;
         ResponseEntity obj = graphService.userInfo(new UserToken(auth_model.getAccess_token()));
         if (obj.getStatusCode() == HttpStatus.OK) {
             user = mapper.convertValue(obj.getBody(), MicrosoftTeamsUser.class);
         }
-        //        String id, String tokenId, String accessToken, int expiring
+ 
+        return manageSession(user, auth_model);
+    }
+
+    private SessionInfo manageSession(MicrosoftTeamsUser user, TockenRequestModel auth_model) {
+        //Generate Session
         SessionInfo session = new SessionInfo(
                 user.getId().toString(),
                 user.getDisplayName(),
@@ -68,15 +75,20 @@ public class SessionManagment {
                 Integer.parseInt(auth_model.getExpires_in())
         );
         //register session on the database
+        //each time user tries to register a session simpley overwrites the previus one
         this.sessionRepo.createSession(session);
-        //generate new selfSigned token
+        logger.log(Level.INFO, "User : {0} has been registerd to the database.", user.getDisplayName());
+        //generate new selfSigned token && overwrite the session token
         session.setAccessToken(
                 tokeUtil.generateToken(
-                        session, 
+                        session,
                         Integer.parseInt(auth_model.getExpires_in()) - 100
                 )
         );
-        logger.log(Level.INFO, "User : {0} has been registerd to the database.", user.getDisplayName());
+        //Overwrite the expiring time of the token 
+        // That way the self signed token will always expire before the microsoft one
+        //so as to trigger silent authentication on the client side
+        session.setExpiring(Integer.parseInt(auth_model.getExpires_in()) - 100);
         return session;
     }
 
