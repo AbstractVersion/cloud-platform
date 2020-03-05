@@ -17,10 +17,6 @@ import com.micro.env.repository.remote.GraphServiceImpl;
 import com.micro.env.repository.remote.dataModel.MicrosoftTeamsUser;
 import com.micro.env.repository.remote.temlates.request.UserToken;
 import com.micro.env.templates.request.TockenRequestModel;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,12 +62,20 @@ public class SessionManagment {
         //        String id, String tokenId, String accessToken, int expiring
         SessionInfo session = new SessionInfo(
                 user.getId().toString(),
+                user.getDisplayName(),
                 auth_model.getId_token(),
                 auth_model.getAccess_token(),
                 Integer.parseInt(auth_model.getExpires_in())
         );
+        //register session on the database
         this.sessionRepo.createSession(session);
-        session.setSelfToken(tokeUtil.generateToken(session, Integer.parseInt(auth_model.getExpires_in()) - 100));
+        //generate new selfSigned token
+        session.setAccessToken(
+                tokeUtil.generateToken(
+                        session, 
+                        Integer.parseInt(auth_model.getExpires_in()) - 100
+                )
+        );
         logger.log(Level.INFO, "User : {0} has been registerd to the database.", user.getDisplayName());
         return session;
     }

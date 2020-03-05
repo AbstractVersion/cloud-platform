@@ -3,13 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.micro.env.templates;
+package com.gateway.api.service.repository.template;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.micro.env.entity.SessionInfo;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -19,31 +17,32 @@ import org.springframework.security.core.userdetails.UserDetails;
  */
 public class SessionWrapper implements UserDetails, Serializable {
 
-    private String id;
-    private String uname;
+    private static final long serialVersionUID = -18732190L;
+    private String username;
+    private String uniqueID;
 
     public SessionWrapper() {
 
     }
-    
-    public SessionWrapper(SessionInfo info) {
-        this.id = info.getId();
+
+    public SessionWrapper(String username, String uniqueID) {
+        this.username = username;
+        this.uniqueID = uniqueID;
     }
-    
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return new ArrayList<>();
     }
 
     @Override
     public String getPassword() {
-        return uname;
+        return uniqueID;
     }
 
     @Override
     public String getUsername() {
-        return this.id;
+        return this.username;
     }
 
     @Override
@@ -61,11 +60,9 @@ public class SessionWrapper implements UserDetails, Serializable {
         return true;
     }
 
-
     @Override
     public boolean isEnabled() {
         return true;
     }
 
-   
 }

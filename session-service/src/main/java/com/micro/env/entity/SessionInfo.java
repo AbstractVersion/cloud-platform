@@ -5,7 +5,9 @@
  */
 package com.micro.env.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import javax.persistence.Basic;
@@ -37,7 +39,7 @@ import org.springframework.security.core.userdetails.UserDetails;
     @NamedQuery(name = "SessionInfo.findById", query = "SELECT s FROM SessionInfo s WHERE s.id = :id"),
     @NamedQuery(name = "SessionInfo.findByExpiring", query = "SELECT s FROM SessionInfo s WHERE s.expiring = :expiring"),
     @NamedQuery(name = "SessionInfo.findByDateCreated", query = "SELECT s FROM SessionInfo s WHERE s.dateCreated = :dateCreated")})
-public class SessionInfo implements Serializable {
+public class SessionInfo implements Serializable, UserDetails {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -51,12 +53,14 @@ public class SessionInfo implements Serializable {
     @Lob
     @Size(min = 1, max = 65535)
     @Column(name = "token_id")
+    @JsonIgnore
     private String tokenId;
     @Basic(optional = false)
     @NotNull
     @Lob
     @Size(min = 1, max = 65535)
     @Column(name = "access_token")
+    @JsonIgnore
     private String accessToken;
     @Basic(optional = false)
     @NotNull
@@ -66,16 +70,12 @@ public class SessionInfo implements Serializable {
     @Column(name = "date_created")
     @Temporal(TemporalType.TIMESTAMP)
     private Date dateCreated;
-    @Transient
-    private String selfToken;
-
-    public String getSelfToken() {
-        return selfToken;
-    }
-
-    public void setSelfToken(String selfToken) {
-        this.selfToken = selfToken;
-    }
+    @Basic(optional = false)
+    @NotNull
+    @Lob
+    @Size(min = 1, max = 65535)
+    @Column(name = "username")
+    private String username;
 
     public SessionInfo() {
     }
@@ -97,6 +97,14 @@ public class SessionInfo implements Serializable {
         this.tokenId = tokenId;
         this.accessToken = accessToken;
         this.expiring = expiring;
+    }
+
+    public SessionInfo(String id, String username, String tokenId, String accessToken, int expiring) {
+        this.id = id;
+        this.tokenId = tokenId;
+        this.accessToken = accessToken;
+        this.expiring = expiring;
+        this.username = username;
     }
 
     public String getId() {
@@ -165,18 +173,13 @@ public class SessionInfo implements Serializable {
     }
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
-    }
-
-    @Override
     public String getPassword() {
-        return getSelfToken();
+        return this.id;
     }
 
     @Override
     public String getUsername() {
-        return getId();
+        return this.username;
     }
 
     @Override
@@ -186,17 +189,22 @@ public class SessionInfo implements Serializable {
 
     @Override
     public boolean isAccountNonLocked() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return new ArrayList<>();
     }
 
 }

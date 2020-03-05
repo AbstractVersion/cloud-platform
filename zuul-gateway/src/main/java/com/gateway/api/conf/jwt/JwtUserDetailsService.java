@@ -12,7 +12,7 @@ package com.gateway.api.conf.jwt;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gateway.api.service.repository.SessionServiceRemoteRepository;
-import com.gateway.api.service.repository.template.SessionInfo;
+import com.gateway.api.service.repository.template.SessionWrapper;
 import java.util.ArrayList;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -39,11 +39,12 @@ public class JwtUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public SessionWrapper loadUserByUsername(String username) throws UsernameNotFoundException {
         try {
+            System.out.println(username);
             ResponseEntity obj = sessionRepo.findSessionById(username);
             if (obj.getStatusCode() == HttpStatus.OK) {
-                return mapper.convertValue(obj.getBody(), SessionInfo.class);
+                return mapper.convertValue(obj.getBody(), SessionWrapper.class);
             }
         } catch (Exception ex) {
             throw new UsernameNotFoundException("User not found with username: " + username);
