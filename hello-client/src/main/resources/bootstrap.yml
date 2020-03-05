@@ -1,0 +1,13 @@
+## YAML Template.
+---
+
+spring:
+  cloud:
+    config:
+        uri: http://localhost:8888
+  application:
+    name: hello-client
+  profiles:
+    active: local
+server:
+  port: 8081
