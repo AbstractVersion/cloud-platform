@@ -3,7 +3,7 @@
 # and open the template in the editor.
 FROM java:8-jdk-alpine
 
-COPY ./target/spring-cloud-config-server-0.0.1-SNAPSHOT.jar /tmp/spring-cloud-config-server.jar
+COPY ./target/cloud-config-server-0.0.1-SNAPSHOT.jar /tmp/spring-cloud-config-server.jar
 
 EXPOSE 8888
 

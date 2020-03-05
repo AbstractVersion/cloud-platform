@@ -14,11 +14,12 @@ spring:
   application:
     name: config-server
     
-#    
-#eureka:
-#    instance:
-#        hostname: discovery-service
-#    client:
-#        service-url:
-#            defaultZone: http://discovery-service:8761/eureka/
-#        register-with-eureka: true
+    
+eureka:
+  client:
+    healthcheck:
+      enabled: true
+    serviceUrl:
+      defaultZone: http://discovery-service:8761/eureka/
+    instance:
+      preferIpAddress: true
