@@ -13,8 +13,17 @@
     + [Python & Flask](#python-&-flask)
     + [Elastic Stack](#elastic-stack)
 - [Microservice Architecture](#microservice-architecture)
-  * [Sub-heading](#sub-heading-1)
-    + [Sub-sub-heading](#sub-sub-heading-1)
+  * [Service-list & coresponding content](#service-list-&-coresponding-content)
+    + [Cloud Configuration Server](#cloud-configuration-server)
+    + [Eurika Name Server](#eurika-name-server)
+    + [Secrets Service](#secrets-service)
+    + [Graph API](#graph-api)
+    + [Session Managment](#session-managment)
+    + [Hello Service](#hello-service)
+    + [Python Service](#python-service)
+    + [Hello Client](#hello-client)
+    + [Gateway Proxy Service](#gateway-proxy-service)
+    + [Elastic Stack](#elastic-stack)
 - [Docker Architecture](#docker-architecture)
   * [Docker Containers & Spotofy Maven plugin](#sub-heading-2)
   * [Docker Networks](#docker-networks)
@@ -41,12 +50,12 @@ In this section we will present the core technologies & concepts that the presen
 #### Microservices
 Microservices - also known as the microservice architecture - is an architectural style that structures an application as a collection of services that are :
 
->1. Highly maintainable and testable
->2. Loosely coupled
->3. Independently deployable
->4. Organized around business capabilities
->5. Owned by a small team
->6. The microservice architecture enables the rapid, frequent and reliable delivery of large, complex applications. It also enables an organization to evolve its   technology stack.
+* Highly maintainable and testable
+* Loosely coupled
+* Independently deployable
+* Organized around business capabilities
+* Owned by a small team
+* The microservice architecture enables the rapid, frequent and reliable delivery of large, complex applications. It also enables an organization to evolve its   technology stack.
 
 source : [here](https://microservices.io/).
 #### Docker
@@ -104,6 +113,12 @@ This is an h3 heading
 
 #### Session Managment
 
+#### Hello Service
+
+#### Python Service
+
+#### Hello Client
+
 #### Gateway Proxy Service
 
 #### Elastic Stack
@@ -149,13 +164,6 @@ In a few words:
 source : [here](https://cassiomolin.com/2019/06/30/log-aggregation-with-spring-boot-elastic-stack-and-docker/).
 
 #### Apache as HTTPS proxy
-
-#### Hello Service
-
-#### Python Service
-
-#### Hello Client
-
 
 
 
