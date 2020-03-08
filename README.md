@@ -1,6 +1,8 @@
 # docker-microservice-enviroment
 
 >This document's goal is to describe the high-end architecture of the presented microservice ecosystem. The ecosystem currentely supports services written in 2 languages: python & java, but there is the posibility to increase that number uppon request.
+
+<!-- Table of Contetns -->
 ## Table of Contnents
 - [Overview](#Overview)
   * [Technologies-used ](#technologies-used )
@@ -22,7 +24,7 @@
   * [Docker](#docker-run)
 - [Future Additions](#future-additions)
 
-
+<!-- Overview -->
 ## Overview
 
 Microservices & Docker is tow of the biggest trends of our era used in software industry. This project/template aims to demostrate a base template of a microservice enviroment that can be used in a varriety of different use-cases. This template focuses on :  Microservices Architecture/Implementation & Microservices with Docker Engine. The core "body" of the ecosystem is implemented in java by using the Spring [Cloud](https://spring.io/projects/spring-cloud)/[ Netflix](https://spring.io/projects/spring-cloud-netflix) libraries. 
@@ -39,12 +41,12 @@ In this section we will present the core technologies & concepts that the presen
 #### Microservices
 Microservices - also known as the microservice architecture - is an architectural style that structures an application as a collection of services that are :
 
-1. Highly maintainable and testable
-2. Loosely coupled
-3. Independently deployable
-4. Organized around business capabilities
-5. Owned by a small team
-6. The microservice architecture enables the rapid, frequent and reliable delivery of large, complex applications. It also enables an organization to evolve its   technology stack.
+>1. Highly maintainable and testable
+>2. Loosely coupled
+>3. Independently deployable
+>4. Organized around business capabilities
+>5. Owned by a small team
+>6. The microservice architecture enables the rapid, frequent and reliable delivery of large, complex applications. It also enables an organization to evolve its   technology stack.
 
 source : [here](https://microservices.io/).
 #### Docker
@@ -77,7 +79,7 @@ Logstash, a server-side data processing pipeline that accepts data from various 
 Kibana, a visualization layer that works on top of Elasticsearch.
 Elastic has recently included a family of log shippers called Beats and renamed the stack as Elastic Stack. The solution is flexible and is mostly used to centralize logging requirements.
 
-
+<!-- Microservices Architecture Section -->
 ## Microservice Architecture 
 
 This is an h1 heading.
@@ -97,16 +99,15 @@ This is an h3 heading
 This is an h3 heading
 
 
-## 
-
+<!-- Docker Architecture Section -->
 
 ## Docker Architecture 
 
 This is an h1 heading
 
-![alt text][logo2]
+![alt text][logo3]
 
-[logo2]: ./img/dockerrizing-microservices.jpg "Dockerized Microservices"
+[logo3]: ./img/dockerrizing-microservices.jpg "Dockerized Microservices"
 
 ### Docker Containers & Spotofy Maven plugin.
 
