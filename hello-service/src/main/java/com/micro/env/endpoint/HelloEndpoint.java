@@ -11,6 +11,8 @@ import com.micro.env.template.ConfTemplate;
 import com.micro.env.template.HelloMessage;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
@@ -24,6 +26,8 @@ import org.springframework.web.bind.annotation.RestController;
  *
  * @author onelove
  */
+@Slf4j
+@RequiredArgsConstructor
 @EnableDiscoveryClient
 @RestController
 @RefreshScope
@@ -39,6 +43,7 @@ public class HelloEndpoint {
 
     @GetMapping(value = "/", produces = "application/json")
     public ResponseEntity<?> hello() throws UnknownHostException {
+        log.info("Ta kataferame dikie mou {}", "skatoules");
         return ResponseEntity.ok(
                 new HelloMessage(message,
                         Integer.parseInt(environment.getProperty("local.server.port")),

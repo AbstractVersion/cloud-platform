@@ -1,5 +1,5 @@
 FROM openjdk:11-jre
-MAINTAINER Cassio George Fiotakis
+MAINTAINER George Fiotakis
 
 VOLUME /tmp
 
