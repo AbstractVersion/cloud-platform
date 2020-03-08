@@ -10,13 +10,17 @@
     + [Java & Spring](#java-&-spring)
     + [Python & Flask](#python-&-flask)
     + [Elastic Stack](#elastic-stack)
-- [Heading](#heading-1)
+- [Microservice Architecture](#microservice-architecture)
   * [Sub-heading](#sub-heading-1)
     + [Sub-sub-heading](#sub-sub-heading-1)
-- [Heading](#heading-2)
-  * [Sub-heading](#sub-heading-2)
-    + [Sub-sub-heading](#sub-sub-heading-2)
-
+- [Docker Architecture](#docker-architecture)
+  * [Docker Containers & Spotofy Maven plugin](#sub-heading-2)
+  * [Docker Networks](#docker-networks)
+  * [Docker Volumes](#docker-volumes)
+- [Run The System](#run-the-system)
+  * [Localy](#local-run)
+  * [Docker](#docker-run)
+- [Future Additions](#future-additions)
 
 
 ## Overview
@@ -72,37 +76,48 @@ Elasticsearch, a NoSQL database based on the Lucene search engine.
 Logstash, a server-side data processing pipeline that accepts data from various simultaneously, transforms it, and exports the data to various targets.
 Kibana, a visualization layer that works on top of Elasticsearch.
 Elastic has recently included a family of log shippers called Beats and renamed the stack as Elastic Stack. The solution is flexible and is mostly used to centralize logging requirements.
-## Heading
 
-This is an h1 heading
 
-### Sub-heading
+## Microservice Architecture 
 
-This is an h2 heading
+This is an h1 heading.
 
-#### Sub-sub-heading
+![alt text][logo2]
 
-This is an h3 heading
+[logo2]: ./img/Microservice-Ecosystem.jpg "Dockerized Microservices"
 
-## Heading
-
-This is an h1 heading
-
-### Sub-heading
+### Service-list & coresponding content
 
 This is an h2 heading
 
-#### Sub-sub-heading
-
+#### Cloud Configuration Server
 This is an h3 heading
 
-## Service list & coresponding content
-asdasd
+#### Eurika Name Server
+This is an h3 heading
 
-## High End architecture discription
-dsad
 
-## Installation details
-dsad
+## 
 
-## Future additions 
+
+## Docker Architecture 
+
+This is an h1 heading
+
+![alt text][logo2]
+
+[logo2]: ./img/dockerrizing-microservices.jpg "Dockerized Microservices"
+
+### Docker Containers & Spotofy Maven plugin.
+
+### Docker Networks.
+
+### Docker Volumes.
+
+## Run The System
+
+### Local Run
+
+### Docker Run
+
+## Future Additions
