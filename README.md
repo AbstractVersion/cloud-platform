@@ -98,6 +98,67 @@ This is an h3 heading
 #### Eurika Name Server
 This is an h3 heading
 
+#### Secrets Service
+
+#### Graph API
+
+#### Session Managment
+
+#### Gateway Proxy Service
+
+#### Elastic Stack
+
+In a microservices architecture, a single business operation might trigger a chain of downstream microservice calls, which can be pretty challenging to debug. Things, however, can be easier when the logs of all microservices are centralized and each log event contains details that allow us to trace the interactions between the applications.
+
+This is where Elastic Stack comes int picture. Elastic Stack is a group of open source applications from Elastic designed to take data from any source and in any format and then search, analyze, and visualize that data in real time. It was formerly known as ELK Stack, in which the letters in the name stood for the applications in the group: Elasticsearch, Logstash and Kibana. A fourth application, Beats, was subsequently added to the stack, rendering the potential acronym to be unpronounceable. So ELK Stack became Elastic Stack.
+
+##### Elasticsearch
+Elasticsearch is a real-time, distributed storage, JSON-based search, and analytics engine designed for horizontal scalability, maximum reliability, and easy management. It can be used for many purposes, but one context where it excels is indexing streams of semi-structured data, such as logs or decoded network packets.
+
+##### Kibana
+Kibana is an open source analytics and visualization platform designed to work with Elasticsearch. Kibana can be used to search, view, and interact with data stored in Elasticsearch indices, allowing advanced data analysis and visualizing data in a variety of charts, tables, and maps.
+
+##### Beats
+Beats are open source data shippers that can be installed as agents on servers to send operational data directly to Elasticsearch or via Logstash, where it can be further processed and enhanced. There’s a number of Beats for different purposes:
+
+* Filebeat: Log files
+* Metricbeat: Metrics
+* Packetbeat: Network data
+* Heartbeat: Uptime monitoring
+* And more.
+
+As we intend to ship log files, Filebeat will be our choice.
+
+##### Logstash
+Logstash is a powerful tool that integrates with a wide variety of deployments. It offers a large selection of plugins to help you parse, enrich, transform, and buffer data from a variety of sources. If the data requires additional processing that is not available in Beats, then Logstash can be added to the deployment.
+
+##### Putting the pieces together
+The following illustration shows how the components of Elastic Stack interact with each other:
+
+![alt text][logo4]
+
+[logo4]: ./img/elk.png "Elastic Stack"
+
+In a few words:
+
+* Filebeat collects data from the log files and sends it to Logststash.
+* Logstash enhances the data and sends it to Elasticsearch.
+* Elasticsearch stores and indexes the data.
+* Kibana displays the data stored in Elasticsearch.
+
+source : [here](https://cassiomolin.com/2019/06/30/log-aggregation-with-spring-boot-elastic-stack-and-docker/).
+
+#### Apache as HTTPS proxy
+
+#### Hello Service
+
+#### Python Service
+
+#### Hello Client
+
+
+
+
 
 <!-- Docker Architecture Section -->
 
