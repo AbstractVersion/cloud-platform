@@ -15,13 +15,15 @@ spring:
   cloud:
     #configuration service base uri
     config:
-      uri: http://localhost:8888
+      uri: http://config-server:8888
     #Active profiles
   profiles:
     active: local
   application:
     #App name
     name: discovery-service
+  main:
+    banner-mode: "off"
 
 
 #  client:
