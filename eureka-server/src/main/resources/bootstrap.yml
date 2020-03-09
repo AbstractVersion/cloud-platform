@@ -2,26 +2,26 @@
 ---
 #Actuator refresh endpoint
 management: 
-    endpoints: 
-        web: 
-            exposure:
-                include: refresh
+  endpoints: 
+    web: 
+      exposure:
+        include: refresh
 #Server Specifics
 error:
-    whitelabel:
-      enabled: false
+  whitelabel:
+    enabled: false
 spring:
   #Cloud Configurations
   cloud:
     #configuration service base uri
     config:
-        uri: http://localhost:8888
+      uri: http://localhost:8888
     #Active profiles
   profiles:
     active: local
   application:
     #App name
-    name: eureka-server
+    name: discovery-service
 
 
 #  client:
