@@ -1,11 +1,15 @@
 # To change this license header, choose License Headers in Project Properties.
 # To change this template file, choose Tools | Templates
 # and open the template in the editor.
-FROM java:8-jdk-alpine
+FROM openjdk:11-jre
+MAINTAINER George Fiotakis
 
-COPY ./target/cloud-config-server-0.0.1-SNAPSHOT.jar /tmp/spring-cloud-config-server.jar
+VOLUME /tmp
 
+ARG DEPENDENCY=target/dependency
+COPY ${DEPENDENCY}/BOOT-INF/lib /app/lib
+COPY ${DEPENDENCY}/META-INF /app/META-INF
+COPY ${DEPENDENCY}/BOOT-INF/classes /app
 EXPOSE 8888
 
-ENTRYPOINT ["sh","-c","java -jar /tmp/spring-cloud-config-server.jar"]
-
+ENTRYPOINT ["java","-cp","app:app/lib/*","com.cloud.config.CloudConfigServerApplication"]
