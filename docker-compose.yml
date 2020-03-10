@@ -9,7 +9,9 @@ services:
       collect_logs_with_filebeat: "false"
       decode_log_event_to_json_object: "false"
     networks:
-      - micro-network
+      default:
+        external:
+          name: micro-network
 
   #Eurika Server
   discovery-service:
@@ -22,11 +24,17 @@ services:
     depends_on:
       - config-server
     networks:
-      - micro-network
+      default:
+        external:
+          name: micro-network
 
   #Hello Service
   hello-service:
     image: micro-env/hello-service:latest
+    networks:
+      default:
+        external:
+          name: micro-network
     ports:
         - "8080:8080"
     links:
