@@ -5,25 +5,27 @@ networks:
     external:
       name: micro-network
 services:
-  config-server:
-    image: micro-env/cloud-config-server:latest
-    ports:
-      - "8888"
-    labels:
-      collect_logs_with_filebeat: "false"
-      decode_log_event_to_json_object: "false"
+#  config-server:
+#    image: micro-env/config-server:latest
+#    ports:
+#      - "8888"
+#    labels:
+#      collect_logs_with_filebeat: "false"
+#      decode_log_event_to_json_object: "false"
 
 
   #Eurika Server
   discovery-service:
-    image: micro-env/eureka-server:latest
+    image: micro-env/discovery-service
     ports:
         - "80:8761"
     labels:
         collect_logs_with_filebeat: "false"
         decode_log_event_to_json_object: "false"
-    depends_on:
-      - config-server
+  #  depends_on:
+  #    - config-server
+ #   links:
+ #     - "config-server:config-server"
 
   #Hello Service
   hello-service:
@@ -31,12 +33,13 @@ services:
     ports:
         - "8080:8080"
     links:
-        # - "config-server:config-server"
+#        - "config-server:config-server"
         - "discovery-service:discovery-service"    
     labels:
         collect_logs_with_filebeat: "true"
         decode_log_event_to_json_object: "true"
     depends_on:
       - discovery-service
-
+    deploy:
+      replicas: 2
 
