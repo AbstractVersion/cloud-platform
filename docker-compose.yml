@@ -5,6 +5,8 @@ networks:
     external:
       name: micro-network
 services:
+# The rest of the service cannot see cloud config on start up which resutls to gain the custom configurations 
+# Thats why I deploy indepentedly the container before fire up the docker-compose (The container shoudl be at the same network as the compose)
 #  config-server:
 #    image: micro-env/config-server:latest
 #    ports:
@@ -22,24 +24,25 @@ services:
     labels:
         collect_logs_with_filebeat: "false"
         decode_log_event_to_json_object: "false"
-  #  depends_on:
-  #    - config-server
- #   links:
- #     - "config-server:config-server"
+    external_links:
+      - "config-server"
 
   #Hello Service
   hello-service:
     image: micro-env/hello-service:latest
     ports:
         - "8080:8080"
+    #internal-links
     links:
-#        - "config-server:config-server"
-        - "discovery-service:discovery-service"    
+        - "discovery-service:discovery-service"  
+    #extrnal-links  
+    external_links:
+      - "config-server"
     labels:
         collect_logs_with_filebeat: "true"
         decode_log_event_to_json_object: "true"
     depends_on:
       - discovery-service
-    deploy:
-      replicas: 2
+    # deploy:
+    #   replicas: 2
 
