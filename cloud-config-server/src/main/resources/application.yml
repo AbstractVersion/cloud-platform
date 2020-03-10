@@ -15,11 +15,11 @@ spring:
     name: config-server
     
     
-eureka:
-  client:
-    healthcheck:
-      enabled: true
-    serviceUrl:
-      defaultZone: http://discovery-service:8761/eureka/
-    instance:
-      preferIpAddress: true
+# eureka:
+#   client:
+#     healthcheck:
+#       enabled: true
+#     serviceUrl:
+#       defaultZone: http://discovery-service:8761/eureka/
+#     instance:
+#       preferIpAddress: true

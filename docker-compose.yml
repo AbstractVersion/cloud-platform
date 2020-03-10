@@ -31,7 +31,7 @@ services:
     ports:
         - "8080:8080"
     links:
-        - "config-server:config-server"
+        # - "config-server:config-server"
         - "discovery-service:discovery-service"    
     labels:
         collect_logs_with_filebeat: "true"
