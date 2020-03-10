@@ -30,12 +30,8 @@ services:
   #Hello Service
   hello-service:
     image: micro-env/hello-service:latest
-    ports:
-        - "8080:8080"
-        - "8081:8080"
-        - "8082:8080"
-        - "8083:8080"
-        - "8084:8080"
+    # ports:
+    #     - "8080:8080"
     #internal-links
     links:
         - "discovery-service:discovery-service"  
@@ -50,3 +46,92 @@ services:
     # deploy:
     #   replicas: 2
 
+  #Python Service
+  python-service:
+    image: micro/python-api:latest
+    # ports:
+    #     - "8080:8080"
+    #internal-links
+    links:
+        - "discovery-service:discovery-service"  
+    labels:
+        collect_logs_with_filebeat: "true"
+        decode_log_event_to_json_object: "true"
+    depends_on:
+      - discovery-service
+
+  #hello Client
+  hello-client:
+    image: micro-env/hello-client:latest
+    #internal-links
+    links:
+        - "discovery-service:discovery-service"  
+    #extrnal-links  
+    external_links:
+      - "config-server"
+    labels:
+        collect_logs_with_filebeat: "true"
+        decode_log_event_to_json_object: "true"
+    depends_on:
+      - discovery-service
+      - hello-service
+      - python-service
+    # deploy:
+    #   replicas: 2
+    
+  #hello Client
+  graph-service:
+    image: micro-env/graph-api:latest
+    #internal-links
+    links:
+        - "discovery-service:discovery-service"  
+    #extrnal-links  
+    external_links:
+      - "config-server"
+    labels:
+        collect_logs_with_filebeat: "true"
+        decode_log_event_to_json_object: "true"
+    depends_on:
+      - discovery-service
+    # deploy:
+    #   replicas: 2
+    
+  #Session Service
+  session-service:
+    image: micro-env/session-service:latest
+    #internal-links
+    links:
+        - "discovery-service:discovery-service"  
+    #extrnal-links  
+    external_links:
+      - "config-server"
+      - "generalRDBMS"
+    labels:
+        collect_logs_with_filebeat: "true"
+        decode_log_event_to_json_object: "true"
+    depends_on:
+      - discovery-service
+      - graph-service
+    # deploy:
+    #   replicas: 2
+
+  #Session Service
+  zuul-proxy:
+    image: micro-env/zuul-proxy:latest
+    #internal-links
+    links:
+        - "discovery-service:discovery-service"  
+    #extrnal-links  
+    external_links:
+      - "config-server"
+    labels:
+        collect_logs_with_filebeat: "true"
+        decode_log_event_to_json_object: "true"
+    depends_on:
+      - discovery-service
+      - session-service
+      - hello-client
+    # deploy:
+    #   replicas: 2
+    
+    

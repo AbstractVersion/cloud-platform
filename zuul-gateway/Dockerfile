@@ -1,10 +1,11 @@
-# To change this license header, choose License Headers in Project Properties.
-# To change this template file, choose Tools | Templates
-# and open the template in the editor.
-FROM java:8-jdk-alpine
+FROM openjdk:11-jre
+MAINTAINER Georgios Fiotakis <g.fiotakis@hotmail.com>
 
-COPY ./target/gateway-api-zuul-0.1.jar /tmp/name-server.jar
+VOLUME /tmp
 
-EXPOSE 8761
+ARG DEPENDENCY=target/dependency
+COPY ${DEPENDENCY}/BOOT-INF/lib /app/lib
+COPY ${DEPENDENCY}/META-INF /app/META-INF
+COPY ${DEPENDENCY}/BOOT-INF/classes /app
 
-ENTRYPOINT ["sh","-c","java -jar /tmp/name-server.jar"]
+ENTRYPOINT ["java","-cp","app:app/lib/*","-Dspring.profiles.active=docker","com.gateway.api.GatewayApiZuulApplication"]
