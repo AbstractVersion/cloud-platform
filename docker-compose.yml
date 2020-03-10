@@ -1,5 +1,9 @@
 version: '3.5'
 # Cloud Config Service
+networks:
+  default:
+    external:
+      name: micro-network
 services:
   config-server:
     image: micro-env/cloud-config-server:latest
@@ -8,10 +12,7 @@ services:
     labels:
       collect_logs_with_filebeat: "false"
       decode_log_event_to_json_object: "false"
-    networks:
-      default:
-        external:
-          name: micro-network
+
 
   #Eurika Server
   discovery-service:
@@ -23,18 +24,10 @@ services:
         decode_log_event_to_json_object: "false"
     depends_on:
       - config-server
-    networks:
-      default:
-        external:
-          name: micro-network
 
   #Hello Service
   hello-service:
     image: micro-env/hello-service:latest
-    networks:
-      default:
-        external:
-          name: micro-network
     ports:
         - "8080:8080"
     links:
