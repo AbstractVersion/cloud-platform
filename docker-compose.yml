@@ -131,7 +131,8 @@ services:
       - discovery-service
       - session-service
       - hello-client
-    # deploy:
-    #   replicas: 2
+    ports:
+      - "8080:8080"
+
     
     
