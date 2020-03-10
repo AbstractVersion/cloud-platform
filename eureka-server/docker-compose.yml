@@ -1,0 +1,41 @@
+version: '3.5'
+# Cloud Config Service
+services:
+  config-server:
+    image: micro-env/cloud-config-server:latest
+    ports:
+      - "80:8761"
+    labels:
+      collect_logs_with_filebeat: "false"
+      decode_log_event_to_json_object: "false"
+    networks:
+      - micro-network
+
+  #Eurika Server
+  discovery-service:
+    image: micro-env/eureka-server:latest
+    ports:
+        - "80:8761"
+    labels:
+        collect_logs_with_filebeat: "false"
+        decode_log_event_to_json_object: "false"
+    depends_on:
+      - config-server
+    networks:
+      - micro-network
+
+  #Hello Service
+  hello-service:
+    image: micro-env/hello-service:latest
+    ports:
+        - "8080:8080"
+    links:
+        - "config-server:config-server"
+        - "discovery-service:discovery-service"    
+    labels:
+        collect_logs_with_filebeat: "true"
+        decode_log_event_to_json_object: "true"
+    depends_on:
+      - discovery-service
+
+

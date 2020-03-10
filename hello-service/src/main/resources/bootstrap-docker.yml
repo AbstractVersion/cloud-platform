@@ -1,0 +1,13 @@
+## YAML Template.
+---
+
+spring:
+  cloud:
+    config:
+        uri: http://config-server:8888
+  application:
+    name: hello-service
+  profiles:
+    active: docker
+server:
+  port: 8080
