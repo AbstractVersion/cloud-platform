@@ -1,5 +1,6 @@
 package com.gateway.api;
 
+import com.gateway.api.conf.filters.PostConstractRequestFilter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
@@ -19,8 +20,12 @@ public class GatewayApiZuulApplication {
     }
     
   @Bean
-  public PreRequestFilter simpleFilter() {
+  public PreRequestFilter preRequestFilter() {
     return new PreRequestFilter();
+  }
+  @Bean
+  public PostConstractRequestFilter postRequestFilter() {
+    return new PostConstractRequestFilter();
   }
 
 }
