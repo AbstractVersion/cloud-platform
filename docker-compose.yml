@@ -88,8 +88,8 @@ services:
   #Session Service
   session-service:
     image: micro-env/session-service:latest
-    ports:
-        - "8082:8080"
+    # ports:
+    #     - "8082:8080"
     #internal-links
     links:
         - "discovery-service:discovery-service"  

@@ -1,6 +1,7 @@
 # Micro Enviroment
 
-## Permissions on the Elastic && Filebeat.yml
+## Compose 
+docker-compose up -d --scale hello-service=3 --scale hello-client=2 --scale session-service=2
 ## Create network
 
 docker network create -d bridge micro-network
