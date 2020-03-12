@@ -1,5 +1,10 @@
 #!/bin/sh
 # This is a comment!
+echo -------------------configuring essential things------------------
+
+echo Configuring Filebeat ...
+chmod 600 ./filebeat/filebeat.docker.yml && chown -R root:root ./filebeat/filebeat.docker.yml
+
 echo -------------------Starting Build---------------------
 
 # Cloud config build
