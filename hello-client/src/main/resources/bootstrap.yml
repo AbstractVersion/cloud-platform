@@ -3,10 +3,10 @@
 
 spring:
   main:
-    banner-mode: "off"
+    banner-mode: off
   cloud:
     config:
-        uri: http://config-server:8888
+        uri: http://localhost:8888
   application:
     name: hello-client
   profiles:

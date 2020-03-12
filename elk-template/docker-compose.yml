@@ -1,19 +1,21 @@
-version: "3.5"
+version: "3.7"
+# Cloud Config Service
 networks:
   default:
     external:
       name: micro-network
       
 services:
+
   elasticsearch:
-    user: root  
     image: docker.elastic.co/elasticsearch/elasticsearch:7.2.0
+    user: root
     ports:
       - "9200:9200"
     environment:
       - "discovery.type=single-node"
     volumes:
-      - ./elasticsearch/data:/usr/share/elasticsearch/data:rw              # Persistence data
+      - elastic-volume:/usr/share/elasticsearch/data              # Persistence data
 
   logstash:
     image: docker.elastic.co/logstash/logstash:7.2.0
@@ -23,7 +25,6 @@ services:
     volumes:
       - ./logstash/pipeline:/usr/share/logstash/pipeline:ro                # Pipeline configuration
     restart: on-failure
-    user: root  
     depends_on:
       - elasticsearch
 
@@ -38,7 +39,7 @@ services:
   filebeat:
     image: docker.elastic.co/beats/filebeat:7.2.0
     volumes:
-      - ./filebeat/filebeat.docker.yml:/usr/share/filebeat/filebeat.yml:ro # Configuration file
+      - /home/onelove/Documents/filebeat.docker.yml:/usr/share/filebeat/filebeat.yml:ro # Configuration file
       - /var/lib/docker/containers:/var/lib/docker/containers:ro           # Docker logs
       - /var/run/docker.sock:/var/run/docker.sock:ro                       # Additional information about containers
       - ./filebeat/data:/usr/share/filebeat/data:rw                        # Persistence data
@@ -46,3 +47,51 @@ services:
     restart: on-failure
     depends_on:
       - logstash
+
+#  comment-service:
+#    image: cassiomolin/comment-service:latest
+#    ports:
+#      - "8002:8002"
+#    labels:
+#      collect_logs_with_filebeat: "true"
+#      decode_log_event_to_json_object: "true"
+
+#  post-service:
+#    image: cassiomolin/post-service:latest
+#    ports:
+#      - "8001:8001"
+#    labels:
+#      collect_logs_with_filebeat: "true"
+#      decode_log_event_to_json_object: "true"
+
+#  config-server:
+#    image: cassiomolin/cloud-config-server:latest
+#    ports:
+#      - "8888:8888"
+#    labels:
+#      collect_logs_with_filebeat: "false"
+#      decode_log_event_to_json_object: "false"
+
+#  discovery-service:
+#    image: micro-env/eureka-server:latest
+#    ports:
+#        - "8761:8761"
+#    labels:
+#        collect_logs_with_filebeat: "false"
+#        decode_log_event_to_json_object: "false"
+#    depends_on:
+#      - config-server
+
+  # hello-service:
+  #   image: micro-env/hello-service:latest
+  #   ports:
+  #       - "8080:8080"
+  #   labels:
+  #       collect_logs_with_filebeat: "true"
+  #       decode_log_event_to_json_object: "true"
+#    depends_on:
+#      - discovery-service
+
+volumes:
+  elastic-volume:
+    driver: local

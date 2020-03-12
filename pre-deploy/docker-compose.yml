@@ -1,0 +1,39 @@
+version: '3.7'
+networks:
+    default:
+      external:
+        name: micro-network
+#General RDBMS volume
+volumes:
+  general-rdbms-volume:
+    driver: local
+
+
+services:
+# The rest of the service cannot see cloud config on start up which resutls to gain the custom configurations 
+# Thats why I deploy indepentedly the container before fire up the docker-compose (The container shoudl be at the same network as the compose)
+  config-server:
+    image: micro-env/config-server:latest
+    #  ports:
+    #    - "8888"
+    labels:
+      collect_logs_with_filebeat: "false"
+      decode_log_event_to_json_object: "false"
+
+
+  generalRDBMS:
+    image: mariadb:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: sessionDB
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+    logging:
+      driver: syslog
+      options:
+        tag: "{{.DaemonName}}(image={{.ImageName}};name={{.Name}};id={{.ID}})"
+    # networks:
+    #   - backend
+    restart: on-failure
+    volumes:
+     - ${PWD}/mariadb:/var/lib/mysql

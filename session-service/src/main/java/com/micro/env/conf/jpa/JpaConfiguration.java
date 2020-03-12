@@ -37,7 +37,7 @@ public class JpaConfiguration {
 
         dataSource.setDriverClassName(jpaConfig.getDriverClass());
         dataSource.setUsername("root"); //request from secrets-api
-        dataSource.setPassword("InfiNite@KK@");
+        dataSource.setPassword("root");
         dataSource.setUrl(jpaConfig.getUrl());
         return dataSource;
     }

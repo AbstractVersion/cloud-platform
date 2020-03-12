@@ -12,6 +12,8 @@ import com.infinite.graph.exception.UserTokenExpiredException;
 import com.infinite.graph.resource.template.request.UserToken;
 import java.net.UnknownHostException;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,6 +26,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
  *
  * @author onelove
  */
+@Slf4j
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/graph")
 public class GraphResource {
@@ -35,6 +39,7 @@ public class GraphResource {
 
     @PostMapping(value = "/me", consumes = "application/json", produces = "application/json")
     public ResponseEntity<?> userInfo(@RequestBody UserToken tokenDetails) throws UserNotFound, UserTokenExpiredException, UnknownHostException {
+        log.info("Requesting user information based on token");
         return ResponseEntity.ok(
                 user.getSignedUserInfo(tokenDetails)
         );
@@ -44,6 +49,7 @@ public class GraphResource {
     //@Valid to validate the posted body attribute content
     @PostMapping(value = "/me/teams", consumes = "application/json", produces = "application/json")
     public ResponseEntity<?> list_user_teams(@RequestBody UserToken tokenDetails) throws UserNotFound, UserTokenExpiredException {
+        log.info("Requesting user teams information based on token");
         return ResponseEntity.ok(
                 teams.findAllUserTeams(tokenDetails.getUserToken()
                 )
@@ -52,6 +58,7 @@ public class GraphResource {
 
     @PostMapping(value = "team/{uuid}/users", consumes = "application/json", produces = "application/json")
     public ResponseEntity<?> list_team_members_resource(@PathVariable UUID uuid, @RequestBody UserToken tokenDetails) throws UserNotFound, UserTokenExpiredException {
+        log.info("Requesting team : {} users", uuid);
         return ResponseEntity.ok(
                 teams.list_team_members(tokenDetails.getUserToken(),
                         uuid
@@ -61,6 +68,7 @@ public class GraphResource {
 
     @PostMapping(value = "team/{uuid}/sites", consumes = "application/json", produces = "application/json")
     public ResponseEntity<?> listTeamsSitesByTeamId(@PathVariable UUID uuid, @RequestBody UserToken tokenDetails) throws UserNotFound, UserTokenExpiredException {
+        log.info("Requesting team : {} site", uuid);
         return ResponseEntity.ok(
                 teams.list_team_sites(tokenDetails.getUserToken(), uuid)
         );
