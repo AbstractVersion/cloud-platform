@@ -1,5 +1,6 @@
 # Micro Enviroment
 
+## Permissions on the Elastic && Filebeat.yml
 ## Create network
 
 docker network create -d bridge micro-network
