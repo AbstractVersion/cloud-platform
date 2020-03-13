@@ -50,9 +50,7 @@ services:
         decode_log_event_to_json_object: "true"
     depends_on:
       - discovery-service
-    wait:
-      - discovery-service
-
+      
   #hello Client
   hello-client:
     image: micro-env/hello-client:latest
