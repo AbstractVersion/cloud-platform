@@ -31,16 +31,16 @@ public class FeignConfiguration {
         return new Request.Options(5000, 30000);
     }
 
-    @Bean
-    public RequestInterceptor requestLoggingInterceptor() {
-        return new RequestInterceptor() {
-            @Override
-            public void apply(RequestTemplate template) {
-                LOG.info("Adding header [testHeader / testHeaderValue] to request");
-                template.header("testHeader", "testHeaderValue");
-            }
-        };
-    }
+    // @Bean
+    // public RequestInterceptor requestLoggingInterceptor() {
+    //     return new RequestInterceptor() {
+    //         @Override
+    //         public void apply(RequestTemplate template) {
+    //             LOG.info("Adding header [testHeader / testHeaderValue] to request");
+    //             template.header("testHeader", "testHeaderValue");
+    //         }
+    //     };
+    // }
 
 //    BASIC AUTH
 //    @Bean
