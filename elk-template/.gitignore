@@ -1,6 +1,6 @@
 HELP.md
 target/
-elk-template/elasticsearch/data/*
+elasticsearch/data/*
 filebeat/data/*
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**
