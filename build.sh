@@ -3,7 +3,7 @@
 echo -------------------configuring essential things------------------
 
 echo Configuring Filebeat ...
-chmod 600 ./filebeat/filebeat.docker.yml && chown -R root:root ./filebeat/filebeat.docker.yml
+sudo chmod 600 ./elk-template/filebeat/filebeat.docker.yml && sudo chown -R root:root ./elk-template/filebeat/filebeat.docker.yml
 
 echo -------------------Starting Build---------------------
 
