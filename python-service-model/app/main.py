@@ -46,7 +46,7 @@ def api_all():
 if __name__ == '__main__':
     # with app.app_context():
     # Go!
-    logger.info("Starting API")
+    # logger.info("Starting API")
     app.before_request(b3.start_span)
     app.after_request(b3.end_span)
     app.run(
