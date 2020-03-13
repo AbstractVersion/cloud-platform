@@ -66,8 +66,8 @@ services:
         decode_log_event_to_json_object: "true"
     depends_on:
       - discovery-service
-      # - hello-service
-      - python-service
+      - hello-service
+      # - python-service
     # deploy:
     #   replicas: 2
     
