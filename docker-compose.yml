@@ -1,4 +1,4 @@
-version: '3.5'
+version: '3.7'
 # Cloud Config Service
 networks:
   default:
@@ -36,18 +36,19 @@ services:
     #   replicas: 2
 
   #Python Service
-  # python-service:
-  #   image: micro/python-api:latest
-  #   # ports:
-  #   #     - "8080:8080"
-  #   #internal-links
-  #   links:
-  #       - "discovery-service:discovery-service"  
-  #   labels:
-  #       collect_logs_with_filebeat: "true"
-  #       decode_log_event_to_json_object: "true"
-  #   depends_on:
-  #     - discovery-service
+  python-service:
+    build:
+      context: ./python-service-model
+      dockerfile: Dockerfile
+    image: micro-env/python-api:latest
+    #internal-links
+    links:
+        - "discovery-service:discovery-service"  
+    labels:
+        collect_logs_with_filebeat: "true"
+        decode_log_event_to_json_object: "true"
+    depends_on:
+      - discovery-service
 
   #hello Client
   hello-client:
