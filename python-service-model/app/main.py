@@ -35,9 +35,10 @@ def home():
 @app.route('/api/info', methods=['GET'])
 def api_all():
     logger = logging.getLogger("python-app")
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.INFO)
     b3.start_span()
-    logger.debug("Requested python APi information")
+    logger.info("Requested python APi information")
+    logger.info("Hey")
     b3.end_span()
     return jsonify(info)
 
@@ -45,7 +46,7 @@ def api_all():
 if __name__ == '__main__':
     # with app.app_context():
     # Go!
-
+    logger.info("Starting API")
     app.before_request(b3.start_span)
     app.after_request(b3.end_span)
     app.run(
