@@ -39,13 +39,4 @@ services:
      - ${PWD}/mariadb:/var/lib/mysql
 
 
-  #Eurika Server
-  discovery-service:
-    image: micro-env/discovery-service
-    ports:
-        - "80:8761"
-    labels:
-        collect_logs_with_filebeat: "false"
-        decode_log_event_to_json_object: "false"
-    depends_on:
-      - "config-server"
+  
