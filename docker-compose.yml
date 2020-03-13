@@ -50,7 +50,8 @@ services:
         decode_log_event_to_json_object: "true"
     depends_on:
       - discovery-service
-      
+      - zuul-proxy
+
   #hello Client
   hello-client:
     image: micro-env/hello-client:latest
@@ -65,7 +66,7 @@ services:
         decode_log_event_to_json_object: "true"
     depends_on:
       - discovery-service
-      - hello-service
+      # - hello-service
       - python-service
     # deploy:
     #   replicas: 2
