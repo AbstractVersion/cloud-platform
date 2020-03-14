@@ -19,12 +19,12 @@ public class PostConstractRequestFilter extends ZuulFilter {
 
     @Override
     public String filterType() {
-        return "post";
+        return "pre";
     }
 
     @Override
     public int filterOrder() {
-        return 1;
+        return 2;
     }
 
     @Override
