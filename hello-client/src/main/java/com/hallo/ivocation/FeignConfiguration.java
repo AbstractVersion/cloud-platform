@@ -5,6 +5,7 @@
  */
 package com.hallo.ivocation;
 
+import brave.Tracer;
 import org.springframework.context.annotation.Bean;
 import feign.Logger;
 import feign.Request;
@@ -12,13 +13,16 @@ import feign.RequestInterceptor;
 import feign.RequestTemplate;
 import feign.Retryer;
 import feign.auth.BasicAuthRequestInterceptor;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  *
- * @author onelove
+ * @authorpre onelove
  */
 public class FeignConfiguration {
-
+   @Autowired
+    private Tracer tracer;
+   
     private static final java.util.logging.Logger LOG = java.util.logging.Logger.getLogger(FeignConfiguration.class.getName());
 
     @Bean
@@ -31,16 +35,16 @@ public class FeignConfiguration {
         return new Request.Options(5000, 30000);
     }
 
-    // @Bean
-    // public RequestInterceptor requestLoggingInterceptor() {
-    //     return new RequestInterceptor() {
-    //         @Override
-    //         public void apply(RequestTemplate template) {
-    //             LOG.info("Adding header [testHeader / testHeaderValue] to request");
-    //             template.header("testHeader", "testHeaderValue");
-    //         }
-    //     };
-    // }
+    @Bean
+    public RequestInterceptor requestLoggingInterceptor() {
+        return new RequestInterceptor() {
+            @Override
+            public void apply(RequestTemplate template) {
+                LOG.info("Adding header [testHeader / testHeaderValue] to request");
+                template.header("request-trace-id", tracer.currentSpan().context().traceIdString());
+            }
+        };
+    }
 
 //    BASIC AUTH
 //    @Bean
