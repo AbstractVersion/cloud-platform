@@ -12,9 +12,10 @@ serviceHost = socket.gethostname()
 
 app = flask.Flask(__name__)
 
-# https://pypi.org/project/json-logging/0.0.1/
+# https://github.com/thangbn/json-logging-python
+app = flask.Flask(__name__)
 json_logging.ENABLE_JSON_LOGGING = True
-json_logging.init(framework_name='flask')
+json_logging.init_flask()
 json_logging.init_request_instrument(app)
 
 # init the logger as usual
