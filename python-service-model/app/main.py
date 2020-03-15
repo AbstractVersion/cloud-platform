@@ -38,7 +38,7 @@ def api_all():
     logger = logging.getLogger("werkzeug")
     logger.setLevel(logging.DEBUG)
     b3.start_span()
-    logger.debug(b3.values())
+    logger.debug(b3.values()['X-B3-TraceId'])
     logger.info("Requested python APi information")
     logger.info("Hey")
     b3.end_span()
