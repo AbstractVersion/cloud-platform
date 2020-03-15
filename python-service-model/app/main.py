@@ -25,10 +25,8 @@ def json_translate(obj):
 
 formatter = jsonlogger.JsonFormatter(json_default=json_translate,
                                      json_encoder=json.JSONEncoder)
-logHandler.setFormatter(formatter)
-
 logHandler = logging.StreamHandler()
-
+logHandler.setFormatter(formatter)
 logger.addHandler(logHandler)
 
 app.config["DEBUG"] = True
