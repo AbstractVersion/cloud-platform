@@ -64,7 +64,7 @@ def api_all():
     # logger.debug(b3.values()['X-B3-TraceId'], extra = {'props' : {'extra_property' : 'extra_value'}})
     # logger.info("Requested python APi information")
     # logger.info("Hey")
-    elk_log("Custom Logger message Python API", b3, app_name)
+    elk_log_info("Custom Logger message Python API", b3, app_name)
     b3.end_span()
     return jsonify(info)
 
