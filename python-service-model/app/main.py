@@ -8,7 +8,7 @@ import b3
 import sys 
 import os
 sys.path.append(os.path.abspath("./custom-elk-logger"))
-from elk-logger import *
+from elk_logger import *
 
 serviceId = uuid.uuid1()
 serviceHost = socket.gethostname()
