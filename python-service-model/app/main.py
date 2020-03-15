@@ -57,8 +57,7 @@ def api_all():
     # logger = logging.getLogger("werkzeug")
     # logger.setLevel(logging.DEBUG)
     b3.start_span()
-    traceInfo = 
-    {
+    traceInfo = {
         "trace":
         {
             "trace_id":b3.values()['X-B3-TraceId'],
