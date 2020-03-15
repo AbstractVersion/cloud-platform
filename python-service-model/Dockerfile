@@ -9,6 +9,7 @@ RUN pip install py_eureka_client
 RUN pip install flask
 RUN  pip install Flask-B3
 RUN pip install Flask-Sleuth
+RUN pip install json-logging
 #Copy and run the app
 COPY ./app /app
 CMD [ "python3", "/app/main.py" ]
