@@ -18,7 +18,7 @@ app = flask.Flask(__name__)
 # app = flask.Flask(__name__)
 app_name = "py-app"
 
-
+# https://github.com/madzak/python-json-logger
 logger = logging.getLogger("werkzeug")
 
 def json_translate(obj):
@@ -60,6 +60,7 @@ def api_all():
     # logger.setLevel(logging.DEBUG)
     b3.start_span()
     traceInfo = {
+        "level": logging.getLogger().getEffectiveLevel(),
         "application_name": app_name,
         "trace":
         {
@@ -71,7 +72,7 @@ def api_all():
     # logger.debug(b3.values()['X-B3-TraceId'], extra = {'props' : {'extra_property' : 'extra_value'}})
     # logger.info("Requested python APi information")
     # logger.info("Hey")
-    logger.info("classic message", extra=traceInfo)
+    logger.info("Python Api logging", extra=traceInfo)
     b3.end_span()
     return jsonify(info)
 
