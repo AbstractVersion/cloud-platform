@@ -67,12 +67,15 @@ def logger_init():
 # You would normally import logger_init and setup the logger in your main module - e.g.
 # main.py
 
-logger_init()
+
 
 # logger = logging.getLogger("werkzeug")
 # logger.setLevel(logging.DEBUG)
 # logger.addHandler(logging.StreamHandler(sys.stderr))
 
-
-
-
+# def halloLog():
+#     logger.info('Starting')
+#     try:
+#         1/0
+#     except: # noqa pylint: disable=bare-except
+#         logger.exception('You can\'t divide by zero')

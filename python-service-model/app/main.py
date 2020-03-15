@@ -8,7 +8,7 @@ import b3
 # import sys 
 # import os
 # sys.path.append(os.path.abspath("./custom-elk-logger"))
-from elk_logger import *
+from elk_logger import logger_init
 import datetime, logging, sys, json_logging, flask
 
 serviceId = uuid.uuid1()
@@ -30,14 +30,12 @@ app = flask.Flask(__name__)
 # logger.setLevel(logging.DEBUG)
 # logger.addHandler(logging.StreamHandler(sys.stdout))
 
-json_logging.ENABLE_JSON_LOGGING = True
-json_logging.init_flask()
-json_logging.init_request_instrument(app)
 
 # # init the logger as usual
+logger_init()
 logger = logging.getLogger("werkzeug")
 logger.setLevel(logging.DEBUG)
-logger.addHandler(logging.StreamHandler(sys.stdout))
+logger.addHandler(logging.StreamHandler(sys.stderr))
 
 # https://github.com/madzak/python-json-logger
 # logger = logging.getLogger("werkzeug")
