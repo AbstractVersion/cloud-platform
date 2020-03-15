@@ -15,7 +15,6 @@ def extra(**kw):
     '''Add the required nested props layer'''
     return {'extra': {'props': kw}}
 
-traceId = None
 
 class CustomJSONLog(logging.Formatter):
     """
@@ -49,8 +48,8 @@ class CustomJSONLog(logging.Formatter):
             f'{self.python_log_prefix}pid': record.process
         }
         json_log_object ['trace'] ={
-            "trace_id":traceId.values()['X-B3-TraceId'],
-            "span_id":traceId.values()['X-B3-TraceId'],
+            "trace_id":b3.values()['X-B3-TraceId'],
+            "span_id":b3.values()['X-B3-TraceId'],
             "exportable":"false"
         }
         if hasattr(record, 'props'):
@@ -73,8 +72,7 @@ logger_init()
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 logger.addHandler(logging.StreamHandler(sys.stderr))
-def halloLog(test):
-    traceId = test
+def halloLog():
     logger.info('Starting')
     try:
         1/0

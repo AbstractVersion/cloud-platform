@@ -76,7 +76,7 @@ def api_all():
     # logger.info("Requested python APi information")
     # logger.info("Hey")
     # logger.info("Custom Logger message Python API", extra = buildTraceInfo(app_name,b3.values()['X-B3-TraceId']) )
-    halloLog(b3)
+    halloLog()
     b3.end_span()
     return jsonify(info)
 
