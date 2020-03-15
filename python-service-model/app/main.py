@@ -35,7 +35,7 @@ def home():
 @app.route('/api/info', methods=['GET'])
 def api_all():
     print(request.headers.get('request-trace-id'))
-    logger = logging.getLogger("python-app")
+    logger = logging.getLogger("werkzeug")
     logger.setLevel(logging.DEBUG)
     b3.start_span()
     logger.debug(request.headers.get('request-trace-id'))
