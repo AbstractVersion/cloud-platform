@@ -73,18 +73,6 @@ logger_init()
 # logger.setLevel(logging.DEBUG)
 # logger.addHandler(logging.StreamHandler(sys.stderr))
 
-json_logging.ENABLE_JSON_LOGGING = True
-json_logging.init_flask()
-json_logging.init_request_instrument(app)
 
-# # init the logger as usual
-logger = logging.getLogger("werkzeug")
-logger.setLevel(logging.DEBUG)
-logger.addHandler(logging.StreamHandler(sys.stdout))
 
-def halloLog():
-    logger.info('Starting')
-    try:
-        1/0
-    except: # noqa pylint: disable=bare-except
-        logger.exception('You can\'t divide by zero')
+

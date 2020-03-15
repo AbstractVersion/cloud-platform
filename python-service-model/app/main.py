@@ -30,6 +30,15 @@ app = flask.Flask(__name__)
 # logger.setLevel(logging.DEBUG)
 # logger.addHandler(logging.StreamHandler(sys.stdout))
 
+json_logging.ENABLE_JSON_LOGGING = True
+json_logging.init_flask()
+json_logging.init_request_instrument(app)
+
+# # init the logger as usual
+logger = logging.getLogger("werkzeug")
+logger.setLevel(logging.DEBUG)
+logger.addHandler(logging.StreamHandler(sys.stdout))
+
 # https://github.com/madzak/python-json-logger
 # logger = logging.getLogger("werkzeug")
 
@@ -99,6 +108,13 @@ def buildTraceInfo( app_name, trace_id):
                 "exportable":"false"
             }
         }
+
+def halloLog():
+    logger.info('Starting')
+    # try:
+    #     1/0
+    # except: # noqa pylint: disable=bare-except
+    #     logger.exception('You can\'t divide by zero')
 
 if __name__ == '__main__':
     # with app.app_context():
