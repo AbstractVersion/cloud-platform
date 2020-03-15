@@ -32,7 +32,7 @@ app_name = "py-app"
 # logHandler.setFormatter(formatter)
 # logger.addHandler(logHandler)
 
-app.config["DEBUG"] = True
+app.config["DEBUG"] = False
 eureka_client.init(eureka_server="http://discovery-service:8761/eureka",
 		   instance_port=5001,
            app_name=app_name,
@@ -77,7 +77,7 @@ if __name__ == '__main__':
     app.after_request(b3.end_span)
     app.run(
         host="0.0.0.0",
-        debug=True,
+        debug=False,
         threaded=True,
         port=5001,
         use_reloader=False
