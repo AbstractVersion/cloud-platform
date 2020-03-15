@@ -7,6 +7,7 @@ import sleuth
 import b3
 import logging
 from pythonjsonlogger import jsonlogger
+import json
 
 serviceId = uuid.uuid1()
 serviceHost = socket.gethostname()
