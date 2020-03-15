@@ -57,10 +57,19 @@ def api_all():
     # logger = logging.getLogger("werkzeug")
     # logger.setLevel(logging.DEBUG)
     b3.start_span()
+    traceInfo = 
+    {
+        "trace":
+        {
+            "trace_id":b3.values()['X-B3-TraceId'],
+            "span_id": b3.values()['X-B3-TraceId'],
+            "exportable":"false"
+        }
+    }
     # logger.debug(b3.values()['X-B3-TraceId'], extra = {'props' : {'extra_property' : 'extra_value'}})
     # logger.info("Requested python APi information")
     # logger.info("Hey")
-    logger.info("classic message", extra=b3.values())
+    logger.info("classic message", extra=traceInfo)
     b3.end_span()
     return jsonify(info)
 
