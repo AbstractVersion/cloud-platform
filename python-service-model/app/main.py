@@ -8,7 +8,7 @@ import b3
 # import sys 
 # import os
 # sys.path.append(os.path.abspath("./custom-elk-logger"))
-# from elk_logger import *
+from elk_logger import *
 import datetime, logging, sys, json_logging, flask
 
 serviceId = uuid.uuid1()
@@ -21,14 +21,14 @@ app_name = "py-app"
 
 app = flask.Flask(__name__)
 
-json_logging.ENABLE_JSON_LOGGING = True
-json_logging.init_flask()
-json_logging.init_request_instrument(app)
+# json_logging.ENABLE_JSON_LOGGING = True
+# json_logging.init_flask()
+# json_logging.init_request_instrument(app)
 
-# init the logger as usual
-logger = logging.getLogger("test-logger")
-logger.setLevel(logging.DEBUG)
-logger.addHandler(logging.StreamHandler(sys.stdout))
+# # init the logger as usual
+# logger = logging.getLogger("test-logger")
+# logger.setLevel(logging.DEBUG)
+# logger.addHandler(logging.StreamHandler(sys.stdout))
 
 # https://github.com/madzak/python-json-logger
 # logger = logging.getLogger("werkzeug")
@@ -75,7 +75,8 @@ def api_all():
     # logger.debug(b3.values()['X-B3-TraceId'], extra = {'props' : {'extra_property' : 'extra_value'}})
     # logger.info("Requested python APi information")
     # logger.info("Hey")
-    logger.info("Custom Logger message Python API", extra = buildTraceInfo(app_name,b3.values()['X-B3-TraceId']) )
+    # logger.info("Custom Logger message Python API", extra = buildTraceInfo(app_name,b3.values()['X-B3-TraceId']) )
+    halloLog(b3)
     b3.end_span()
     return jsonify(info)
 

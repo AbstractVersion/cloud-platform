@@ -1,42 +1,82 @@
+# This example shows how the logger can be set up to use a custom JSON format.
 import logging
-from pythonjsonlogger import jsonlogger
 import json
+import traceback
+from datetime import datetime
+import copy
+import json_logging
+import sys
+import sleuth
+import b3
+json_logging.ENABLE_JSON_LOGGING = True
 
 
+def extra(**kw):
+    '''Add the required nested props layer'''
+    return {'extra': {'props': kw}}
 
-# https://github.com/madzak/python-json-logger
-logger = logging.getLogger("werkzeug")
+traceId = None
 
-def json_translate(obj):
-    if isinstance(obj, MyClass):
-        return {"special": obj.special}
+class CustomJSONLog(logging.Formatter):
+    """
+    Customized logger
+    """
+    python_log_prefix = 'python.'
+    def get_exc_fields(self, record):
+        if record.exc_info:
+            exc_info = self.format_exception(record.exc_info)
+        else:
+            exc_info = record.exc_text
+        return {f'{self.python_log_prefix}exc_info': exc_info}
 
-formatter = jsonlogger.JsonFormatter(json_default=json_translate,
-                                     json_encoder=json.JSONEncoder)
-logHandler = logging.StreamHandler()
-logHandler.setFormatter(formatter)
-logger.addHandler(logHandler)
+    @classmethod
+    def format_exception(cls, exc_info):
+        return ''.join(traceback.format_exception(*exc_info)) if exc_info else ''
 
-def elk_log_info(message, b3, app_name):
-    logger.info(message, extra=buildTraceInfo("INFO",app_name,b3.values()['X-B3-TraceId']))
-
-
-def elk_log_debug(message, b3, app_name):
-    logger.info(message, extra=buildTraceInfo("DEBUG",app_name,b3.values()['X-B3-TraceId']))
-
-
-
-def elk_log_error(message, b3, app_name):
-    logger.info(message, extra=buildTraceInfo("ERROR",app_name,b3.values()['X-B3-TraceId']))
-
-def buildTraceInfo(level, app_name, trace_id):
-    return {
-            "level": level,
-            "application_name": app_name,
-            "trace":
-            {
-                "trace_id":trace_id,
-                "span_id": trace_id,
-                "exportable":"false"
-            }
+    def format(self, record):
+        json_log_object = {"@timestamp": datetime.utcnow().isoformat(),
+                           "level": record.levelname,
+                           "message": record.getMessage(),
+                           "caller": record.filename + '::' + record.funcName
+                           }
+        json_log_object['data'] = {
+            f'{self.python_log_prefix}logger_name': record.name,
+            f'{self.python_log_prefix}module': record.module,
+            f'{self.python_log_prefix}funcName': record.funcName,
+            f'{self.python_log_prefix}filename': record.filename,
+            f'{self.python_log_prefix}lineno': record.lineno,
+            f'{self.python_log_prefix}thread': f'{record.threadName}[{record.thread}]',
+            f'{self.python_log_prefix}pid': record.process
         }
+        json_log_object ['trace'] ={
+            "trace_id":traceId.values()['X-B3-TraceId'],
+            "span_id":traceId.values()['X-B3-TraceId'],
+            "exportable":"false"
+        }
+        if hasattr(record, 'props'):
+            json_log_object['data'].update(record.props)
+
+        if record.exc_info or record.exc_text:
+            json_log_object['data'].update(self.get_exc_fields(record))
+
+        return json.dumps(json_log_object)
+
+
+def logger_init():
+    json_logging.__init(custom_formatter=CustomJSONLog)
+
+# You would normally import logger_init and setup the logger in your main module - e.g.
+# main.py
+
+logger_init()
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+logger.addHandler(logging.StreamHandler(sys.stderr))
+def halloLog(test):
+    traceId = test
+    logger.info('Starting')
+    try:
+        1/0
+    except: # noqa pylint: disable=bare-except
+        logger.exception('You can\'t divide by zero')
