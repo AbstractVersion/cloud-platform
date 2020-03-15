@@ -1,4 +1,5 @@
-FROM python:3
+FROM tiangolo/meinheld-gunicorn:python3.7
+
 #Set up enviroment
 RUN pip install --upgrade pip
 # https://stackoverflow.com/questions/34819221/why-is-python-setup-py-saying-invalid-command-bdist-wheel-on-travis-ci
@@ -13,4 +14,4 @@ RUN pip install Flask-Sleuth
 RUN pip install json-logging
 #Copy and run the app
 COPY ./app /app
-CMD [ "python3", "/app/main.py" ]
+
