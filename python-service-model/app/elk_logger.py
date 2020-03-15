@@ -17,16 +17,26 @@ logHandler = logging.StreamHandler()
 logHandler.setFormatter(formatter)
 logger.addHandler(logHandler)
 
-def elk_log(message, b3, app_name):
-    traceInfo = {
-            "level": logging.getLogger().getEffectiveLevel(),
+def elk_log_info(message, b3, app_name):
+    logger.info(message, extra=buildTraceInfo("INFO",app_name,b3.values()['X-B3-TraceId']))
+
+
+def elk_log_debug(message, b3, app_name):
+    logger.info(message, extra=buildTraceInfo("DEBUG",app_name,b3.values()['X-B3-TraceId']))
+
+
+
+def elk_log_error(message, b3, app_name):
+    logger.info(message, extra=buildTraceInfo("ERROR",app_name,b3.values()['X-B3-TraceId']))
+
+def buildTraceInfo(level, app_name, trace_id):
+    return {
+            "level": level,
             "application_name": app_name,
             "trace":
             {
-                "trace_id":b3.values()['X-B3-TraceId'],
-                "span_id": b3.values()['X-B3-TraceId'],
+                "trace_id":trace_id,
+                "span_id": trace_id,
                 "exportable":"false"
             }
         }
-    logger.info("Python Api logging", extra=traceInfo)
-
