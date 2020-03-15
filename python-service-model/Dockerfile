@@ -10,7 +10,7 @@ RUN pip install flask
 RUN  pip install Flask-B3
 RUN pip install Flask-Sleuth
 #https://github.com/madzak/python-json-logger
-RUN pip install python-json-logger
+RUN pip install json-logging==0.0.1
 #Copy and run the app
 COPY ./app /app
 CMD [ "python3", "/app/main.py" ]

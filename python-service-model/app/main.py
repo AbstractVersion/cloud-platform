@@ -8,7 +8,8 @@ import b3
 # import sys 
 # import os
 # sys.path.append(os.path.abspath("./custom-elk-logger"))
-from elk_logger import *
+# from elk_logger import *
+import datetime, logging, sys, json_logging, flask
 
 serviceId = uuid.uuid1()
 serviceHost = socket.gethostname()
@@ -18,6 +19,16 @@ app = flask.Flask(__name__)
 # https://github.com/thangbn/json-logging-python
 # app = flask.Flask(__name__)
 app_name = "py-app"
+
+app = flask.Flask(__name__)
+json_logging.ENABLE_JSON_LOGGING = True
+json_logging.init(framework_name='flask')
+json_logging.init_request_instrument(app)
+
+# init the logger as usual
+logger = logging.getLogger("test-logger")
+logger.setLevel(logging.DEBUG)
+logger.addHandler(logging.StreamHandler(sys.stdout))
 
 # https://github.com/madzak/python-json-logger
 # logger = logging.getLogger("werkzeug")
@@ -32,7 +43,7 @@ app_name = "py-app"
 # logHandler.setFormatter(formatter)
 # logger.addHandler(logHandler)
 
-app.config["DEBUG"] = False
+# app.config["DEBUG"] = False
 eureka_client.init(eureka_server="http://discovery-service:8761/eureka",
 		   instance_port=5001,
            app_name=app_name,
@@ -64,11 +75,20 @@ def api_all():
     # logger.debug(b3.values()['X-B3-TraceId'], extra = {'props' : {'extra_property' : 'extra_value'}})
     # logger.info("Requested python APi information")
     # logger.info("Hey")
-    elk_log_info("Custom Logger message Python API", b3, app_name)
+    logger.info("Custom Logger message Python API", extra=buildTraceInfo(app_name,b3.values()['X-B3-TraceId']))
     b3.end_span()
     return jsonify(info)
 
-
+def buildTraceInfo( app_name, trace_id):
+    return {
+            "application_name": app_name,
+            "trace":
+            {
+                "trace_id":trace_id,
+                "span_id": trace_id,
+                "exportable":"false"
+            }
+        }
 if __name__ == '__main__':
     # with app.app_context():
     # Go!
@@ -77,7 +97,7 @@ if __name__ == '__main__':
     app.after_request(b3.end_span)
     app.run(
         host="0.0.0.0",
-        debug=False,
+        debug=True,
         threaded=True,
         port=5001,
         use_reloader=False
