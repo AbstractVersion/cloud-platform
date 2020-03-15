@@ -29,7 +29,7 @@ services:
       - "config-server"
     labels:
         collect_logs_with_filebeat: "true"
-        decode_log_event_to_json_object: "false"
+        decode_log_event_to_json_object: "true"
     depends_on:
       - discovery-service
     # deploy:
