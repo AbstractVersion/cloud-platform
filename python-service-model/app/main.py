@@ -26,7 +26,7 @@ json_logging.init(framework_name='flask')
 json_logging.init_request_instrument(app)
 
 # init the logger as usual
-logger = logging.getLogger("test-logger")
+logger = logging.getLogger("werkzeug")
 logger.setLevel(logging.DEBUG)
 logger.addHandler(logging.StreamHandler(sys.stdout))
 
