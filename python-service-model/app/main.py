@@ -31,7 +31,7 @@ logHandler = logging.StreamHandler()
 logHandler.setFormatter(formatter)
 logger.addHandler(logHandler)
 
-# app.config["DEBUG"] = True
+app.config["DEBUG"] = True
 eureka_client.init(eureka_server="http://discovery-service:8761/eureka",
 		   instance_port=5001,
            app_name=app_name,
@@ -60,7 +60,6 @@ def api_all():
     # logger.setLevel(logging.DEBUG)
     b3.start_span()
     traceInfo = {
-        "logger_name": "python-logger-pyapp",
         "application_name": app_name,
         "trace":
         {
@@ -72,8 +71,7 @@ def api_all():
     # logger.debug(b3.values()['X-B3-TraceId'], extra = {'props' : {'extra_property' : 'extra_value'}})
     # logger.info("Requested python APi information")
     # logger.info("Hey")
-    log_adapter = logging.LoggerAdapter(log, context)
-    log_adapter.info("classic message", extra=traceInfo)
+    logger.info("classic message", extra=traceInfo)
     b3.end_span()
     return jsonify(info)
 
@@ -86,7 +84,7 @@ if __name__ == '__main__':
     app.after_request(b3.end_span)
     app.run(
         host="0.0.0.0",
-        debug=False,
+        debug=True,
         threaded=True,
         port=5001,
         use_reloader=False
