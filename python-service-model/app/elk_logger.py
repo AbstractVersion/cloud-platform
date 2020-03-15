@@ -69,9 +69,19 @@ def logger_init():
 
 logger_init()
 
-logger = logging.getLogger(__name__)
+# logger = logging.getLogger("werkzeug")
+# logger.setLevel(logging.DEBUG)
+# logger.addHandler(logging.StreamHandler(sys.stderr))
+
+json_logging.ENABLE_JSON_LOGGING = True
+json_logging.init_flask()
+json_logging.init_request_instrument(app)
+
+# # init the logger as usual
+logger = logging.getLogger("werkzeug")
 logger.setLevel(logging.DEBUG)
-logger.addHandler(logging.StreamHandler(sys.stderr))
+logger.addHandler(logging.StreamHandler(sys.stdout))
+
 def halloLog():
     logger.info('Starting')
     try:
