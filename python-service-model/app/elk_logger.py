@@ -17,7 +17,7 @@ logHandler = logging.StreamHandler()
 logHandler.setFormatter(formatter)
 logger.addHandler(logHandler)
 
-def elk_log(message, b3):
+def elk_log(message, b3, app_name):
     traceInfo = {
             "level": logging.getLogger().getEffectiveLevel(),
             "application_name": app_name,
