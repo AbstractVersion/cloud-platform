@@ -34,11 +34,11 @@ def home():
 # A route to return all of the available entries in our catalog.
 @app.route('/api/info', methods=['GET'])
 def api_all():
-    print(request.headers.get('request-trace-id'))
+    print(b3.values())
     logger = logging.getLogger("werkzeug")
     logger.setLevel(logging.DEBUG)
     b3.start_span()
-    logger.debug(request.headers.get('request-trace-id'))
+    logger.debug(b3.values())
     logger.info("Requested python APi information")
     logger.info("Hey")
     b3.end_span()
