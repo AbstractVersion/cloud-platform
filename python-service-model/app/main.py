@@ -5,9 +5,9 @@ import uuid
 import socket
 import sleuth
 import b3
-import sys 
-import os
-sys.path.append(os.path.abspath("./custom-elk-logger"))
+# import sys 
+# import os
+# sys.path.append(os.path.abspath("./custom-elk-logger"))
 from elk_logger import *
 
 serviceId = uuid.uuid1()
