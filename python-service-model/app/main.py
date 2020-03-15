@@ -14,19 +14,19 @@ import datetime, logging, sys, json_logging, flask
 serviceId = uuid.uuid1()
 serviceHost = socket.gethostname()
 
-app = flask.Flask(__name__)
 
 # https://github.com/thangbn/json-logging-python
 # app = flask.Flask(__name__)
 app_name = "py-app"
 
 app = flask.Flask(__name__)
+
 json_logging.ENABLE_JSON_LOGGING = True
-json_logging.init(framework_name='flask')
+json_logging.init_flask()
 json_logging.init_request_instrument(app)
 
 # init the logger as usual
-logger = logging.getLogger("werkzeug")
+logger = logging.getLogger("test-logger")
 logger.setLevel(logging.DEBUG)
 logger.addHandler(logging.StreamHandler(sys.stdout))
 
@@ -75,9 +75,18 @@ def api_all():
     # logger.debug(b3.values()['X-B3-TraceId'], extra = {'props' : {'extra_property' : 'extra_value'}})
     # logger.info("Requested python APi information")
     # logger.info("Hey")
-    logger.info("Custom Logger message Python API", extra=buildTraceInfo(app_name,b3.values()['X-B3-TraceId']))
+    logger.info("Custom Logger message Python API", extra = buildTraceInfo(app_name,b3.values()['X-B3-TraceId']) )
     b3.end_span()
     return jsonify(info)
+
+@app.route('/exception')
+def exception():
+    try:
+        raise RuntimeError
+    except BaseException as e:
+        logger.error("Error occurred", exc_info=e)
+        logger.exception("Error occurred", exc_info=e,  extra = buildTraceInfo(app_name,b3.values()['X-B3-TraceId']) )
+    return "Error occurred, check log for detail"
 
 def buildTraceInfo( app_name, trace_id):
     return {
@@ -89,6 +98,7 @@ def buildTraceInfo( app_name, trace_id):
                 "exportable":"false"
             }
         }
+
 if __name__ == '__main__':
     # with app.app_context():
     # Go!
@@ -97,8 +107,6 @@ if __name__ == '__main__':
     app.after_request(b3.end_span)
     app.run(
         host="0.0.0.0",
-        debug=True,
-        threaded=True,
         port=5001,
         use_reloader=False
     )
