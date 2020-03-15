@@ -75,7 +75,7 @@ def api_all():
     # logger.debug(b3.values()['X-B3-TraceId'], extra = {'props' : {'extra_property' : 'extra_value'}})
     # logger.info("Requested python APi information")
     # logger.info("Hey")
-    json_logging.info("Custom Logger message Python API", extra = buildTraceInfo(app_name,b3.values()['X-B3-TraceId']) )
+    logger.info("Custom Logger message Python API", extra = buildTraceInfo(app_name,b3.values()['X-B3-TraceId']) )
     b3.end_span()
     return jsonify(info)
 
@@ -84,8 +84,8 @@ def exception():
     try:
         raise RuntimeError
     except BaseException as e:
-        json_logging.error("Error occurred", exc_info=e)
-        json_logging.exception("Error occurred", exc_info=e,  extra = buildTraceInfo(app_name,b3.values()['X-B3-TraceId']) )
+        logger.error("Error occurred", exc_info=e)
+        logger.exception("Error occurred", exc_info=e)
     return "Error occurred, check log for detail"
 
 def buildTraceInfo( app_name, trace_id):
@@ -107,6 +107,8 @@ if __name__ == '__main__':
     app.after_request(b3.end_span)
     app.run(
         host="0.0.0.0",
+        debug=True,
+        threaded=True,
         port=5001,
         use_reloader=False
     )
