@@ -5,9 +5,10 @@ import uuid
 import socket
 import sleuth
 import b3
-import logging
-from pythonjsonlogger import jsonlogger
-import json
+import sys 
+import os
+sys.path.append(os.path.abspath("./custom-elk-logger"))
+from elk-logger import *
 
 serviceId = uuid.uuid1()
 serviceHost = socket.gethostname()
@@ -19,19 +20,19 @@ app = flask.Flask(__name__)
 app_name = "py-app"
 
 # https://github.com/madzak/python-json-logger
-logger = logging.getLogger("werkzeug")
+# logger = logging.getLogger("werkzeug")
 
-def json_translate(obj):
-    if isinstance(obj, MyClass):
-        return {"special": obj.special}
+# def json_translate(obj):
+#     if isinstance(obj, MyClass):
+#         return {"special": obj.special}
 
-formatter = jsonlogger.JsonFormatter(json_default=json_translate,
-                                     json_encoder=json.JSONEncoder)
-logHandler = logging.StreamHandler()
-logHandler.setFormatter(formatter)
-logger.addHandler(logHandler)
+# formatter = jsonlogger.JsonFormatter(json_default=json_translate,
+#                                      json_encoder=json.JSONEncoder)
+# logHandler = logging.StreamHandler()
+# logHandler.setFormatter(formatter)
+# logger.addHandler(logHandler)
 
-app.config["DEBUG"] = True
+app.config["DEBUG"] = False
 eureka_client.init(eureka_server="http://discovery-service:8761/eureka",
 		   instance_port=5001,
            app_name=app_name,
@@ -59,20 +60,11 @@ def api_all():
     # logger = logging.getLogger("werkzeug")
     # logger.setLevel(logging.DEBUG)
     b3.start_span()
-    traceInfo = {
-        "level": logging.getLogger().getEffectiveLevel(),
-        "application_name": app_name,
-        "trace":
-        {
-            "trace_id":b3.values()['X-B3-TraceId'],
-            "span_id": b3.values()['X-B3-TraceId'],
-            "exportable":"false"
-        }
-    }
+    
     # logger.debug(b3.values()['X-B3-TraceId'], extra = {'props' : {'extra_property' : 'extra_value'}})
     # logger.info("Requested python APi information")
     # logger.info("Hey")
-    logger.info("Python Api logging", extra=traceInfo)
+    elk_log("Custom Logger message Python API", d3)
     b3.end_span()
     return jsonify(info)
 
@@ -85,7 +77,7 @@ if __name__ == '__main__':
     app.after_request(b3.end_span)
     app.run(
         host="0.0.0.0",
-        debug=True,
+        debug=False,
         threaded=True,
         port=5001,
         use_reloader=False
