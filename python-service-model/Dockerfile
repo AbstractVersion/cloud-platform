@@ -1,5 +1,5 @@
 #FROM tiangolo/meinheld-gunicorn:python3.7
-FROM FROM python:3
+FROM python:3
 
 
 #Set up enviroment
