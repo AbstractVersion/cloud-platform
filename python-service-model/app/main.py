@@ -35,7 +35,7 @@ app = flask.Flask(__name__)
 logger_init()
 logger = logging.getLogger("werkzeug")
 logger.setLevel(logging.DEBUG)
-logger.addHandler(logging.StreamHandler(sys.stderr))
+logger.addHandler(logging.StreamHandler(sys.stdout))
 
 # https://github.com/madzak/python-json-logger
 # logger = logging.getLogger("werkzeug")

@@ -7,12 +7,19 @@ spring:
     config:
       server:
         git:
+          clone-on-start: true
           uri: https://github.com/AbstractVersion/micro-env-config.git
 #          If the repo is private fill git cridential here
 #          username: username/e-mail
 #          password: password
   application:
     name: config-server
+    
+#managment:
+#  endpoints:
+#    web:
+#      exposure:
+#        include: bus-refresh
     
     
 # eureka:

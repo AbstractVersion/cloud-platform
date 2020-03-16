@@ -34,10 +34,10 @@ public class JpaConfiguration {
     @Bean
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
-
+        //Read from Cloud config server (The informations are encrypted with JCE default java-11 encryption variable) 
         dataSource.setDriverClassName(jpaConfig.getDriverClass());
-        dataSource.setUsername("root"); //request from secrets-api
-        dataSource.setPassword("root");
+        dataSource.setUsername(jpaConfig.getUser()); 
+        dataSource.setPassword(jpaConfig.getPassword());
         dataSource.setUrl(jpaConfig.getUrl());
         return dataSource;
     }
