@@ -1,4 +1,6 @@
-FROM tiangolo/meinheld-gunicorn:python3.7
+#FROM tiangolo/meinheld-gunicorn:python3.7
+FROM FROM python:3
+
 
 #Set up enviroment
 RUN pip install --upgrade pip
