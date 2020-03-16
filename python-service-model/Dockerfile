@@ -10,10 +10,10 @@ RUN pip install wheel
 RUN pip install requests
 RUN pip install py_eureka_client
 RUN pip install flask
-RUN  pip install Flask-B3
+RUN pip install Flask-B3
 RUN pip install Flask-Sleuth
 #https://github.com/madzak/python-json-logger
 RUN pip install json-logging
 #Copy and run the app
 COPY ./app /app
-
+CMD [ "python3", "/app/main.py" ]
