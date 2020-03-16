@@ -10,8 +10,8 @@ import sleuth
 import b3
 json_logging.ENABLE_JSON_LOGGING = True
 
-logger_name = None
-application_name = None
+#logger_name = None
+#application_name = None
 version = '1'
 
 def extra(**kw):
@@ -37,12 +37,12 @@ class CustomJSONLog(logging.Formatter):
 
     def format(self, record):
         json_log_object = {"@timestamp": datetime.utcnow().isoformat(),
-                           "@Version": version,
+                           "@version": version,
                            "level": record.levelname,
                            "message": record.getMessage(),
                            "caller": record.filename + '::' + record.funcName,
-                           "logger_name": logger_name,
-                           "application_name": application_name
+                           "logger_name": "python-logger",
+                           "application_name": "py-app"
                            }
         json_log_object['data'] = {
             f'{self.python_log_prefix}logger_name': record.name,
@@ -67,9 +67,7 @@ class CustomJSONLog(logging.Formatter):
         return json.dumps(json_log_object)
 
 
-def logger_init(log_name, app_name):
-    logger_name = log_name
-    application_name = app_name
+def logger_init():
     json_logging.__init(custom_formatter=CustomJSONLog)
 
 # You would normally import logger_init and setup the logger in your main module - e.g.
