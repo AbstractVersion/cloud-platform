@@ -32,7 +32,7 @@ app = flask.Flask(__name__)
 
 
 # # init the logger as usual
-logger_init()
+logger_init("python-logger", app_name)
 logger = logging.getLogger("werkzeug")
 logger.setLevel(logging.DEBUG)
 logger.addHandler(logging.StreamHandler(sys.stdout))
