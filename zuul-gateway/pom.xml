@@ -18,7 +18,7 @@
         <!-- <java.version>1.8</java.version> -->
         <spring-cloud.version>Hoxton.SR1</spring-cloud.version>
 
-         <!-- Source encoding -->
+        <!-- Source encoding -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring-boot.version>2.2.4.RELEASE</spring-boot.version>
 
@@ -35,9 +35,13 @@
     </properties>
 
     <dependencies>
-
-    <!-- https://stackoverflow.com/questions/43574426/how-to-resolve-java-lang-noclassdeffounderror-javax-xml-bind-jaxbexception-in-j -->
-    <!-- API, java.xml.bind module -->
+        <!--Bus fo subscrption & config refresh-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-bus-amqp</artifactId>
+        </dependency>
+        <!-- https://stackoverflow.com/questions/43574426/how-to-resolve-java-lang-noclassdeffounderror-javax-xml-bind-jaxbexception-in-j -->
+        <!-- API, java.xml.bind module -->
         <dependency>
             <groupId>jakarta.xml.bind</groupId>
             <artifactId>jakarta.xml.bind-api</artifactId>
@@ -123,7 +127,7 @@
     </dependencies>
 
     <dependencyManagement>
-         <dependencies>
+        <dependencies>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
@@ -141,7 +145,7 @@
         </dependencies>
     </dependencyManagement>
 
-  <build>
+    <build>
         <plugins>
 
             <!-- Spring Boot -->

@@ -77,6 +77,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     private static final String[] AUTH_WHITELIST = {
-        "/session-service/session/register"
+        "/session-service/session/register",
+        "/hello-client/python/info",
+        "/hello-client",
+        "/hello-service"
     };
 }

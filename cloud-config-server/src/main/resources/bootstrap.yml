@@ -1,4 +1,8 @@
 ## YAML Template.
 ---
 encrypt:
-  key: dasdq98ad7sahd98adysh9d8aDdsaPdsadDHdasdSdasdPsadads
+#  key: dasdq98ad7sahd98adysh9d8aDdsaPdsadDHdasdSdasdPsadads
+  key-store:
+    location: file:///keys/micro-env-key.jks
+    password: 123456
+    alias: micro-env-key

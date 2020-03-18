@@ -1,7 +1,11 @@
 # Micro Enviroment
 
+#Generate encryption Key with keytool
+keytool -genkeypair -alias micro-env-key -keyalg RSA -dname "CN=George Fiotakis,OU= Software Engineering,O=com.micr.env,L=France,S=ON,C=CA" -keypass 123456 -keystore micro-env-key.jks -storepass 123456
+
+
 ## Compose 
-docker-compose up -d --scale hello-service=3 --scale hello-client=2 --scale session-service=2
+docker-compose up -d --scale hello-service=2 --scale hello-client=3 --scale session-service=2 --scale python-service=2
 ## Create network
 
 docker network create -d bridge micro-network
@@ -13,7 +17,7 @@ docker build -t  micro-env/config-server:latest .
 
 ### Run the container
 
-docker container run -d  --network micro-network --name config-server micro-env/config-server
+docker container run -d  --network micro-network --name config-server -p 8888:8888 micro-env/config-server
 
 
 ## User Managment

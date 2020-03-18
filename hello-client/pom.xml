@@ -15,10 +15,10 @@
     <description>Demo project for Spring Boot</description>
 
     <properties>
-       <!-- <java.version>1.8</java.version> -->
+        <!-- <java.version>1.8</java.version> -->
         <spring-cloud.version>Hoxton.SR1</spring-cloud.version>
 
-         <!-- Source encoding -->
+        <!-- Source encoding -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring-boot.version>2.2.4.RELEASE</spring-boot.version>
 
@@ -39,6 +39,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
+        <!--Bus fo subscrption & config refresh-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-bus-amqp</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -56,7 +61,7 @@
             <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
 
-      <!--ELASTIC STACK-->
+        <!--ELASTIC STACK-->
 
         <!-- Lombok -->
         <dependency>
@@ -92,7 +97,7 @@
     </dependencies>
 
     <dependencyManagement>
-       <dependencies>
+        <dependencies>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
@@ -110,7 +115,7 @@
         </dependencies>
     </dependencyManagement>
 
- <build>
+    <build>
         <plugins>
 
             <!-- Spring Boot -->

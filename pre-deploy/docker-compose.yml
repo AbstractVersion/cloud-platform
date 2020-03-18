@@ -14,8 +14,8 @@ services:
 # Thats why I deploy indepentedly the container before fire up the docker-compose (The container shoudl be at the same network as the compose)
   config-server:
     image: micro-env/config-server:latest
-    #  ports:
-    #    - "8888"
+    ports:
+      - "8888"
     labels:
       collect_logs_with_filebeat: "false"
       decode_log_event_to_json_object: "false"
@@ -37,6 +37,21 @@ services:
     restart: on-failure
     volumes:
      - ${PWD}/mariadb:/var/lib/mysql
+
+  rabbit-server:
+    image: rabbitmq:3-management
+    hostname: "rabbit-server"
+    environment:
+      RABBITMQ_DEFAULT_USER: "abstract"
+      RABBITMQ_DEFAULT_PASS: "admin"
+      RABBITMQ_DEFAULT_VHOST: "/"
+    ports:
+      - "15672:15672" 
+      - "5672:5672" 
+      - "15671:15671" 
+      - "5671:5671" 
+      - "4369:4369" 
+
 
 
   

@@ -51,7 +51,7 @@ logger.addHandler(logging.StreamHandler(sys.stdout))
 # logger.addHandler(logHandler)
 
 # app.config["DEBUG"] = False
-eureka_client.init(eureka_server="http://discovery-service:8761/eureka",
+eureka_client.init(eureka_server="http://abstract:admin@discovery-service:8761/eureka",
 		   instance_port=5001,
            app_name=app_name,
 		   ha_strategy=eureka_client.HA_STRATEGY_STICK)
