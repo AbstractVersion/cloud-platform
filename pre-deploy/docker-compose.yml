@@ -22,10 +22,14 @@ services:
 
 
   generalRDBMS:
-    image: mariadb:latest
+    build:
+      context: ./mariadb
+      dockerfile: Dockerfile
+    image: micro-env/generalRBMS:latest
+    restart: on-failure
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: sessionDB
+      #MYSQL_DATABASE: sessionDB
       MYSQL_USER: root
       MYSQL_PASSWORD: root
     logging:
