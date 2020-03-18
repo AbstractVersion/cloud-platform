@@ -15,11 +15,13 @@ services:
   config-server:
     image: micro-env/config-server:latest
     ports:
-      - "8888"
+      - "8888:8888"
     labels:
       collect_logs_with_filebeat: "false"
       decode_log_event_to_json_object: "false"
-
+     depends_on:
+      - rabbit-server
+    restart: on-failure
 
   general-rdbms:
     container_name: generalRDBMS
@@ -56,6 +58,7 @@ services:
       - "15671:15671" 
       - "5671:5671" 
       - "4369:4369" 
+    restart: on-failure
 
 
 
