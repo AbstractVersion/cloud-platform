@@ -1,4 +1,12 @@
-CREATE DATABASE sessionDB;
+--
+-- Database: `sessionDB`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `session_info`
+--
 
 USE sessionDB;
 
