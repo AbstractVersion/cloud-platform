@@ -32,7 +32,7 @@ services:
     restart: on-failure
     environment:
       MYSQL_ROOT_PASSWORD: root
-      #MYSQL_DATABASE: sessionDB
+      MYSQL_DATABASE: sessionDB
       MYSQL_USER: root
       MYSQL_PASSWORD: root
     logging:
