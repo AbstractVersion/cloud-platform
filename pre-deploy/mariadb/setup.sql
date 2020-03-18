@@ -7,7 +7,7 @@
 --
 -- Table structure for table `session_info`
 --
-
+CREATE Database sessionDB;
 USE sessionDB;
 
 CREATE TABLE `session_info` (
