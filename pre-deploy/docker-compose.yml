@@ -40,7 +40,7 @@ services:
     #   - backend
     restart: on-failure
     volumes:
-     - ${PWD}/mariadb:/var/lib/mysql
+     - ${PWD}/mariadb/data:/var/lib/mysql
 
   rabbit-server:
     image: rabbitmq:3-management
