@@ -19,7 +19,7 @@ services:
     labels:
       collect_logs_with_filebeat: "false"
       decode_log_event_to_json_object: "false"
-     depends_on:
+    depends_on:
       - rabbit-server
     restart: on-failure
 
