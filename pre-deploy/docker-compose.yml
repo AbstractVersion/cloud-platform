@@ -21,7 +21,8 @@ services:
       decode_log_event_to_json_object: "false"
 
 
-  generalRDBMS:
+  general-rdbms:
+    container_name: generalRDBMS
     build:
       context: ./mariadb
       dockerfile: Dockerfile
