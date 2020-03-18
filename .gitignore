@@ -1,4 +1,4 @@
-elk-template/elasticsearch/data/*
-elk-template/filebeat/data/*
-pre-deploy/mariadb/data/*
+elk-template/elasticsearch/data/**
+elk-template/filebeat/data/**
+pre-deploy/mariadb/data/**
 
