@@ -2,7 +2,11 @@
 # This is a comment!
 echo -------------------configuring essential things------------------
 
-echo Configuring Filebeat ...
+echo Creating directory volumes ...
+mkdir -p ./elk-template/filebeat/data
+mkdir -p ./elk-template/elasticsearch/data
+mkdir -p ./pre-deploy/mariadb/data/
+
 sudo chmod 600 ./elk-template/filebeat/filebeat.docker.yml && sudo chown -R root:root ./elk-template/filebeat/filebeat.docker.yml
 
 echo -------------------Starting Build---------------------
