@@ -26,7 +26,7 @@ services:
     build:
       context: ./mariadb
       dockerfile: Dockerfile
-    image: micro-env/generalRBMS:latest
+    image: micro-env/general-rdbms:latest
     restart: on-failure
     environment:
       MYSQL_ROOT_PASSWORD: root
