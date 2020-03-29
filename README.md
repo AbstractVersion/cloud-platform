@@ -13,8 +13,8 @@ This document is aiming to demonstrate a microserice general purpose architectur
     + [Beats](#beats)
     + [Logstash](#logstash)
     + [Putting the pieces together](#putting-the-pieces-together)
-  * [Resource Architecture & DevOps](#resource-architecture-&-devOps)
-    + [Resource Architecture](#resource-architecture)
+  * [Cloud Architecture & DevOps](#cloud-architecture-&-devOps)
+    + [Cloud Architecture](#cloud-architecture)
     + [Docker Architecture](#docker-architecture)
     + [Build & deploy pipeline](#build-&-deploy-pipeline)
 - [Microservice Architecture](#microservice-architecture)
@@ -93,20 +93,20 @@ In a few words:
 * Elasticsearch stores and indexes the data. (Docker Swarm Level)
 * Kibana displays the data stored in Elasticsearch. (Docker Swarm Level)
 
-### Resource Architecture & DevOps.
+### Cloud Architecture & DevOps.
 
 Since we have everything else figured out now we need to see how and where do we deploy the system. For that we have used Azure Cloud, Debian 10, Docker Engine, Docker Swarm, Git & Maven.
 
 Let's take a closer look and brake it down to pieces.
 
-#### Resource Architecture
+#### Cloud Architecture
 * On Azoure cloud Subscription we have created a vritual network with tow subnets: FrontEnd and BackEnd subnet.
 * FrontEnd Subnet is used to proxy the traffic from and to the BackEnd subnet. Each subnet has it's own Network Security Group (NSG) that restricts the traffic that comes in and off the subnet.
 * On the FrontEnd Subnet there is a proxy machine that acts as the entrypoint of the hole ecosystem. On this machine we have an Apache HTTPD server that is configured to act as a static proxy that redirects the traffic from the WWW to the gateway API's. This apache is also configured to encrypt/decrypt the traffic based on the https protocol SSL/TLS.
 * On the backend subnet we have a set of workers (pods on Kubernets) which preatty much are host machines in which we have installed Docker Engine.
 * Docker Swarm as container orchistration to bring all theese engines together and work as one.
 
-![resource-architecture][resource-architecture]
+![cloud-architecture][resource-architecture]
 
 
 #### Docker Architecture
