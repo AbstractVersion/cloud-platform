@@ -15,6 +15,7 @@ This document is aiming to demonstrate a microserice general purpose architectur
     + [Putting the pieces together](#putting-the-pieces-together)
   * [Resource Architecture & DevOps](#resource-architecture-&-devOps)
     + [Resource Architecture](#resource-architecture)
+    + [Docker Architecture](#docker-architecture)
     + [Build & deploy pipeline](#build-&-deploy-pipeline)
 - [Microservice Architecture](#microservice-architecture)
   * [Request Authentication & JWT Generation.](#request-authentication-&-jwt-generation.)
