@@ -105,6 +105,14 @@ Let's take a closer look and brake it down to pieces.
 * On the backend subnet we have a set of workers (pods on Kubernets) which preatty much are host machines in which we have installed Docker Engine.
 * Docker Swarm as container orchistration to bring all theese engines together and work as one.
 
+![resource-architecture][resource-architecture]
+
+
+#### Docker Architecture
+
+![docker-architecture][docker-architecture]
+
+
 #### Build & deploy pipeline
 * Since docker is used to package & deploy each service we have made a base implementation of the Spotify library to automate the image build for each service with Apache Maven.
 
@@ -112,7 +120,7 @@ Let's take a closer look and brake it down to pieces.
 
 * For the python Flask services we have made a base image which can be extended. On this base image we deploy the python services. 
 
-![resource-architecture][resource-architecture]
+
 
 ## Microservice Architecture
 Now that we have covered the basics of the ecosystem, it's time to take a closer look at the ecosystem's architecture itself.
@@ -190,4 +198,5 @@ Since we have made it this far, lets take a look at one of the benefits that thi
 [abstract-use-case]: ./img/architecture/request-flow-example.jpg "abstract-use-case"
 [service-discovery]: ./img/architecture/service-discovery.jpg "service-discovery"
 [overal-system]: ./img/architecture/overal-core-system.jpg "overal-system-backbone"
+[docker-architecture]: ./img/architecture/docker-architecture.jpg "docker-architecture"
 
