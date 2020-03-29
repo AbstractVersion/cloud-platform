@@ -128,6 +128,9 @@ We have tow different ways of authentication thus we have tow different ways of 
 #### Request/JWT Authentication
 For each different authentication mechanism we use a different gateway API. This way we can demonstrate the real value that an architecture such as this provides. Lets break it down to pieces.
 
+![toke-authentication-flow][toke-authentication-flow]
+
+
 ##### SSO token authentication request flow
 1. A request with a JWT tocken arrives on the Apache WebServer. depending on the sub-url we redirect the traffic to the appropriate gateway API.
 
@@ -155,7 +158,7 @@ The process stays the same through the custom authentication with the one discri
 5.  User-service requests the user information based on the User UUID from the user database and returns the outcome to the session service.
 
 
-![toke-authentication-flow][toke-authentication-flow]
+
 
 
 ### Abstract use-case
