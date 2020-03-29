@@ -173,7 +173,7 @@ Since we have made it this far, lets take a look at one of the benefits that thi
 
 [service-configuration]: ./img/architecture/enviroment-cloud-config.jpg "Service configuration"
 
-[centralized-logs]: ./img/architecture/log-aggrication.jpg "centralized-logging"
+[centralized-logs]: ./img/architecture/log-ggrecation-no-bg.jpg "centralized-logging"
 
 [resource-architecture]: ./img/architecture/resource-architecture.jpg "resource-architecture"
 
