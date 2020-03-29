@@ -41,6 +41,8 @@ Lets take a look on what component we used and how each one of them solve a micr
 
 Service discovery is a common "nightmare" on all the architectures that are based on microservces. Thats because when instead of one or tow monolithic applications, you now have 15, 20, 30, servces that each one of them needs to be able to communicate with each other and monst important scale indepentandly. The present architecture is not focusing on a custom solution of service discovery thus we have used the very handfull solution provided by Neftlix OSS. Netflix has developed a number of projects that you might find usefull on architectures such as this. Most importantly this software is tested, validated and implemented, by Netflix which means that is fault tollerant and trustworthy. You can find more infomrations [here](https://netflix.github.io/)
 
+![service-discovery][service-discovery]
+
 ### Architecture Backbone
 
 Now that we know how to discover our services, we need a framework in which we can work on and implement the Netflix OSS. Luckily for us one of the biggest frameworks wright now, does just this. Spring framework has been evolved to an amaizing tool for situations like this. [Spring](https://spring.io/projects/spring-boot) provides easy-to-use implementations for all the components we need such as Netflix OSS, but also provides it's own very helpfull set of tools such as [spring-cloud](https://spring.io/projects/spring-cloud), [spring-data](https://spring.io/projects/spring-data) etc. Spring though is a java based framework and we need more than that in order to prove the flexibility and show the real benefits of this architecture. Thats why we have chosen [Flask](https://flask.palletsprojects.com/en/1.1.x/) as the secondary framework on which we can deploy our applications and be compatitable with the rest of the ecosystem.
@@ -181,3 +183,5 @@ Since we have made it this far, lets take a look at one of the benefits that thi
 
 [token-registration]: ./img/architecture/token-registration.jpg "token-registration"
 [abstract-use-case]: ./img/architecture/request-flow-example.jpg "abstract-use-case"
+[service-discovery]: ./img/architecture/service-discovery.jpg "service-discovery"
+
