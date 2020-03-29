@@ -5,16 +5,25 @@ This document is aiming to demonstrate a microserice general purpose architectur
 ## Table of Contnents
 - [Known technologies & patterns](#known-technologies-&-patterns)
   * [Service Discovery](#service-discovery)
+  * [Architecture Backbone](#architecture-backbone)
+  * [Enviroment & Cloud configuration](#enviroment-&-cloud-configuration)
+  * [Log Aggrication](#log-aggrication)
+    + [Elasticsearch](#elasticsearch)
+    + [Kibana](#kibana)
+    + [Beats](#beats)
+    + [Logstash](#logstash)
+    + [Putting the pieces together](#putting-the-pieces-together)
+  * [Resource Architecture & DevOps](#resource-architecture-&-devOps)
+    + [Resource Architecture](#resource-architecture)
+    + [Build & deploy pipeline](#build-&-deploy-pipeline)
 - [Microservice Architecture](#microservice-architecture)
-  * [Service-list & coresponding content](#service-list-&-coresponding-content))
-    + [Elastic Stack](#elastic-stack)
-- [Docker Architecture](#docker-architecture)
-  * [Docker Containers & Spotofy Maven plugin](#sub-heading-2)
-  * [Docker Networks](#docker-networks)
-  * [Docker Volumes](#docker-volumes)
+  * [Request Authentication & JWT Generation.](#request-authentication-&-jwt-generation.)
+    + [JWT Generation](#jwt-generation)
+    + [Request/JWT Authentication](#request/jwt-authentication)
+  * [Abstract use-case](#abstract-use-case)
 - [Deploy The System](#deploy-the-system)
-  * [Localy](#local-run)
-  * [Docker](#docker-run)
+  * [Docker Compose](#docker-compose)
+  * [Docker Swarn](#docker-swarm)
 - [Future Additions](#future-additions)
 
 
@@ -112,7 +121,7 @@ We have tow different ways of authentication thus we have tow different ways of 
 
 ![token-registration][token-registration]
 
-#### Request Authentication
+#### Request/JWT Authentication
 For each different authentication mechanism we use a different gateway API. This way we can demonstrate the real value that an architecture such as this provides. Lets break it down to pieces.
 
 ##### SSO token authentication request flow
@@ -147,10 +156,18 @@ The process stays the same through the custom authentication with the one discri
 
 ### Abstract use-case
 
+Since we have made it this far, lets take a look at one of the benefits that this architecture provides.
+
 ![abstract-use-case][abstract-use-case]
 
 
 ## Deploy the System
+
+### Docker Compose 
+
+### Docker Swarn
+
+## Future Additions
 
 [technologies-used-diagram]: ./img/architecture/general-architecture-components.jpg "Implemented Technologies"
 
