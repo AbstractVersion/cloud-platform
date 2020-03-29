@@ -47,6 +47,8 @@ Service discovery is a common "nightmare" on all the architectures that are base
 
 Now that we know how to discover our services, we need a framework in which we can work on and implement the Netflix OSS. Luckily for us one of the biggest frameworks wright now, does just this. Spring framework has been evolved to an amaizing tool for situations like this. [Spring](https://spring.io/projects/spring-boot) provides easy-to-use implementations for all the components we need such as Netflix OSS, but also provides it's own very helpfull set of tools such as [spring-cloud](https://spring.io/projects/spring-cloud), [spring-data](https://spring.io/projects/spring-data) etc. Spring though is a java based framework and we need more than that in order to prove the flexibility and show the real benefits of this architecture. Thats why we have chosen [Flask](https://flask.palletsprojects.com/en/1.1.x/) as the secondary framework on which we can deploy our applications and be compatitable with the rest of the ecosystem.
 
+![overal-system-backbone][overal-system]
+
 ### Enviroment & Cloud configuration
 Since we have diffined the backbone of our architectures (languages, frameworks etc.), it's time for us to take a look at the different enviroment configurations & the way we will be injecting configurations into our system. An architecture such as this provides a lot of beneffits and a variaty of different wasy that you can implement you architecure ideas. In our case for service configuration we have used Spring Cloud, Spring Cloud Bus, Git & Rabbit MQ.
 
@@ -184,4 +186,5 @@ Since we have made it this far, lets take a look at one of the benefits that thi
 [token-registration]: ./img/architecture/token-registration.jpg "token-registration"
 [abstract-use-case]: ./img/architecture/request-flow-example.jpg "abstract-use-case"
 [service-discovery]: ./img/architecture/service-discovery.jpg "service-discovery"
+[overal-system]: ./img/architecture/overal-core-system.jpg "overal-system-backbone"
 
