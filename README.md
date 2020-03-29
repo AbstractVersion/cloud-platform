@@ -1,128 +1,47 @@
-# A Microservices Environment Deployed on Docker Engine
+# Microservice Ecosystem
 
->This document's goal is to describe the high-end architecture of the presented microservice ecosystem. The ecosystem currentely supports services written in 2 languages: python & java, but there is the posibility to increase that number uppon request.
+This document is aiming to demonstrate a microserice general purpose architecture. All the work on this document is opensource and is licenced under Apache Licence.
 
-<!-- Table of Contetns -->
 ## Table of Contnents
-- [Overview](#Overview)
-  * [Technologies-used ](#technologies-used )
-    + [Microservices](#microservices)
-    + [Docker](#docker)
-    + [Spring Netflix/Cloud](#spring-netflix/cloud)
-    + [Java & Spring](#java-&-spring)
-    + [Python & Flask](#python-&-flask)
-    + [Elastic Stack](#elastic-stack)
+- [Known technologies & patterns](#known-technologies-&-patterns)
+  * [Service Discovery](#service-discovery)
 - [Microservice Architecture](#microservice-architecture)
-  * [Service-list & coresponding content](#service-list-&-coresponding-content)
-    + [Cloud Configuration Server](#cloud-configuration-server)
-    + [Eurika Name Server](#eurika-name-server)
-    + [Secrets Service](#secrets-service)
-    + [Graph API](#graph-api)
-    + [Session Managment](#session-managment)
-    + [Hello Service](#hello-service)
-    + [Python Service](#python-service)
-    + [Hello Client](#hello-client)
-    + [Gateway Proxy Service](#gateway-proxy-service)
+  * [Service-list & coresponding content](#service-list-&-coresponding-content))
     + [Elastic Stack](#elastic-stack)
 - [Docker Architecture](#docker-architecture)
   * [Docker Containers & Spotofy Maven plugin](#sub-heading-2)
   * [Docker Networks](#docker-networks)
   * [Docker Volumes](#docker-volumes)
-- [Run The System](#run-the-system)
+- [Deploy The System](#deploy-the-system)
   * [Localy](#local-run)
   * [Docker](#docker-run)
 - [Future Additions](#future-additions)
 
-<!-- Overview -->
-## Overview
 
-Microservices & Docker is tow of the biggest trends of our era used in software industry. This project/template aims to demostrate a base template of a microservice enviroment that can be used in a varriety of different use-cases. This template focuses on :  Microservices Architecture/Implementation & Microservices with Docker Engine. The core "body" of the ecosystem is implemented in java by using the Spring [Cloud](https://spring.io/projects/spring-cloud)/[ Netflix](https://spring.io/projects/spring-cloud-netflix) libraries. 
+## Known technologies & patterns
+Lets take a look on what component we used and how each one of them solve a microservice architecture "common problem". We will classify the technologies used based on the use-case that they help to implement :
 
-### Technologies-used 
+* Service Discovery & Architecture Backbone
+* Log Aggrication/Sentrilization
+* Real-Time service configuration
+* Development & Operations
 
-In this section we will present the core technologies & concepts that the present ecosystem is depending on.
+![Implemented Technologies][technologies-used-diagram]
 
+### Service Discovery
 
-![alt text][logo]
+Service discovery is a common "nightmare" on all the architectures that are based on microservces. Thats because when instead of one or tow monolithic applications, you now have 15, 20, 30, servces that each one of them needs to be able to communicate with each other and monst important scale indepentandly. The present architecture is not focusing on a custom solution of service discovery thus we have used the very handfull solution provided by Neftlix OSS. Netflix has developed a number of projects that you might find usefull on architectures such as this. Most importantly this software is tested, validated and implemented, by Netflix which means that is fault tollerant and trustworthy. You can find more infomrations [here](https://netflix.github.io/)
 
-[logo]: ./img/technplogies.jpg "Logo Title Text 2"
+### Architecture Backbone
 
-#### Microservices
-Microservices - also known as the microservice architecture - is an architectural style that structures an application as a collection of services that are :
+Now that we know how to discover our services, we need a framework in which we can work on and implement the Netflix OSS. Luckily for us one of the biggest frameworks wright now, does just this. Spring framework has been evolved to an amaizing tool for situations like this. [Spring](https://spring.io/projects/spring-boot) provides easy-to-use implementations for all the components we need such as Netflix OSS, but also provides it's own very helpfull set of tools such as [spring-cloud](https://spring.io/projects/spring-cloud), [spring-data](https://spring.io/projects/spring-data) etc. Spring though is a java based framework and we need more than that in order to prove the flexibility and show the real benefits of this architecture. Thats why we have chosen [Flask](https://flask.palletsprojects.com/en/1.1.x/) as the secondary framework on which we can deploy our applications and be compatitable with the rest of the ecosystem.
 
-* Highly maintainable and testable
-* Loosely coupled
-* Independently deployable
-* Organized around business capabilities
-* Owned by a small team
-* The microservice architecture enables the rapid, frequent and reliable delivery of large, complex applications. It also enables an organization to evolve its   technology stack.
+### Enviroment & Cloud configuration
+Since we have diffined the backbone of our architectures (languages, frameworks etc.), it's time for us to take a look at the different enviroment configurations & the way we will be injecting configurations into our system. An architecture such as this provides a lot of beneffits and a variaty of different wasy that you can implement you architecure ideas. In our case for service configuration we have used Spring Cloud, Spring Cloud Bus, Git & Rabbit MQ.
 
-source : [here](https://microservices.io/).
-#### Docker
+![Service configuration][service-configuration]
 
-[Docker](https://www.docker.com/) is a tool designed to make it easier to create, deploy, and run applications by using containers. Containers allow a developer to package up an application with all of the parts it needs, such as libraries and other dependencies, and ship it all out as one package. 
-
-In this project other than that, docker is used due to the scalability that provides. Scalability is a key element in a microservice enviroment and we will see why in the next sections of this document.
-
-#### Spring Netflix/Cloud
-
-Spring Cloud Netflix provides Netflix OSS integrations for Spring Boot apps through autoconfiguration and binding to the Spring Environment and other Spring programming model idioms. With a few simple annotations you can quickly enable and configure the common patterns inside your application and build large distributed systems with battle-tested Netflix components. The patterns provided include Service Discovery (Eureka), Circuit Breaker (Hystrix), Intelligent Routing (Zuul) and Client Side Load Balancing (Ribbon).
-
-source : [here](https://spring.io/projects/spring-cloud-netflix).
-
-#### Java & Spring
-
-These tow needs no indroduction I guess. If you want to know why Spring check [here](https://spring.io/why-spring).
-
-#### Python & Flask
-
-Flask is a lightweight WSGI web application framework. It is designed to make getting started quick and easy, with the ability to scale up to complex applications. It began as a simple wrapper around Werkzeug and Jinja and has become one of the most popular Python web application frameworks.
-
-Some of the template API's are written based on [Python](https://www.python.org/)& [Flask](https://flask.palletsprojects.com/en/1.1.x/) framework. 
-
-#### Elastic Stack
-Historically ELK is a bundle of three open source software projects: Elasticsearch, Logstash and Kibana. All these products are maintained by the company Elastic. This bundle consists of:
-
-Elasticsearch, a NoSQL database based on the Lucene search engine.
-Logstash, a server-side data processing pipeline that accepts data from various simultaneously, transforms it, and exports the data to various targets.
-Kibana, a visualization layer that works on top of Elasticsearch.
-Elastic has recently included a family of log shippers called Beats and renamed the stack as Elastic Stack. The solution is flexible and is mostly used to centralize logging requirements.
-
-<!-- Microservices Architecture Section -->
-## Microservice Architecture 
-
-This is an h1 heading.
-
-![alt text][logo2]
-
-[logo2]: ./img/Microservice-Ecosystem.jpg "Dockerized Microservices"
-
-### Service-list & coresponding content
-
-This is an h2 heading
-
-#### Cloud Configuration Server
-This is an h3 heading
-
-#### Eurika Name Server
-This is an h3 heading
-
-#### Secrets Service
-
-#### Graph API
-
-#### Session Managment
-
-#### Hello Service
-
-#### Python Service
-
-#### Hello Client
-
-#### Gateway Proxy Service
-
-#### Elastic Stack
-
+### Log Aggrication
 In a microservices architecture, a single business operation might trigger a chain of downstream microservice calls, which can be pretty challenging to debug. Things, however, can be easier when the logs of all microservices are centralized and each log event contains details that allow us to trace the interactions between the applications.
 
 This is where Elastic Stack comes int picture. Elastic Stack is a group of open source applications from Elastic designed to take data from any source and in any format and then search, analyze, and visualize that data in real time. It was formerly known as ELK Stack, in which the letters in the name stood for the applications in the group: Elasticsearch, Logstash and Kibana. A fourth application, Beats, was subsequently added to the stack, rendering the potential acronym to be unpronounceable. So ELK Stack became Elastic Stack.
@@ -150,44 +69,98 @@ Logstash is a powerful tool that integrates with a wide variety of deployments. 
 ##### Putting the pieces together
 The following illustration shows how the components of Elastic Stack interact with each other:
 
-![alt text][logo4]
-
-[logo4]: ./img/elk.png "Elastic Stack"
+![centralized-logging][centralized-logs]
 
 In a few words:
 
-* Filebeat collects data from the log files and sends it to Logststash.
-* Logstash enhances the data and sends it to Elasticsearch.
-* Elasticsearch stores and indexes the data.
-* Kibana displays the data stored in Elasticsearch.
+* Each service is deployied on a docker container. Docker writes the logs on each host machine at /vat/lib/docker/containers... directory.
+* Filebeat is deployied on each host machine (docker worker) and collects data from the log files and sends it to Logststash.
+* Logstash enhances the data and sends it to Elasticsearch. (Docker Swarm Level)
+* Elasticsearch stores and indexes the data. (Docker Swarm Level)
+* Kibana displays the data stored in Elasticsearch. (Docker Swarm Level)
 
-source : [here](https://cassiomolin.com/2019/06/30/log-aggregation-with-spring-boot-elastic-stack-and-docker/).
+### Resource Architecture & DevOps.
 
-#### Apache as HTTPS proxy
+Since we have everything else figured out now we need to see how and where do we deploy the system. For that we have used Azure Cloud, Debian 10, Docker Engine, Docker Swarm, Git & Maven.
+
+Let's take a closer look and brake it down to pieces.
+
+#### Resource Architecture
+* On Azoure cloud Subscription we have created a vritual network with tow subnets: FrontEnd and BackEnd subnet.
+* FrontEnd Subnet is used to proxy the traffic from and to the BackEnd subnet. Each subnet has it's own Network Security Group (NSG) that restricts the traffic that comes in and off the subnet.
+* On the FrontEnd Subnet there is a proxy machine that acts as the entrypoint of the hole ecosystem. On this machine we have an Apache HTTPD server that is configured to act as a static proxy that redirects the traffic from the WWW to the gateway API's. This apache is also configured to encrypt/decrypt the traffic based on the https protocol SSL/TLS.
+* On the backend subnet we have a set of workers (pods on Kubernets) which preatty much are host machines in which we have installed Docker Engine.
+* Docker Swarm as container orchistration to bring all theese engines together and work as one.
+
+#### Build & deploy pipeline
+* Since docker is used to package & deploy each service we have made a base implementation of the Spotify library to automate the image build for each service with Apache Maven.
+
+* Git is used for the project versioning and for the build pipeline.
+
+* For the python Flask services we have made a base image which can be extended. On this base image we deploy the python services. 
+
+![resource-architecture][resource-architecture]
+
+## Microservice Architecture
+Now that we have covered the basics of the ecosystem, it's time to take a closer look at the ecosystem's architecture itself.
+
+### Request Authentication & JWT Generation.
+The system provides 2 different tipes of authentication. An SSO based version of authentication based on Azure Active directory and a custom authentication based on a custom user database.
+
+### JWT Generation
+We have tow different ways of authentication thus we have tow different ways of generating jwt tokens (with different signatures). For simplisity we will explain in depth only the SSO version of the JWT token generation. The process of JWT token generation is presented on the followin UML process diagram.
+
+![token-registration][token-registration]
+
+#### Request Authentication
+For each different authentication mechanism we use a different gateway API. This way we can demonstrate the real value that an architecture such as this provides. Lets break it down to pieces.
+
+##### SSO token authentication request flow
+1. A request with a JWT tocken arrives on the Apache WebServer. depending on the sub-url we redirect the traffic to the appropriate gateway API.
+
+2. The gateway API performs token validation (over the token signature) and checks if the token is expired. 
+
+3. Next the gateway API extracts the user information from the JWT token and requests information verification from the session-service.
+
+4.  Session-service depending on the headder and the data-stracture requests the graph-service to validate the user information. It retrieves the microsoft token from the session-database (based on the user uuid) and implements the microsoft token to the body of the request on graph-service.
+
+5.  Graph-service recieves the request, extracts the microsoft token from the body and requests Microsoft Graph API for information based on this token. Microsoft Graph API returns the user information if the token is valid. (We use Microsoft Graph as a Real time user database among others.). The response is the stractured and retruned to the session service
+
+6.  If the user exists and he is active a new session is registered on the Session-service, which is written in the session-db.
+
+7. The session DB is a NoSQL database (Mongo) because we store data of the same fammily (session) but with different structure (SSO, custom).
+
+8. The session information reaches the gateway-service in which the final stage of authentication takes palace, cross validate the information we got from the session-service with the ones from the token we recieved from the request.
+
+9.  After the authentication the gateway service checks if the user has the authority to ping the requested service and forwreds the traffic to appropriate service.
+
+##### Custom (User) token authentication request flow
+The process stays the same through the custom authentication with the one discribed above. The only difference is on the steps 4, 5 where the system instead of contacting the Microsoft Graph for token excange it contacts the user service.
+
+4.  Session-service depending on the headder and the data-stracture requests the user information from the user-service bases on the user UUID.
+
+5.  User-service requests the user information based on the User UUID from the user database and returns the outcome to the session service.
 
 
+![toke-authentication-flow][toke-authentication-flow]
 
 
-<!-- Docker Architecture Section -->
+### Abstract use-case
 
-## Docker Architecture 
+![abstract-use-case][abstract-use-case]
 
-This is an h1 heading
 
-![alt text][logo3]
+## Deploy the System
 
-[logo3]: ./img/dockerrizing-microservices.jpg "Dockerized Microservices"
+[technologies-used-diagram]: ./img/architecture/general-architecture-components.jpg "Implemented Technologies"
 
-### Docker Containers & Spotofy Maven plugin.
+[service-configuration]: ./img/architecture/enviroment-cloud-config.jpg "Service configuration"
 
-### Docker Networks.
+[centralized-logs]: ./img/architecture/log-aggrication.jpg "centralized-logging"
 
-### Docker Volumes.
+[resource-architecture]: ./img/architecture/resource-architecture.jpg "resource-architecture"
 
-## Run The System
+[toke-authentication-flow]: ./img/architecture/authentication-flow.jpg "toke-authentication-flow"
 
-### Local Run
-
-### Docker Run
-
-## Future Additions
+[token-registration]: ./img/architecture/token-registration.jpg "token-registration"
+[abstract-use-case]: ./img/architecture/request-flow-example.jpg "abstract-use-case"
