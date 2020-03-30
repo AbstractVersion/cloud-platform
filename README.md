@@ -210,16 +210,12 @@ The process stays the same through the custom authentication with the one descri
 Since we have made it this far, lets take a look at one of the benefits that this architecture provides.
 
 * Individual and independent scale for each service.
-
 * Individual test & deploy pipeline for each service.
-
 * Technology Independence.
-
 * Reactive programming with implementation  of Message brokers.
-
 * Code reusability
-
 * Different entrypoints for each business  model.
+* Boost of the Agile work-way.
 
 ![abstract-use-case][abstract-use-case]
 
