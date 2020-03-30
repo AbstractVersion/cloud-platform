@@ -4,8 +4,8 @@ This document is aiming to demonstrate a microserice general purpose architectur
 
 ## Table of Contnents
 - [Known technologies & patterns](#known-technologies-&-patterns)
-  * [Service Discovery](#service-discovery)
   * [Architecture Backbone](#architecture-backbone)
+  * [Service Discovery](#service-discovery)  
   * [Enviroment & Cloud configuration](#enviroment-&-cloud-configuration)
   * [Log Aggrication](#log-aggrication)
     + [Elasticsearch](#elasticsearch)
@@ -31,27 +31,54 @@ This document is aiming to demonstrate a microserice general purpose architectur
 ## Known technologies & patterns
 Lets take a look on what component we used and how each one of them solve a microservice architecture "common problem". We will classify the technologies used based on the use-case that they help to implement :
 
-* Service Discovery & Architecture Backbone
+* Architecture Backbone
+* Service Discovery 
 * Log Aggrication/Sentrilization
 * Real-Time service configuration
 * Development & Operations
 
 ![Implemented Technologies][technologies-used-diagram]
 
-### Service Discovery
 
-Service discovery is a common "nightmare" on all the architectures that are based on microservces. Thats because when instead of one or tow monolithic applications, you now have 15, 20, 30, servces that each one of them needs to be able to communicate with each other and monst important scale indepentandly. The present architecture is not focusing on a custom solution of service discovery thus we have used the very handfull solution provided by Neftlix OSS. Netflix has developed a number of projects that you might find usefull on architectures such as this. Most importantly this software is tested, validated and implemented, by Netflix which means that is fault tollerant and trustworthy. You can find more infomrations [here](https://netflix.github.io/)
-
-![service-discovery][service-discovery]
 
 ### Architecture Backbone
 
-Now that we know how to discover our services, we need a framework in which we can work on and implement the Netflix OSS. Luckily for us one of the biggest frameworks wright now, does just this. Spring framework has been evolved to an amaizing tool for situations like this. [Spring](https://spring.io/projects/spring-boot) provides easy-to-use implementations for all the components we need such as Netflix OSS, but also provides it's own very helpfull set of tools such as [spring-cloud](https://spring.io/projects/spring-cloud), [spring-data](https://spring.io/projects/spring-data) etc. Spring though is a java based framework and we need more than that in order to prove the flexibility and show the real benefits of this architecture. Thats why we have chosen [Flask](https://flask.palletsprojects.com/en/1.1.x/) as the secondary framework on which we can deploy our applications and be compatitable with the rest of the ecosystem.
+We define the bakcbone of the architecture as the core compoenents that need to be active in order for as to be able to add a use-case (service) on our envirment. So, essentially the backbone is a group of services that all together provide the core functionality of the ecosyste. Lets take a look at each piece & framework:
+
+* We use [Apache2 HTTPD](https://httpd.apache.org/) as http proxy to forward the requests to the gateway service & encrypt the traffic (SSL/TLS).
+* From [Netflix OSS](https://netflix.github.io/), we use [Zuul](https://github.com/Netflix/zuul) as a gateway service. Zuul acts as an entry point for the rest of the microservice ecosystem. Each request comming from Apache passes through this service. Gatway servce performs request authentication & routs the traffic the approporiate service. 
+* From [Netflix OSS](https://netflix.github.io/), we use [Eureka ](https://github.com/Netflix/eureka) as discovery service. Eureka enables the microservices to register themselfs. Also provides the HTTP address for each service registered.
+* From [Netflix OSS](https://netflix.github.io/), we use [Ribbon ](https://github.com/Netflix/eureka) so as to perform client-side load ballancing on the requests performed between microservices.
+* We use [Elastic Stack](https://www.elastic.co/products/) & [Docker](https://www.docker.com/) for log aggrigation/centralization.
+* We use [Spring Cloud](https://spring.io/projects/spring-cloud), [Rabbit MQ](https://www.rabbitmq.com/) & [GitHub](https://github.com/) for enviroment & attribute configuration.
+* For request authentication we provide [JWT](https://oauth.net/2/jwt/) implementation.
+* Finally we use [Spring Boot](https://spring.io/projects/spring-framework) & [Flask](https://flask.palletsprojects.com/en/1.1.x/) frameworks for each service base implementation.
 
 ![overal-system-backbone][overal-system]
 
+
+### Service Discovery
+
+Service discovery is a common "nightmare" on all the architectures that are based on microservces. Thats because when instead of one or tow monolithic applications, you now have 15, 20, 30, servces that each one of them needs to be able to communicate with each other and monst important scale indepentandly. Lets take a look at the process :
+
+* Each service register itself with Eurika.
+* Ribbon requests the url list for a specific service, and based on a load balancer algorith (Round Robbin in this case) forwards the traffic.
+* Each service that needs to request information from another microservice uses ribbon to perform the request.
+* The gateway service routs the traffic with ribbon as well.
+
+![service-discovery][service-discovery]
+
+
 ### Enviroment & Cloud configuration
-Since we have diffined the backbone of our architectures (languages, frameworks etc.), it's time for us to take a look at the different enviroment configurations & the way we will be injecting configurations into our system. An architecture such as this provides a lot of beneffits and a variaty of different wasy that you can implement you architecure ideas. In our case for service configuration we have used Spring Cloud, Spring Cloud Bus, Git & Rabbit MQ.
+ Cloud configuration is a very important part of the system. Each service retrieves their configuration from the cloud config server. Let's take a look how:
+
+ * Configuration for each service is stored on a git repository.
+ * Once a service fires up, it requestes from the cloud-config server the configuration.
+ * Every sensitive information is hashed & decrypted at runtime with the help of Java Security Framework presented on Java 11 & above.
+ * Rabbit MQ is a message broaker. Spring framework provides a tool called Spring Cloud Bus that allows each service to register as consumer or provider. 
+ * Cloud config server and all it's instances are registered as providers on the RabbitMQ queue.
+ * Every other microservice registers itself with Spring Cloud Bus as an consumer on the RabbitMQ queue.
+ * Once an actor performs a push on the remote git repository that holds the configuration information and then pings the endpoint of spring cloud server /bus/refresh. Cloud server will pull the new version of the configurations and let each active service that the configuration has changed. So the service will request the new configuration from the cloud config server. That's how we achieve real time configuration.
 
 ![Service configuration][service-configuration]
 
@@ -110,6 +137,17 @@ Let's take a closer look and brake it down to pieces.
 
 
 #### Docker Architecture
+We spoke of the cloud architecture and how the different virtual machines communicate with each other. So, its time to take a look at the proposed docker architecture for the presented ecosystem. Let's break it into pieces:
+
+* First of all we use Docker Swarm because it is not a large scale project.
+* We create an overlay network with tow subnets. A front-end and a back-end.
+* We have 3 host machines running debian or every other linux distro. On this machine we install docker Engine & enable the Docker Swarm package.
+* As swarm manager we difine one of the 3 docker engine. On this engine we run the services that do not need to scale as much as the microservices. For instance ELK,  Cloud Config & the databases have no meaning to be on each worker. (thuts up to you though how you wil organize the service deployment).
+*  The we register the tow other engines as workers on our swarm cluster. Which means that on thos tow engines we deploy and scale our system. In this particular case because the system is not enormus we just use the different engines to replicate the services. Se, each engine has a copy of the rest of the enviroment.
+* The deployment and the container orchistration happens with Swarm Stack.
+* Each service communicate with each other through the overlay network of the Swarm Cluster.
+* All the gateway, buissness & CRUD services are attached on the front-end network.
+* While all the database & sensitive repos are attahched on the back-end network. On the back-end network are attached the CRUD services also that needs to communicate with this layer.
 
 ![docker-architecture][docker-architecture]
 
