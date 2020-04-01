@@ -1,6 +1,6 @@
 # Microservice Ecosystem
 
-This document is aiming to demonstrate a microservice general purpose architecture. All the work on this document is open source and is licensed under Apache License.
+This document is aiming to demonstrate a microservice general purpose architecture. All the work on this document is open source and is licensed under [Apache License](apache-license-2.0.md).
 
 ## Table of Contents
 - [Known technologies & patterns](#known-technologies-&-patterns)
