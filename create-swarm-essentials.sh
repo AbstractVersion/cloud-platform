@@ -113,12 +113,13 @@ fi
 read -p "Create Shared volumes ? (y/n) " RESP
 if [ "$RESP" = "y" ]; then
     sudo -u root mkdir -p /mnt/sharedfolder/volumes/data/elsasticsearch
-    # sudo -u root mkdir -p /mnt/sharedfolder/volumes/data/mariadb      
-    ip="$(ifconfig | grep -A 1 'eth0' | tail -1 | cut -d ':' -f 2 | cut -d ' ' -f 1)"
+    # sudo -u root mkdir -p /mnt/sharedfolder/volumes/data/mariadb  
+    echo 'please provide the NFS server ip :'
+    read input    
 
     docker volume create --driver local \
       --opt type=nfs \
-      --opt o=nfsvers=4,addr=$ip,rw \
+      --opt o=nfsvers=4,addr=$input,rw \
       --opt device=:/mnt/sharedfolder/volumes/data/elsasticsearch \
       elsasticsearch-volume
 else
