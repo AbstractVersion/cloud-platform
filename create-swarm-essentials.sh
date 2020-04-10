@@ -52,7 +52,7 @@ fi
 
 echo "Initialize NFS server on this machine? [Y,n]"
 read input
-if [[ $input == "Y" || $input == "y" ]]
+if [[ $input == "Y" || $input == "y" ]];
 
 then
     echo 'Installing NFS Server for File sharing, you will need a sudoer'
