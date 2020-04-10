@@ -46,7 +46,7 @@ if [ "$RESP" = "y" ]; then
         sudo -u root iptables -A INPUT -s $q -j ACCEPT
         echo '\n'
     done
-    sudo -u root copy ./exports /etc/exports
+    sudo -u root cp -fr ./exports /etc/exports
     # After making all the above configurations in the host system, 
     # now is the time to export the shared directory through the following command as sudo:
     sudo -u root exportfs -a
