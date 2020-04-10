@@ -120,3 +120,13 @@ else
     echo "Ok then proceeding with the initialization..."
 fi
 
+read -p "Do you want to create a registry service to push your images localy ? (y/n) " RESP
+if [ "$RESP" = "y" ]; then
+#    1.Start the registry as a service on your swarm:
+    docker service create --name registry --publish published=5000,target=5000 registry:2
+    watch docker service ls
+# 2.Check its status with docker service ls:
+else
+    echo "Ok then proceeding with the initialization..."
+fi
+
