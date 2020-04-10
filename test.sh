@@ -38,7 +38,7 @@ if [ "$RESP" = "y" ]; then
         sudo -u root echo  "/mnt/sharedfolder $(docker node inspect --format '{{.Status.Addr}}' "${NODE}")(rw,sync,no_subtree_check)"$'\r' >> /etc/exports
 
         echo "Allowing client through debian ip-tables : \t" $(docker node inspect --format "{{.Status.Addr}}" ${NODE})
-        sudo -u iptables -A INPUT -s "$(docker node inspect --format '{{.Status.Addr}}' ${NODE})" -j ACCEPT
+        sudo -u root iptables -A INPUT -s "$(docker node inspect --format '{{.Status.Addr}}' ${NODE})" -j ACCEPT
         echo '\n'
     done
 
