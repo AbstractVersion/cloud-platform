@@ -96,31 +96,25 @@ if [ "$RESP" = "y" ]; then
 
     sudo -u root systemctl restart nfs-kernel-server
 else
-    read -p "Do you want to configure it as a client ? (y/n) " RESP
-    if [ "$RESP" = "y" ]; then
-
-        sudo -u root apt-get update && sudo -u root apt-get install nfs-common
-        sudo -u root mkdir -p /mnt/sharedfolder
-        echo 'please provide the NFS server ip :'
-        read input
-        sudo -u root mount $input:/mnt/sharedfolder
-    else
     echo "Ok then proceeding with the initialization..."
-    fi
 fi
 
 
-read -p "Create Shared volumes ? (y/n) " RESP
+read -p "Create Shared volumes (this will register as client this machine to the NFS server) ? (y/n) " RESP
 if [ "$RESP" = "y" ]; then
-    sudo -u root mkdir -p /mnt/sharedfolder/volumes/data/elsasticsearch
+    sudo -u root apt-get update && sudo -u root apt-get install nfs-common
+    sudo -u root mkdir -p /mnt/sharedfolder
+
+    # sudo -u root mkdir -p /mnt/sharedfolder/volumes/data/elsasticsearch
     # sudo -u root mkdir -p /mnt/sharedfolder/volumes/data/mariadb  
+
     echo 'please provide the NFS server ip :'
-    read input    
+    read input
+    sudo -u root mount -t nfs $input:/mnt/sharedfolder /mnt/sharedfolder
 
     docker volume create --driver local \
-      --opt type=nfs \
-      --opt o=nfsvers=4,addr=$input,rw \
-      --opt device=:/mnt/sharedfolder/volumes/data/elsasticsearch \
+      --opt type=none \
+      --opt device=/mnt/sharedfolder/volumes/data/elsasticsearch \
       elsasticsearch-volume
 else
     echo "Ok then proceeding with the initialization..."
