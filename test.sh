@@ -30,6 +30,7 @@ if [ "$RESP" = "y" ]; then
 
     
     echo 'Adding clients to NFS, you will need root for that'
+    sudo -u root rm -rf ./exports
     touch ./exports
     for NODE in $(docker node ls --filter role=manager --format '{{.Hostname}}')
     do 
