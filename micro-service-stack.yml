@@ -1,6 +1,6 @@
 version: '3.7'
 networks:
-    backend:
+    micro-nework-backend:
       external: true
 volumes:
     generalRDBMS:
@@ -17,7 +17,7 @@ services:
     volumes:
      - generalRDBMS:/var/lib/mysql
     networks:
-      - backend
+      - micro-nework-backend
     # restart: on-failure 
     deploy:
         placement:
