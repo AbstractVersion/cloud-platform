@@ -26,11 +26,9 @@ echo Current Active networks :
 
 docker network ls
 
-echo "Do you want to create the overlay networks ? [Y,n]"
-read input
-if [[ $input == "Y" || $input == "y" ]]
-then
-        echo Creating Swarm Networks
+read -p "Create Shared volumes ? (y/n) " RESP
+if [ "$RESP" = "y" ]; then
+    echo Creating Swarm Networks
 
         docker network create -d overlay micro-nework-frontend
         docker network create -d overlay micro-nework-backend
@@ -40,8 +38,9 @@ then
 
         docker network ls
 else
-        echo "Proceeding with the iitialization..."
+    echo "Ok then proceeding with the initialization..."
 fi
+
 
 
 
@@ -50,11 +49,9 @@ fi
 #------------------------------------ Initializeing NFS ---------------------------------------------
 #https://vitux.com/install-nfs-server-and-client-on-ubuntu/
 
-echo "Initialize NFS server on this machine? [Y,n]"
-read input
-if [[ $input == "Y" || $input == "y" ]];
 
-then
+read -p "Do you want to install NFS server here ? (y/n) " RESP
+if [ "$RESP" = "y" ]; then
     echo 'Installing NFS Server for File sharing, you will need a sudoer'
     #Update apt & install nfs kernel
     sudo apt-get update
@@ -67,20 +64,29 @@ then
     # Assigne the filesystem permissions so as the directory to be accessible by the NFS.
     sudo chown nobody:nogroup /mnt/sharedfolder
     sudo chmod 777 /mnt/sharedfolder
-
-    echo 'Adding clients to NFS, you will need root for that'
     
+    sudo cat /etc/exports
+
+    
+    echo 'Adding clients to NFS, you will need root for that'
+    sudo -u root rm -rf ./exports
+    touch ./exports
     for NODE in $(docker node ls --filter role=manager --format '{{.Hostname}}')
     do 
-        echo  "Adding as client :\t${NODE} - $(docker node inspect --format '{{.Status.Addr}}' "${NODE}")"; 
-
-        sudo -u root echo  "/mnt/sharedfolder $(docker node inspect --format '{{.Status.Addr}}' "${NODE}")(rw,sync,no_subtree_check)" >> /etc/exports
+        echo  "Adding as client :\t${NODE} - $(docker node inspect --format '{{.Status.Addr}}' "${NODE}")"
+        q=$(docker node inspect --format '{{.Status.Addr}}' ${NODE})
+        echo  "/mnt/sharedfolder $q(rw,sync,no_subtree_check)" >> ./exports
+        # echo '"/mnt/sharedfolder '$q'(rw,sync,no_subtree_check)" >> /etc/exports'
+        
+        # temp = "$(docker node inspect --format '{{.Status.Addr}}' "${NODE}"
+        # echo $temp
+        # sudo echo  "/mnt/sharedfolder $temp(rw,sync,no_subtree_check)"$'\r' >> /etc/exports
 
         echo "Allowing client through debian ip-tables : \t" $(docker node inspect --format "{{.Status.Addr}}" ${NODE})
-        sudo -u iptables -A INPUT -s "$(docker node inspect --format '{{.Status.Addr}}' ${NODE})" -j ACCEPT
+        sudo -u root iptables -A INPUT -s $q -j ACCEPT
         echo '\n'
     done
-
+    sudo -u root cp -fr ./exports /etc/exports
     # After making all the above configurations in the host system, 
     # now is the time to export the shared directory through the following command as sudo:
     sudo -u root exportfs -a
@@ -90,32 +96,24 @@ then
 
     sudo -u root systemctl restart nfs-kernel-server
 else
-    #Initializing NFS client
-    echo "Initialize NFS Client ? [Y,n]"
-    read input
-    if [[ $input == "Y" || $input == "y" ]]
-    then
+    read -p "Do you want to configure it as a client ? (y/n) " RESP
+    if [ "$RESP" = "y" ]; then
+
         sudo -u root apt-get update && sudo -u root apt-get install nfs-common
         sudo -u root mkdir -p /mnt/sharedfolder
         echo 'please provide the NFS server ip :'
         read input
-        sudo -u root mount $input:/mnt/sharedfolder 
+        sudo -u root mount $input:/mnt/sharedfolder
     else
-        echo "Proceeding with the initialization"
+    echo "Ok then proceeding with the initialization..."
     fi
-    echo "Proceeding with the initialization"
 fi
 
-# Must run on The machines that will 
-echo "Create Shared volumes ? [Y,n]"
-read input
-if [[ $input == "Y" || $input == "y" ]]
-then
-echo Creating Swarm volumes volumes
-    # Create elsastic search directory 
-    
+
+read -p "Create Shared volumes ? (y/n) " RESP
+if [ "$RESP" = "y" ]; then
     sudo -u root mkdir -p /mnt/sharedfolder/volumes/data/elsasticsearch
-    sudo -u root mkdir -p /mnt/sharedfolder/volumes/data/mariadb      
+    # sudo -u root mkdir -p /mnt/sharedfolder/volumes/data/mariadb      
     ip="$(ifconfig | grep -A 1 'eth0' | tail -1 | cut -d ':' -f 2 | cut -d ' ' -f 1)"
 
     docker volume create --driver local \
@@ -123,9 +121,7 @@ echo Creating Swarm volumes volumes
       --opt o=nfsvers=4,addr=$ip,rw \
       --opt device=:/mnt/sharedfolder/volumes/data/elsasticsearch \
       elsasticsearch-volume
-      
 else
-        echo "Proceeding with the initialization"
+    echo "Ok then proceeding with the initialization..."
 fi
-
 

@@ -11,7 +11,7 @@
 #     echo '\n'
 # done
 
-read -p "Are you alright? (y/n) " RESP
+read -p "Do you want to install NFS server here ? (y/n) " RESP
 if [ "$RESP" = "y" ]; then
     echo 'Installing NFS Server for File sharing, you will need a sudoer'
     #Update apt & install nfs kernel
