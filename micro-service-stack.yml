@@ -12,22 +12,23 @@ volumes:
 services:
 
   generalRDBMS:
-    container_name: generalRDBMS
+    # container_name: generalRDBMS
     image: mariadb:latest
     volumes:
      - generalRDBMS:/var/lib/mysql
     networks:
       - backend
-    restart: on-failure 
+    # restart: on-failure 
     deploy:
+        placement:
+            constraints:
+              - "node.role==manager"
       #Number of replicas
-      replicas: 1
+        replicas: 1
       # Configure stack update
-      restart_policy:
-        condition: on-failure
-      placement:
-        constrains: 
-          - "node.role==manager"
+        restart_policy:
+          condition: on-failure
+
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: sessionDB
