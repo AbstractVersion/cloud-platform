@@ -35,8 +35,8 @@ if [ "$RESP" = "y" ]; then
     do 
         echo  "Adding as client :\t${NODE} - $(docker node inspect --format '{{.Status.Addr}}' "${NODE}")"
         q=$(docker node inspect --format '{{.Status.Addr}}' ${NODE})
-        sudo -u root echo  "/mnt/sharedfolder $q(rw,sync,no_subtree_check)"$'\r' >> ./exports
-        echo '"/mnt/sharedfolder '$q'(rw,sync,no_subtree_check)" >> /etc/exports'
+        echo  "/mnt/sharedfolder $q(rw,sync,no_subtree_check)"$'\r' >> ./exports
+        # echo '"/mnt/sharedfolder '$q'(rw,sync,no_subtree_check)" >> /etc/exports'
         
         # temp = "$(docker node inspect --format '{{.Status.Addr}}' "${NODE}"
         # echo $temp
@@ -46,7 +46,7 @@ if [ "$RESP" = "y" ]; then
         sudo -u root iptables -A INPUT -s $q -j ACCEPT
         echo '\n'
     done
-    sudo -u copy ./exports /etc/exports
+    sudo -u root copy ./exports /etc/exports
     # After making all the above configurations in the host system, 
     # now is the time to export the shared directory through the following command as sudo:
     sudo -u root exportfs -a
