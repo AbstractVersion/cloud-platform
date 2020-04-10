@@ -25,14 +25,17 @@ if [ "$RESP" = "y" ]; then
     # Assigne the filesystem permissions so as the directory to be accessible by the NFS.
     sudo chown nobody:nogroup /mnt/sharedfolder
     sudo chmod 777 /mnt/sharedfolder
+    
+    sudo cat /etc/exports
 
+    
     echo 'Adding clients to NFS, you will need root for that'
     
     for NODE in $(docker node ls --filter role=manager --format '{{.Hostname}}')
     do 
         echo  "Adding as client :\t${NODE} - $(docker node inspect --format '{{.Status.Addr}}' "${NODE}")"
 
-        sudo -u root echo  "/mnt/sharedfolder $(docker node inspect --format '{{.Status.Addr}}' "${NODE}")(rw,sync,no_subtree_check)" >> /etc/exports
+        sudo -u root echo  "/mnt/sharedfolder $(docker node inspect --format '{{.Status.Addr}}' "${NODE}")(rw,sync,no_subtree_check)"$'\r' >> /etc/exports
 
         echo "Allowing client through debian ip-tables : \t" $(docker node inspect --format "{{.Status.Addr}}" ${NODE})
         sudo -u iptables -A INPUT -s "$(docker node inspect --format '{{.Status.Addr}}' ${NODE})" -j ACCEPT
