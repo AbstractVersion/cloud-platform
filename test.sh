@@ -34,11 +34,16 @@ if [ "$RESP" = "y" ]; then
     for NODE in $(docker node ls --filter role=manager --format '{{.Hostname}}')
     do 
         echo  "Adding as client :\t${NODE} - $(docker node inspect --format '{{.Status.Addr}}' "${NODE}")"
-
-        sudo -u root echo  "/mnt/sharedfolder $(docker node inspect --format '{{.Status.Addr}}' "${NODE}")(rw,sync,no_subtree_check)"$'\r' >> /etc/exports
+        q=$(docker node inspect --format '{{.Status.Addr}}' ${NODE})
+        sudo -u root echo  "/mnt/sharedfolder $q(rw,sync,no_subtree_check)"$'\r' >> /etc/exports
+        echo '"/mnt/sharedfolder '$q'(rw,sync,no_subtree_check)" >> /etc/exports'
+        
+        # temp = "$(docker node inspect --format '{{.Status.Addr}}' "${NODE}"
+        # echo $temp
+        # sudo echo  "/mnt/sharedfolder $temp(rw,sync,no_subtree_check)"$'\r' >> /etc/exports
 
         echo "Allowing client through debian ip-tables : \t" $(docker node inspect --format "{{.Status.Addr}}" ${NODE})
-        sudo -u root iptables -A INPUT -s "$(docker node inspect --format '{{.Status.Addr}}' ${NODE})" -j ACCEPT
+        sudo -u root iptables -A INPUT -s $q -j ACCEPT
         echo '\n'
     done
 
@@ -51,11 +56,10 @@ if [ "$RESP" = "y" ]; then
 
     sudo -u root systemctl restart nfs-kernel-server
 else
-   #Initializing NFS client
+     #Initializing NFS client
     echo "Initialize NFS Client ? [Y,n]"
     read input
-    if [[ $input == "Y" || $input == "y" ]]
-    then
+    if [[ $input == "Y" || $input == "y" ]]; then
         sudo -u root apt-get update && sudo -u root apt-get install nfs-common
         sudo -u root mkdir -p /mnt/sharedfolder
         echo 'please provide the NFS server ip :'
