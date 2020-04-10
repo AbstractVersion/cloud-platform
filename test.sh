@@ -36,7 +36,7 @@ if [ "$RESP" = "y" ]; then
     do 
         echo  "Adding as client :\t${NODE} - $(docker node inspect --format '{{.Status.Addr}}' "${NODE}")"
         q=$(docker node inspect --format '{{.Status.Addr}}' ${NODE})
-        echo  "/mnt/sharedfolder $q(rw,sync,no_subtree_check)"$'\r' >> ./exports
+        echo  "/mnt/sharedfolder $q(rw,sync,no_subtree_check)" >> ./exports
         # echo '"/mnt/sharedfolder '$q'(rw,sync,no_subtree_check)" >> /etc/exports'
         
         # temp = "$(docker node inspect --format '{{.Status.Addr}}' "${NODE}"
