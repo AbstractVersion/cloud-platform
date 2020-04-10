@@ -28,7 +28,8 @@ docker network ls
 
 echo "Do you want to create the overlay networks ? [Y,n]"
 read input
-if [[ $input == "Y" || $input == "y" ]]; then
+if [[ $input == "Y" || $input == "y" ]]
+then
         echo Creating Swarm Networks
 
         docker network create -d overlay micro-nework-frontend
@@ -51,7 +52,9 @@ fi
 
 echo "Initialize NFS server on this machine? [Y,n]"
 read input
-if [[ $input == "Y" || $input == "y" ]]; then
+if [[ $input == "Y" || $input == "y" ]]
+
+then
     echo 'Installing NFS Server for File sharing, you will need a sudoer'
     #Update apt & install nfs kernel
     sudo apt-get update
@@ -90,7 +93,8 @@ else
     #Initializing NFS client
     echo "Initialize NFS Client ? [Y,n]"
     read input
-    if [[ $input == "Y" || $input == "y" ]]; then
+    if [[ $input == "Y" || $input == "y" ]]
+    then
         sudo -u root apt-get update && sudo -u root apt-get install nfs-common
         sudo -u root mkdir -p /mnt/sharedfolder
         echo 'please provide the NFS server ip :'
@@ -105,7 +109,8 @@ fi
 # Must run on The machines that will 
 echo "Create Shared volumes ? [Y,n]"
 read input
-if [[ $input == "Y" || $input == "y" ]]; then
+if [[ $input == "Y" || $input == "y" ]]
+then
 echo Creating Swarm volumes volumes
     # Create elsastic search directory 
     
