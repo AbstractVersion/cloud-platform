@@ -3,11 +3,11 @@ networks:
     micro-nework-backend:
       external: true
 volumes:
-    generalRDBMS:
-      driver_opts:
-        type: "nfs"
-        o: "addr=192.168.2.4,nolock,soft,rw"
-        device: ":/mnt/sharedfolder/"
+  mysql.vol:
+    driver: nfs
+    driver_opts:
+      share: 192.168.2.4:/mysql
+      # https://sysadmins.co.za/docker-swarm-persistent-storage-with-nfs/
 
 services:
 
@@ -15,7 +15,7 @@ services:
     # container_name: generalRDBMS
     image: mariadb:latest
     volumes:
-     - generalRDBMS:/var/lib/mysql
+     - mysql.vol:/var/lib/mysql
     networks:
       - micro-nework-backend
     # restart: on-failure 
