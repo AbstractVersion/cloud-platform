@@ -28,30 +28,13 @@ services:
       # Configure stack update
         restart_policy:
           condition: on-failure
-
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: sessionDB
       MYSQL_USER: root
       MYSQL_PASSWORD: root
-    logging:
-      driver: syslog
-      options:
-        tag: "{{.DaemonName}}(image={{.ImageName}};name={{.Name}};id={{.ID}})"
+
 
     
 
-#   rabbit-server:
-#     image: rabbitmq:3-management
-#     hostname: "rabbit-server"
-#     environment:
-#       RABBITMQ_DEFAULT_USER: "abstract"
-#       RABBITMQ_DEFAULT_PASS: "admin"
-#       RABBITMQ_DEFAULT_VHOST: "/"
-#     ports:
-#       - "15672:15672" 
-#       - "5672:5672" 
-#       - "15671:15671" 
-#       - "5671:5671" 
-#       - "4369:4369" 
-#     restart: on-failure
+
