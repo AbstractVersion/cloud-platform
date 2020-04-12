@@ -1,38 +1,220 @@
 version: '3.7'
+#Netorks
 networks:
-    micro-nework-backend:
-      external: true
+  micro-nework-frontend:
+    driver: overlay
+  micro-nework-backend:
+    driver: overlay
+  elastic-stack-network:
+    driver: overlay
+
+# Be sure that you have configure the remote volumes with NFS
+# https://sysadmins.co.za/docker-swarm-persistent-storage-with-nfs/
 volumes:
+  # Elsatic search volume, this volume will be shared among the registered & Configured managers.
   mysql.vol:
     driver: nfs
     driver_opts:
+      # Here you should replace this ip with the NFS server IP, the directory /mysql exists on the root folder of NFS shared + /mysql
       share: 192.168.2.4:/mysql
-      # https://sysadmins.co.za/docker-swarm-persistent-storage-with-nfs/
+  # Elsatic search volume, this volume will be shared among the registered & Configured managers.
+  elastic-volume.vol:
+    driver: nfs
+    driver_opts:
+      # Here you should replace this ip with the NFS server IP, the directory /mysql exists on the root folder of NFS shared + /mysql
+      share: 192.168.2.4:/elastic-volume
+  
+  # This volume must be created externally in order to configure the data persists correctely.
+  # By mounting this volume directely on the local filesystem, no matter which container run will have the information of the previus beats running.
+  # COnfigure each worker to have a volume like this in order to gather logs per worker Machine 
+  # Run to create the volume :
+  # docker volume create --driver local \
+  #   --opt type=none \
+  #   --opt device=/volumes/beats \
+  #   --opt o=bind logstash.ext.vol
+  logstash.ext.vol: 
+    external: true
+    name: logstash.ext.vol
+    # driver: local
+    # driver_opts:
+    #   type: 'none'
+    #   o: 'bind'
+    #   device: '/'
+  
+      
 
 services:
 
-  generalRDBMS:
-    # container_name: generalRDBMS
-    image: mariadb:latest
-    volumes:
-     - mysql.vol:/var/lib/mysql
+  # generalRDBMS:
+  #   # container_name: generalRDBMS
+  #   image: mariadb:latest
+  #   volumes:
+  #    - mysql.vol:/var/lib/mysql
+  #   networks:
+  #     - micro-nework-backend
+  #   # restart: on-failure 
+  #   deploy:
+  #       placement:
+  #           constraints:
+  #             - "node.role==manager"
+  #     #Number of replicas
+  #       replicas: 1
+  #     # Configure stack update
+  #       restart_policy:
+  #         condition: on-failure
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: root
+  #     MYSQL_DATABASE: sessionDB
+  #     MYSQL_USER: root
+  #     MYSQL_PASSWORD: root
+
+  # Rabbit MQ Server 
+  # rabbit-server:
+  #   image: rabbitmq:3-management
+  #   hostname: "rabbit-server"
+  #   environment:
+  #     RABBITMQ_DEFAULT_USER: "abstract"
+  #     RABBITMQ_DEFAULT_PASS: "admin"
+  #     RABBITMQ_DEFAULT_VHOST: "/"
+  #   ports:
+  #     - "15672:15672" 
+  #     - "5672:5672" 
+  #     - "15671:15671" 
+  #     - "5671:5671" 
+  #     - "4369:4369" 
+  #   networks:
+  #     - micro-nework-frontend
+  #     - micro-nework-backend
+  #   deploy:
+  #     placement:
+  #       constraints:
+  #         - "node.role==manager"
+  #     replicas: 1
+  #     restart_policy:
+  #       condition: on-failure
+
+  # Cloud COnfig server
+  # config-server:
+  #   image: micro-env/config-server:latest
+  #   ports:
+  #     - "8888:8888"
+  #   labels:
+  #     collect_logs_with_filebeat: "false"
+  #     decode_log_event_to_json_object: "false"
+  #   networks:
+  #     - micro-nework-frontend
+  #     - micro-nework-backend
+  #   depends_on:
+  #     - rabbit-server
+  #   deploy:
+  #     placement:
+  #       constraints:
+  #         - "node.role==manager"
+  #     replicas: 1
+  #     restart_policy:
+  #       condition: on-failure
+
+  #Centralized Logging ELK
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.2.0
+    user: root
     networks:
-      - micro-nework-backend
-    # restart: on-failure 
-    deploy:
-        placement:
-            constraints:
-              - "node.role==manager"
-      #Number of replicas
-        replicas: 1
-      # Configure stack update
-        restart_policy:
-          condition: on-failure
+      - elastic-stack-network
+    ports:
+      - "9200:9200"
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: sessionDB
-      MYSQL_USER: root
-      MYSQL_PASSWORD: root
+      - "discovery.type=single-node"
+    volumes:
+      - elastic-volume.vol:/usr/share/elasticsearch/data              # Persistence data
+    # depends_on:
+      # - config-server
+    deploy:
+      placement:
+        constraints:
+          - "node.role==manager"
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:7.2.0
+    networks:
+      - elastic-stack-network
+    ports:
+      - "25826:25826"
+      - "5044:5044"
+    volumes:
+      - ./elk-template/logstash/pipeline:/usr/share/logstash/pipeline:ro                # Pipeline configuration
+    depends_on:
+      - elasticsearch
+    deploy:
+      placement:
+        constraints:
+          - "node.role==manager"
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.2.0
+    networks:
+      - elastic-stack-network
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+    deploy:
+      placement:
+        constraints:
+          - "node.role==manager"
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+  # Beats will be installed on the workers and it will scale as one container per worker
+  # due to that we need to scale it externalyy depending on the number of workers we have (docker service update --replicas-max-per-node=20 your_service_name)
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:7.2.0
+    networks:
+      - elastic-stack-network
+    volumes:
+      # - ./elk-template/filebeat/filebeat.docker.yml:/usr/share/filebeat/filebeat.yml:ro # Configuration file
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro           # Docker logs
+      - /var/run/docker.sock:/var/run/docker.sock:ro                       # Additional information about containers
+      - logstash.ext.vol:/usr/share/filebeat/data:rw                        # Persistence data
+    user: root                                                             # Allow access to log files and docker.sock
+    depends_on:
+      - logstash
+    deploy:
+      placement:
+        constraints: 
+          - node.role != manager
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+
+  # Discovery service 
+  # discovery-service:
+  #   image: micro-env/discovery-service
+  #   networks:
+  #     - elastic-stack-network
+  #   ports:
+  #       - "80:8761" 
+  #   labels:
+  #       collect_logs_with_filebeat: "false"
+  #       decode_log_event_to_json_object: "false"
+  #   depends_on:
+  #     - config-server
+  #   deploy:
+  #     placement:
+  #       constraints:
+  #         - "node.role==manager"
+  #     replicas: 1
+  #     restart_policy:
+  #       condition: on-failure
 
 
     
