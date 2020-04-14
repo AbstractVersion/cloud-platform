@@ -1,6 +1,5 @@
-version: '3'
+version: '3.7'
 services:
-
 #Registry
   registry:
     image: registry:2

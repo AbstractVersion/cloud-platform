@@ -1,7 +1,7 @@
 #!/bin/sh
 # create private registry for swarm cluster image distribution
 sudo apt install -y gnupg2 pass apache2-utils httpie
-sudo apt isntall tree
+sudo apt install tree
 
 read -p "Do you want initialize this node as registry server ?" RESP
 if [ "$RESP" = "y" ]; then
@@ -50,15 +50,15 @@ if [ "$RESP" = "y" ]; then
     if [ "$RESP" = "y" ]; then
         echo "trusting certificates, please select the rootCA from extra folder as trusted source"
         # Generate crt from pem to add to trusted domains of OS & docker
-        openssl x509 -in docker-registry/nginx/ssl/fullchain.pem -inform PEM -out docker-registry/nginx/ssl/rootCA.crt
+        openssl x509 -in docker-registry/nginx/ssl/fullchain.pem -inform PEM -out docker-registry/nginx/ssl/private-registry-cert.crt
 
         # Now create a new directory for docker certificate and copy the Root CA certificate into it.
         sudo mkdir -p /etc/docker/certs.d/private.registry.io/
-        sudo cp docker-registry/nginx/ssl/rootCA.crt /etc/docker/certs.d/private.registry.io/
+        sudo cp docker-registry/nginx/ssl/private-registry-cert.crt /etc/docker/certs.d/private.registry.io/
 
         # And then create a new directory '/usr/share/ca-certificate/extra' and copy the Root CA certificate into it.
         sudo mkdir -p /usr/share/ca-certificates/extra/
-        sudo cp docker-registry/nginx/ssl/rootCA.crt /usr/share/ca-certificates/extra/
+        sudo cp docker-registry/nginx/ssl/private-registry-cert.crt /usr/share/ca-certificates/extra/
 
         # Update certificates & restart docker
         sudo dpkg-reconfigure ca-certificates
@@ -71,7 +71,7 @@ if [ "$RESP" = "y" ]; then
     read -p "Do you want to add ? (y/n) " RESP
     if [ "$RESP" = "y" ]; then
         # Edit hosts file
-        sudo echo '127.0.0.1    private.registry.io' >> /etc/hosts
+        sudo -u root echo '127.0.0.1    private.registry.io' >> /etc/hosts
     else
         echo "To provide your own credentials please paste them in htpasswd format to :"
         echo "docker-registry/auth/registry.passwd"
@@ -96,14 +96,15 @@ else
     sudo su
     echo $registry_ip'    private.registry.io' >> /etc/hosts
     exit
+    openssl x509 -in docker-registry/nginx/ssl/fullchain.pem -inform PEM -out docker-registry/nginx/ssl/private-registry-cert.crt
 
     # Now create a new directory for docker certificate and copy the Root CA certificate into it.
     sudo mkdir -p /etc/docker/certs.d/private.registry.io/
-    sudo cp docker-registry/nginx/ssl/rootCA.crt /etc/docker/certs.d/private.registry.io/
+    sudo cp docker-registry/nginx/ssl/private-registry-cert.crt /etc/docker/certs.d/private.registry.io/
 
     # And then create a new directory '/usr/share/ca-certificate/extra' and copy the Root CA certificate into it.
     sudo mkdir -p /usr/share/ca-certificates/extra/
-    sudo cp docker-registry/nginx/ssl/docker-registry/nginx/ssl/rootCA.crt /usr/share/ca-certificates/extra/
+    sudo cp docker-registry/nginx/ssl/private-registry-cert.crt /usr/share/ca-certificates/extra/
 
     # Update certificates & restart docker
     sudo dpkg-reconfigure ca-certificates
