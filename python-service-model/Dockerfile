@@ -2,7 +2,7 @@
 FROM python:3
 MAINTAINER GEORGIOS FIOTAKIS <GEORGIOS.FIOTAKIS@AKKA.EU>
 
-COPY ../installation-scripts/wait_from_cloud_config.sh /wait_from_cloud_config.sh
+COPY ./wait_from_cloud_config.sh /wait_from_cloud_config.sh
 RUN chmod +x /wait_from_cloud_config.sh
 
 #Set up enviroment

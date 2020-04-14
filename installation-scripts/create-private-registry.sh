@@ -1,5 +1,6 @@
 #!/bin/sh
 # create private registry for swarm cluster image distribution
+# source https://www.howtoforge.com/tutorial/install-nfs-server-and-client-on-debian/   
 sudo apt install -y gnupg2 pass apache2-utils httpie
 sudo apt install tree
 
@@ -140,3 +141,4 @@ fi
 
 
 
+docker run --name registry-browser -d -p 8082:8080 -e DOCKER_REGISTRY_URL=https://private.registry.io -e BASIC_AUTH_USER=abstract -e BASIC_AUTH_PASSWORD-admin klausmeyer/docker-registry-browser
