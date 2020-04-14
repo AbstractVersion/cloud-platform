@@ -98,27 +98,8 @@ else
     #  echo '192.168.2.8   private.registry.io' >> /etc/hosts
     # exit
 
-    # insert/update hosts entry
-    ip_address=$registry_ip
-    host_name="private.registry.io"
-    # find existing instances in the host file and save the line numbers
-    matches_in_hosts="$(grep -n $host_name /etc/hosts | cut -f1 -d:)"
-    host_entry="${ip_address} ${host_name}"
+    sudo sed -i $registry_ip"   private.registry.io" /etc/hosts
 
-    echo "Please enter your password if requested."
-
-    if [ ! -z "$matches_in_hosts" ]
-    then
-        echo "Updating existing hosts entry."
-        # iterate over the line numbers on which matches were found
-        while read -r line_number; do
-            # replace the text of each line with the desired host entry
-            sudo sed -i '' "${line_number}s/.*/${host_entry} /" /etc/hosts
-        done <<< "$matches_in_hosts"
-    else
-        echo "Adding new hosts entry."
-        echo "$host_entry" | sudo tee -a /etc/hosts > /dev/null
-    fi
     openssl x509 -in docker-registry/nginx/ssl/fullchain.pem -inform PEM -out docker-registry/nginx/ssl/private-registry-cert.crt
 
     # Now create a new directory for docker certificate and copy the Root CA certificate into it.
