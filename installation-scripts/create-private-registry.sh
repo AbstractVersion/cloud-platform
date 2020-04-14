@@ -91,6 +91,8 @@ if [ "$RESP" = "y" ]; then
 
 else
     echo "configuring repository client"
+    # PATH TO YOUR HOSTS FILE
+    ETC_HOSTS=/etc/hosts
     read -p "Enter registry IP address: "  registry_ip
 
     # sudo su
@@ -102,7 +104,21 @@ else
 
     # Hostname to add/remove.
     HOSTNAME='private.registry.io'
+    HOSTS_LINE="$IP\t$HOSTNAME"
+    if [ -n "$(grep $HOSTNAME /etc/hosts)" ]
+        then
+            echo "$HOSTNAME already exists : $(grep $HOSTNAME $ETC_HOSTS)"
+        else
+            echo "Adding $HOSTNAME to your $ETC_HOSTS";
+            sudo -- sh -c -e "echo '$HOSTS_LINE' >> /etc/hosts";
 
+            if [ -n "$(grep $HOSTNAME /etc/hosts)" ]
+                then
+                    echo "$HOSTNAME was added succesfully \n $(grep $HOSTNAME /etc/hosts)";
+                else
+                    echo "Failed to Add $HOSTNAME, Try again!";
+            fi
+    fi
     # sudo sed -i $registry_ip"   private.registry.io" /etc/hosts
 
     # Recreate CRT from pem
@@ -121,36 +137,6 @@ else
     sudo systemctl restart docker
 fi
 
-# PATH TO YOUR HOSTS FILE
-ETC_HOSTS=/etc/hosts
 
 
 
-function removehost() {
-    if [ -n "$(grep $HOSTNAME /etc/hosts)" ]
-    then
-        echo "$HOSTNAME Found in your $ETC_HOSTS, Removing now...";
-        sudo sed -i".bak" "/$HOSTNAME/d" $ETC_HOSTS
-    else
-        echo "$HOSTNAME was not found in your $ETC_HOSTS";
-    fi
-}
-
-function addhost() {
-    HOSTNAME=$1
-    HOSTS_LINE="$IP\t$HOSTNAME"
-    if [ -n "$(grep $HOSTNAME /etc/hosts)" ]
-        then
-            echo "$HOSTNAME already exists : $(grep $HOSTNAME $ETC_HOSTS)"
-        else
-            echo "Adding $HOSTNAME to your $ETC_HOSTS";
-            sudo -- sh -c -e "echo '$HOSTS_LINE' >> /etc/hosts";
-
-            if [ -n "$(grep $HOSTNAME /etc/hosts)" ]
-                then
-                    echo "$HOSTNAME was added succesfully \n $(grep $HOSTNAME /etc/hosts)";
-                else
-                    echo "Failed to Add $HOSTNAME, Try again!";
-            fi
-    fi
-}
