@@ -32,7 +32,7 @@ services:
     networks:
       - registry-network
     
-registry-browser:
+  registry-browser:
     restart: unless-stopped
     ports:
         - "8082:8080" 
