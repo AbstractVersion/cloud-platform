@@ -1,8 +1,8 @@
 FROM openjdk:11-jre
-MAINTAINER Cassio Mazzochi Molin <cassio@cassiomolin.com>
+MAINTAINER GEORGIOS FIOTAKIS <GEORGIOS.FIOTAKIS@AKKA.EU>
 
-COPY ./wait_from_cloud_config.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+COPY ../installation-scripts/wait_from_cloud_config.sh /wait_from_cloud_config.sh
+RUN chmod +x /wait_from_cloud_config.sh
 
 VOLUME /tmp
 
@@ -13,6 +13,6 @@ COPY ${DEPENDENCY}/BOOT-INF/classes /app
 
 
 
-ENTRYPOINT ["/entrypoint.sh", "java","-cp","app:app/lib/*","-Dspring.profiles.active=docker","com.eureka.server.demo.DemoApplication"]
+ENTRYPOINT ["/wait_from_cloud_config.sh", "java","-cp","app:app/lib/*","-Dspring.profiles.active=docker","com.eureka.server.demo.DemoApplication"]
 
 

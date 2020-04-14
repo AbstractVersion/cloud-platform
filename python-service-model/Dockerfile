@@ -1,6 +1,9 @@
 #FROM tiangolo/meinheld-gunicorn:python3.7
 FROM python:3
+MAINTAINER GEORGIOS FIOTAKIS <GEORGIOS.FIOTAKIS@AKKA.EU>
 
+COPY ../installation-scripts/wait_from_cloud_config.sh /wait_from_cloud_config.sh
+RUN chmod +x /wait_from_cloud_config.sh
 
 #Set up enviroment
 RUN pip install --upgrade pip
@@ -16,4 +19,6 @@ RUN pip install Flask-Sleuth
 RUN pip install json-logging
 #Copy and run the app
 COPY ./app /app
-CMD [ "python3", "/app/main.py" ]
+
+ENTRYPOINT ["/wait_from_cloud_config.sh", "python3", "/app/main.py" ]
+

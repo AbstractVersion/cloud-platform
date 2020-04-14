@@ -34,7 +34,7 @@ volumes:
   #   --opt o=bind filebeat.ext.vol
   filebeat.ext.vol: 
     external: true
-    name: logstash.ext.vol
+    name: filebeat.ext.vol
   # Shared volume by NFS containing filebeat configuration yml.
   # filebeat.ext.conf.vol: 
     # driver: nfs
@@ -125,7 +125,7 @@ services:
       restart_policy:
         condition: on-failure
 
-  #Centralized Logging ELK
+  #Centralized Logging ELastic tack
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.2.0
     user: root
@@ -147,7 +147,6 @@ services:
       restart_policy:
         condition: on-failure
     
-
   logstash:
     image: docker.elastic.co/logstash/logstash:7.2.0
     networks:
@@ -156,7 +155,7 @@ services:
       - "25826:25826"
       - "5044:5044"
     volumes:
-      - ./elk-template/logstash/pipeline:/usr/share/logstash/pipeline:ro                # Pipeline configuration
+      - /nfs/micor-env/config/logstash/pipeline:/usr/share/logstash/pipeline:ro                # Pipeline configuration
     depends_on:
       - elasticsearch
     deploy:
@@ -166,7 +165,6 @@ services:
       replicas: 1
       restart_policy:
         condition: on-failure
-
 
   kibana:
     image: docker.elastic.co/kibana/kibana:7.2.0
@@ -193,7 +191,7 @@ services:
     volumes:
       # For the beats configuration volume we need to find a way to share the config file git, nfs etc.
       # here we mount configuration files from the nfs to this directory
-      - /home/ghost/test/filebeat-conf/filebeat.docker.yml:/usr/share/filebeat/filebeat.yml:ro # Configuration file
+      - /nfs/micor-env/config/filebeat/filebeat.docker.yml:/usr/share/filebeat/filebeat.yml:ro # Configuration file
       - /var/lib/docker/containers:/var/lib/docker/containers:ro           # Docker logs
       - /var/run/docker.sock:/var/run/docker.sock:ro                       # Additional information about containers
       - filebeat.ext.vol:/usr/share/filebeat/data:rw                        # Persistence data
@@ -207,7 +205,6 @@ services:
       replicas: 1
       restart_policy:
         condition: on-failure
-
 
   # Discovery service 
   discovery-service:
