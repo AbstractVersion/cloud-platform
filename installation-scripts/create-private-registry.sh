@@ -97,10 +97,16 @@ else
     # echo $registry_ip'    private.registry.io' >> /etc/hosts
     #  echo '192.168.2.8   private.registry.io' >> /etc/hosts
     # exit
+    # DEFAULT IP FOR HOSTNAME
+    IP=$registry_ip
 
-    sudo sed -i $registry_ip"   private.registry.io" /etc/hosts
+    # Hostname to add/remove.
+    HOSTNAME='private.registry.io'
 
-    openssl x509 -in docker-registry/nginx/ssl/fullchain.pem -inform PEM -out docker-registry/nginx/ssl/private-registry-cert.crt
+    # sudo sed -i $registry_ip"   private.registry.io" /etc/hosts
+
+    # Recreate CRT from pem
+    # openssl x509 -in docker-registry/nginx/ssl/fullchain.pem -inform PEM -out docker-registry/nginx/ssl/private-registry-cert.crt
 
     # Now create a new directory for docker certificate and copy the Root CA certificate into it.
     sudo mkdir -p /etc/docker/certs.d/private.registry.io/
@@ -114,3 +120,37 @@ else
     sudo dpkg-reconfigure ca-certificates
     sudo systemctl restart docker
 fi
+
+# PATH TO YOUR HOSTS FILE
+ETC_HOSTS=/etc/hosts
+
+
+
+function removehost() {
+    if [ -n "$(grep $HOSTNAME /etc/hosts)" ]
+    then
+        echo "$HOSTNAME Found in your $ETC_HOSTS, Removing now...";
+        sudo sed -i".bak" "/$HOSTNAME/d" $ETC_HOSTS
+    else
+        echo "$HOSTNAME was not found in your $ETC_HOSTS";
+    fi
+}
+
+function addhost() {
+    HOSTNAME=$1
+    HOSTS_LINE="$IP\t$HOSTNAME"
+    if [ -n "$(grep $HOSTNAME /etc/hosts)" ]
+        then
+            echo "$HOSTNAME already exists : $(grep $HOSTNAME $ETC_HOSTS)"
+        else
+            echo "Adding $HOSTNAME to your $ETC_HOSTS";
+            sudo -- sh -c -e "echo '$HOSTS_LINE' >> /etc/hosts";
+
+            if [ -n "$(grep $HOSTNAME /etc/hosts)" ]
+                then
+                    echo "$HOSTNAME was added succesfully \n $(grep $HOSTNAME /etc/hosts)";
+                else
+                    echo "Failed to Add $HOSTNAME, Try again!";
+            fi
+    fi
+}
