@@ -26,6 +26,7 @@ if [ "$RESP" = "y" ]; then
 
     tree
     cd /docker-registry
+
     # Generate crt from pem to add to trusted domains of OS & docker
     openssl x509 -in docker-registry/nginx/ssl/fullchain.pem -inform PEM -out docker-registry/nginx/ssl/rootCA.crt
 
@@ -58,7 +59,10 @@ else
     echo "configuring repository client"
     read -p "Enter registry IP address: "  registry_ip
 
-    sudo echo $registry_ip'    private.registry.io' >> /etc/hosts
+    sudo su
+    echo $registry_ip'    private.registry.io' >> /etc/hosts
+    exit
+    
     # Now create a new directory for docker certificate and copy the Root CA certificate into it.
     sudo mkdir -p /etc/docker/certs.d/private.registry.io/
     sudo cp docker-registry/nginx/ssl/rootCA.crt /etc/docker/certs.d/private.registry.io/
