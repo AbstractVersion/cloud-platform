@@ -93,10 +93,10 @@ else
     echo "configuring repository client"
     read -p "Enter registry IP address: "  registry_ip
 
-    sudo su
-    echo $registry_ip'    private.registry.io' >> /etc/hosts
-     echo '192.168.2.8   private.registry.io' >> /etc/hosts
-    exit
+    # sudo su
+    # echo $registry_ip'    private.registry.io' >> /etc/hosts
+    #  echo '192.168.2.8   private.registry.io' >> /etc/hosts
+    # exit
 
     # insert/update hosts entry
     ip_address=$registry_ip
