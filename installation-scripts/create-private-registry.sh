@@ -40,7 +40,7 @@ if [ "$RESP" = "y" ]; then
         htpasswd -Bc registry.passwd $username   
         tree
         cat registry.passwd
-        cd ..
+        cd ../..
     else
         echo "To provide your own credentials please paste them in htpasswd format to :"
         echo "docker-registry/auth/registry.passwd"
