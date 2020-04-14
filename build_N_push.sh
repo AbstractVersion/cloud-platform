@@ -38,7 +38,7 @@ docker push $registry_ip/hello-client:latest
 echo hello-service Build
 cd ../hello-service && mvn clean install -DskipTests
 # push the image to a local repo
-docker tag micro-env/hello-service:latest $registry_iphello-service:latest
+docker tag micro-env/hello-service:latest $registry_ip/hello-service:latest
 docker push $registry_ip/hello-service:latest
 
 # session-service Build

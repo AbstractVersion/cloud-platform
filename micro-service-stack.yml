@@ -102,7 +102,7 @@ services:
 
   # Cloud COnfig server
   config-server:
-    image: 192.168.2.5:5000/config-server:latest
+    image: private.registry.io/config-server:latest
     ports:
       - "8888:8888"
     # healthcheck:
@@ -211,7 +211,7 @@ services:
 
   # Discovery service 
   discovery-service:
-    image: micro-env/discovery-service
+    image: private.registry.io/discovery-service
     networks:
       - micro-nework-frontend
     ports:
@@ -236,7 +236,7 @@ services:
 
   #Hello Service
   hello-service:
-    image: 192.168.2.5:5000/hello-service
+    image: private.registry.io/hello-service
     # ports:
     #     - "8080:8080"
     #internal-links
@@ -261,7 +261,7 @@ services:
     #   replicas: 2
 
   zuul-proxy:
-    image: 192.168.2.5:5000/zuul-proxy:latest
+    image: private.registry.io/zuul-proxy:latest
     #internal-links
     networks:
       - micro-nework-frontend
@@ -285,7 +285,7 @@ services:
         condition: on-failure
   
   session-service:
-    image: 192.168.2.5:5000/session-service:latest
+    image: private.registry.io/session-service:latest
     networks:
       - micro-nework-frontend
       - micro-nework-backend
@@ -307,7 +307,7 @@ services:
         condition: on-failure
 
   graph-service:
-    image: 192.168.2.5:5000/graph-api
+    image: private.registry.io/graph-api
     #internal-links
     networks:
       - micro-nework-frontend
@@ -332,7 +332,7 @@ services:
     build:
       context: ./python-service-model
       dockerfile: Dockerfile
-    image: localhost:5000/python-api:latest
+    image: private.registry.io/python-api:latest
     depends_on:
       - config-server
       - discovery-service
@@ -354,7 +354,7 @@ services:
 
   #hello Client
   hello-client:
-    image: localhost:5000/hello-client:latest
+    image: private.registry.io/hello-client:latest
     networks:
       - micro-nework-frontend
     links:
