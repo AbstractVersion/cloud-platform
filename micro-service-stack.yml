@@ -31,88 +31,99 @@ volumes:
   # docker volume create --driver local \
   #   --opt type=none \
   #   --opt device=/volumes/beats \
-  #   --opt o=bind logstash.ext.vol
-  logstash.ext.vol: 
+  #   --opt o=bind filebeat.ext.vol
+  filebeat.ext.vol: 
     external: true
     name: logstash.ext.vol
+  # Shared volume by NFS containing filebeat configuration yml.
+  # filebeat.ext.conf.vol: 
+    # driver: nfs
+    # driver_opts:
+    #   # Here you should replace this ip with the NFS server IP, the directory /mysql exists on the root folder of NFS shared + /mysql
+    #   share: 192.168.2.4:/filebeat-conf
     # driver: local
     # driver_opts:
     #   type: 'none'
     #   o: 'bind'
-    #   device: '/'
+    #   device: '/home/ghost/test/filebeat-conf/'
+
+      # /home/worker
   
       
 
 services:
 
-  # generalRDBMS:
-  #   # container_name: generalRDBMS
-  #   image: mariadb:latest
-  #   volumes:
-  #    - mysql.vol:/var/lib/mysql
-  #   networks:
-  #     - micro-nework-backend
-  #   # restart: on-failure 
-  #   deploy:
-  #       placement:
-  #           constraints:
-  #             - "node.role==manager"
-  #     #Number of replicas
-  #       replicas: 1
-  #     # Configure stack update
-  #       restart_policy:
-  #         condition: on-failure
-  #   environment:
-  #     MYSQL_ROOT_PASSWORD: root
-  #     MYSQL_DATABASE: sessionDB
-  #     MYSQL_USER: root
-  #     MYSQL_PASSWORD: root
+  generalRDBMS:
+    # container_name: generalRDBMS
+    image: mariadb:latest
+    volumes:
+     - mysql.vol:/var/lib/mysql
+    networks:
+      - micro-nework-backend
+    # restart: on-failure 
+    deploy:
+        placement:
+            constraints:
+              - "node.role==manager"
+      #Number of replicas
+        replicas: 1
+      # Configure stack update
+        restart_policy:
+          condition: on-failure
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: sessionDB
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
 
   # Rabbit MQ Server 
-  # rabbit-server:
-  #   image: rabbitmq:3-management
-  #   hostname: "rabbit-server"
-  #   environment:
-  #     RABBITMQ_DEFAULT_USER: "abstract"
-  #     RABBITMQ_DEFAULT_PASS: "admin"
-  #     RABBITMQ_DEFAULT_VHOST: "/"
-  #   ports:
-  #     - "15672:15672" 
-  #     - "5672:5672" 
-  #     - "15671:15671" 
-  #     - "5671:5671" 
-  #     - "4369:4369" 
-  #   networks:
-  #     - micro-nework-frontend
-  #     - micro-nework-backend
-  #   deploy:
-  #     placement:
-  #       constraints:
-  #         - "node.role==manager"
-  #     replicas: 1
-  #     restart_policy:
-  #       condition: on-failure
+  rabbit-server:
+    image: rabbitmq:3-management
+    hostname: "rabbit-server"
+    environment:
+      RABBITMQ_DEFAULT_USER: "abstract"
+      RABBITMQ_DEFAULT_PASS: "admin"
+      RABBITMQ_DEFAULT_VHOST: "/"
+    ports:
+      - "15672:15672" 
+      - "5672:5672" 
+      - "15671:15671" 
+      - "5671:5671" 
+      - "4369:4369" 
+    networks:
+      - micro-nework-frontend
+    deploy:
+      placement:
+        constraints:
+          - "node.role==manager"
+      replicas: 1
+      restart_policy:
+        condition: on-failure
 
   # Cloud COnfig server
-  # config-server:
-  #   image: micro-env/config-server:latest
-  #   ports:
-  #     - "8888:8888"
-  #   labels:
-  #     collect_logs_with_filebeat: "false"
-  #     decode_log_event_to_json_object: "false"
-  #   networks:
-  #     - micro-nework-frontend
-  #     - micro-nework-backend
-  #   depends_on:
-  #     - rabbit-server
-  #   deploy:
-  #     placement:
-  #       constraints:
-  #         - "node.role==manager"
-  #     replicas: 1
-  #     restart_policy:
-  #       condition: on-failure
+  config-server:
+    image: 192.168.2.5:5000/config-server:latest
+    ports:
+      - "8888:8888"
+    # healthcheck:
+    #     test: ["CMD", "curl", "-f", "http://localhost:8888/actuator"]
+    #     interval: 30s
+    #     timeout: 10s
+    #     retries: 5
+    labels:
+      collect_logs_with_filebeat: "false"
+      decode_log_event_to_json_object: "false"
+    networks:
+      - micro-nework-frontend
+    depends_on:
+      - rabbit-server
+    deploy:
+      placement:
+        constraints:
+          - "node.role==manager"
+      replicas: 1
+      restart_policy:
+        condition: on-failure
 
   #Centralized Logging ELK
   elasticsearch:
@@ -180,10 +191,12 @@ services:
     networks:
       - elastic-stack-network
     volumes:
-      # - ./elk-template/filebeat/filebeat.docker.yml:/usr/share/filebeat/filebeat.yml:ro # Configuration file
+      # For the beats configuration volume we need to find a way to share the config file git, nfs etc.
+      # here we mount configuration files from the nfs to this directory
+      - /home/ghost/test/filebeat-conf/filebeat.docker.yml:/usr/share/filebeat/filebeat.yml:ro # Configuration file
       - /var/lib/docker/containers:/var/lib/docker/containers:ro           # Docker logs
       - /var/run/docker.sock:/var/run/docker.sock:ro                       # Additional information about containers
-      - logstash.ext.vol:/usr/share/filebeat/data:rw                        # Persistence data
+      - filebeat.ext.vol:/usr/share/filebeat/data:rw                        # Persistence data
     user: root                                                             # Allow access to log files and docker.sock
     depends_on:
       - logstash
@@ -197,26 +210,166 @@ services:
 
 
   # Discovery service 
-  # discovery-service:
-  #   image: micro-env/discovery-service
-  #   networks:
-  #     - elastic-stack-network
-  #   ports:
-  #       - "80:8761" 
-  #   labels:
-  #       collect_logs_with_filebeat: "false"
-  #       decode_log_event_to_json_object: "false"
-  #   depends_on:
-  #     - config-server
-  #   deploy:
-  #     placement:
-  #       constraints:
-  #         - "node.role==manager"
-  #     replicas: 1
-  #     restart_policy:
-  #       condition: on-failure
+  discovery-service:
+    image: micro-env/discovery-service
+    networks:
+      - micro-nework-frontend
+    ports:
+        - "80:8761"
+    healthcheck:
+        test: ["CMD", "curl", "-f", "http://abstract:admin@localhost:8761/actuator"]
+        interval: 30s
+        timeout: 10s
+        retries: 5 
+    labels:
+        collect_logs_with_filebeat: "false"
+        decode_log_event_to_json_object: "false"
+    depends_on:
+      - config-server
+    deploy:
+      placement:
+        constraints:
+          - "node.role==manager"
+      replicas: 1
+      restart_policy:
+        condition: on-failure
 
+  #Hello Service
+  hello-service:
+    image: 192.168.2.5:5000/hello-service
+    # ports:
+    #     - "8080:8080"
+    #internal-links
+    networks:
+      - micro-nework-frontend
+    links:
+        - "discovery-service:discovery-service"  
+    labels:
+        collect_logs_with_filebeat: "true"
+        decode_log_event_to_json_object: "true"
+    depends_on:
+      - config-server
+      - discovery-service
+    deploy:
+      placement:
+        constraints:
+          - "node.role!=manager"
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    # deploy:
+    #   replicas: 2
 
-    
+  zuul-proxy:
+    image: 192.168.2.5:5000/zuul-proxy:latest
+    #internal-links
+    networks:
+      - micro-nework-frontend
+    links:
+        - "discovery-service:discovery-service"  
+    labels:
+        collect_logs_with_filebeat: "true"
+        decode_log_event_to_json_object: "true"
+    depends_on:
+      - config-server
+      - discovery-service
+      - session-service
+    ports:
+      - "8080:8080"
+    deploy:
+      placement:
+        constraints:
+          - "node.role!=manager"
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+  
+  session-service:
+    image: 192.168.2.5:5000/session-service:latest
+    networks:
+      - micro-nework-frontend
+      - micro-nework-backend
+    links:
+        - "discovery-service:discovery-service"  
+    labels:
+        collect_logs_with_filebeat: "true"
+        decode_log_event_to_json_object: "true"
+    depends_on:
+      - config-server
+      - discovery-service
+      - graph-service
+    deploy:
+      placement:
+        constraints:
+          - "node.role!=manager"
+      replicas: 1
+      restart_policy:
+        condition: on-failure
 
+  graph-service:
+    image: 192.168.2.5:5000/graph-api
+    #internal-links
+    networks:
+      - micro-nework-frontend
+    links:
+        - "discovery-service:discovery-service"  
+    labels:
+        collect_logs_with_filebeat: "true"
+        decode_log_event_to_json_object: "true"
+    depends_on:
+      - config-server
+      - discovery-service
+    deploy:
+      placement:
+        constraints:
+          - "node.role!=manager"
+      replicas: 1
+      restart_policy:
+        condition: on-failure
 
+  #Python Service
+  python-service:
+    build:
+      context: ./python-service-model
+      dockerfile: Dockerfile
+    image: localhost:5000/python-api:latest
+    depends_on:
+      - config-server
+      - discovery-service
+    networks:
+      - micro-nework-frontend
+    #internal-links
+    links:
+        - "discovery-service:discovery-service"  
+    labels:
+        collect_logs_with_filebeat: "true"
+        decode_log_event_to_json_object: "true"
+    deploy:
+      placement:
+        constraints:
+          - "node.role!=manager"
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+  #hello Client
+  hello-client:
+    image: localhost:5000/hello-client:latest
+    networks:
+      - micro-nework-frontend
+    links:
+        - "discovery-service:discovery-service"
+        - "config-server:config-server"  
+    labels:
+        collect_logs_with_filebeat: "true"
+        decode_log_event_to_json_object: "true"
+    depends_on:
+      - config-server
+      - discovery-service
+    deploy:
+      placement:
+        constraints:
+          - "node.role!=manager"
+      replicas: 1
+      restart_policy:
+        condition: on-failure

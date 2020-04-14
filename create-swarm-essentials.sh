@@ -1,5 +1,6 @@
 #!/bin/sh
 # This is a comment!
+
 echo ----------------------------------------------- Active Hosts of the Swarm Cluster -------------------------------------------
 
 
@@ -123,10 +124,46 @@ fi
 read -p "Do you want to create a registry service to push your images localy ? (y/n) " RESP
 if [ "$RESP" = "y" ]; then
 #    1.Start the registry as a service on your swarm:
-    docker service create --name registry --publish published=5000,target=5000 registry:2
+    # docker service create --name registry --publish published=5000,target=5000 registry:2
+    docker run -d \
+        -e REGISTRY_HTTP_ADDR=0.0.0.0:5000 \
+        -p 5000:5000 \
+        --name registry \
+        registry:2
     watch docker service ls
 # 2.Check its status with docker service ls:
 else
     echo "Ok then proceeding with the initialization..."
 fi
 
+## REGISTRY
+# certificate generation
+#https://www.akadia.com/services/ssh_test_certificate.html
+mkdir certs && cd certs
+
+docker run -t -d -v /opt/registry-v1:/tmp/registry-dev --name docker-registry-v1 registry:0.9.1
+
+#Registry user, password generation
+htpasswd -c htpasswd userXXX
+
+#Step 1: Generate a Private Key
+openssl genrsa -des3 -out docker-registry.key 1024
+
+# Step 2: Generate a CSR (Certificate Signing Request)
+openssl req -new -key docker-registry.key -out docker-registry.csr
+
+#Step 3: Remove Passphrase from Key
+cp docker-registry.key docker-registry.key.org
+openssl rsa -in docker-registry.key.org -out docker-registry.key
+
+# Step 4: Generating a Self-Signed Certificate
+
+openssl x509 -req -days 365 -in docker-registry.csr -signkey docker-registry.key -out docker-registry.crt
+
+
+docker run -t -d -p 443:443 -e REGISTRY_HOST="docker-registry-v1" \
+-e REGISTRY_PORT="5000" -e SERVER_NAME="register.example.com" \
+--link docker-registry-v1:docker-registry-v1 \
+-v /home/abstract/htpasswd:/etc/nginx/.htpasswd:ro \
+-v /home/abstract/certs:/etc/nginx/ssl:ro \
+jmaciasportela/docker-registry-proxy-v1
