@@ -24,7 +24,7 @@ services:
     restart: unless-stopped
     tty: true
     ports:
-    #   - "80:80"
+      - "80:80"
       - "443:443"
     volumes:
       - ./nginx/conf.d/:/etc/nginx/conf.d/
@@ -38,8 +38,8 @@ services:
         - "8082:8080" 
     environment: 
         DOCKER_REGISTRY_URL: http://registry:5000
-            # BASIC_AUTH_USER: abstract
-            # BASIC_AUTH_PASSWORD:admin 
+        BASIC_AUTH_USER: abstract
+        BASIC_AUTH_PASSWORD: admin 
     image: klausmeyer/docker-registry-browser
     networks:
         - registry-network
