@@ -24,6 +24,9 @@ if [ "$RESP" = "y" ]; then
         openssl req -newkey rsa:2048 -new -nodes -x509 -days 3650 -keyout privkey.pem -out fullchain.pem
         mv privkey.pem docker-registry/nginx/ssl/privkey.pem
         mv fullchain.pem docker-registry/nginx/ssl/fullchain.pem
+        # Generate crt from pem to add to trusted domains of OS & docker
+        echo 'please add the certificate docker-registry/nginx/ssl/private-registry-cert.crt on your certificate whitelist'
+        openssl x509 -in docker-registry/nginx/ssl/fullchain.pem -inform PEM -out docker-registry/nginx/ssl/private-registry-cert.crt
         tree
     else
         echo "To provide your own certificates please paste them in pem format to :"
@@ -50,8 +53,7 @@ if [ "$RESP" = "y" ]; then
     read -p "Do you want to add as trusted the registry certificates by docker && OS? (y/n) " RESP
     if [ "$RESP" = "y" ]; then
         echo "trusting certificates, please select the rootCA from extra folder as trusted source"
-        # Generate crt from pem to add to trusted domains of OS & docker
-        openssl x509 -in docker-registry/nginx/ssl/fullchain.pem -inform PEM -out docker-registry/nginx/ssl/private-registry-cert.crt
+        
 
         # Now create a new directory for docker certificate and copy the Root CA certificate into it.
         sudo mkdir -p /etc/docker/certs.d/private.registry.io/
