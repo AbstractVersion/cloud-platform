@@ -66,10 +66,10 @@ services:
         constraints:
           - "node.role==manager"
         #Number of replicas
-        replicas: 1
-        # Configure stack update
-        restart_policy:
-          condition: on-failure  
+      replicas: 1
+      # Configure stack update
+      restart_policy:
+        condition: on-failure  
 
   generalRDBMS:
     # container_name: generalRDBMS
