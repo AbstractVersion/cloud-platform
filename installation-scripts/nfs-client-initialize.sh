@@ -15,6 +15,7 @@ sudo -u root mount 192.168.2.4:/filebeat-conf /nfs/micor-env/config/filebeat
 #On managers
 sudo -u root mount 192.168.2.4:/logstash-conf /nfs/micor-env/config/logstash
 
+
 # docker create volume
 # docker volume create --driver nfs --name foobar2 -o share=192.168.2.4:/foobar2
 # docker volume inspect foobar2

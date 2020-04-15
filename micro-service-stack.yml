@@ -53,6 +53,22 @@ volumes:
 
 services:
 
+  swarm-visualize:
+    image: dockersamples/visualizer
+    ports:
+      - "8090:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    deploy:
+      placement:
+        constraints:
+          - "node.role==manager"
+        #Number of replicas
+        replicas: 1
+        # Configure stack update
+        restart_policy:
+          condition: on-failure  
+
   generalRDBMS:
     # container_name: generalRDBMS
     image: mariadb:latest

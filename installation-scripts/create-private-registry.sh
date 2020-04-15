@@ -69,14 +69,7 @@ if [ "$RESP" = "y" ]; then
         echo "docker-registry/auth/registry.passwd"
     fi
 
-    read -p "Do you want to add ? (y/n) " RESP
-    if [ "$RESP" = "y" ]; then
-        # Edit hosts file
-        sudo -u root echo '127.0.0.1    private.registry.io' >> /etc/hosts
-    else
-        echo "To provide your own credentials please paste them in htpasswd format to :"
-        echo "docker-registry/auth/registry.passwd"
-    fi
+    
     # Create docker compose
     docker-compose up -d
     docker-compose ps
@@ -92,34 +85,7 @@ if [ "$RESP" = "y" ]; then
 
 else
     echo "configuring repository client"
-    # PATH TO YOUR HOSTS FILE
-    ETC_HOSTS=/etc/hosts
-    read -p "Enter registry IP address: "  registry_ip
-
-    # sudo su
-    # echo $registry_ip'    private.registry.io' >> /etc/hosts
-    #  echo '192.168.2.8   private.registry.io' >> /etc/hosts
-    # exit
-    # DEFAULT IP FOR HOSTNAME
-    IP=$registry_ip
-
-    # Hostname to add/remove.
-    HOSTNAME='private.registry.io'
-    HOSTS_LINE="$IP\t$HOSTNAME"
-    if [ -n "$(grep $HOSTNAME /etc/hosts)" ]
-        then
-            echo "$HOSTNAME already exists : $(grep $HOSTNAME $ETC_HOSTS)"
-        else
-            echo "Adding $HOSTNAME to your $ETC_HOSTS";
-            sudo -- sh -c -e "echo '$HOSTS_LINE' >> /etc/hosts";
-
-            if [ -n "$(grep $HOSTNAME /etc/hosts)" ]
-                then
-                    echo "$HOSTNAME was added succesfully \n $(grep $HOSTNAME /etc/hosts)";
-                else
-                    echo "Failed to Add $HOSTNAME, Try again!";
-            fi
-    fi
+   
     # sudo sed -i $registry_ip"   private.registry.io" /etc/hosts
 
     # Recreate CRT from pem
@@ -138,7 +104,35 @@ else
     sudo systemctl restart docker
 fi
 
+ # PATH TO YOUR HOSTS FILE
+ETC_HOSTS=/etc/hosts
+read -p "Enter registry IP address: "  registry_ip
+
+    # sudo su
+    # echo $registry_ip'    private.registry.io' >> /etc/hosts
+    #  echo '192.168.2.8   private.registry.io' >> /etc/hosts
+    # exit
+    # DEFAULT IP FOR HOSTNAME
+IP=$registry_ip
+
+# Hostname to add/remove.
+HOSTNAME='private.registry.io interface.registry.io'
+HOSTS_LINE="$IP\t$HOSTNAME"
+if [ -n "$(grep $HOSTNAME /etc/hosts)" ]
+    then
+        echo "$HOSTNAME already exists : $(grep $HOSTNAME $ETC_HOSTS)"
+    else
+        echo "Adding $HOSTNAME to your $ETC_HOSTS";
+        sudo -- sh -c -e "echo '$HOSTS_LINE' >> /etc/hosts";
+
+        if [ -n "$(grep $HOSTNAME /etc/hosts)" ]
+            then
+                echo "$HOSTNAME was added succesfully \n $(grep $HOSTNAME /etc/hosts)";
+            else
+                echo "Failed to Add $HOSTNAME, Try again!";
+        fi
+fi
 
 
 
-docker run --name registry-browser -d -p 8082:8080 -e DOCKER_REGISTRY_URL=https://private.registry.io -e BASIC_AUTH_USER=abstract -e BASIC_AUTH_PASSWORD-admin klausmeyer/docker-registry-browser
+
