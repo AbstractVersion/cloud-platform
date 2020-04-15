@@ -57,6 +57,8 @@ services:
     image: dockersamples/visualizer
     ports:
       - "8090:8080"
+    networks:
+      - micro-nework-frontend
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     deploy:
