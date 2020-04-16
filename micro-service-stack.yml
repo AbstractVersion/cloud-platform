@@ -95,7 +95,7 @@ services:
       MYSQL_DATABASE: sessionDB
       MYSQL_USER: root
       MYSQL_PASSWORD: root
-      # Check for mysql connection
+    # Check for mysql connection
     # healthcheck:
     #   test: ["CMD", "curl", "-f", "http://localhost"]
     #   interval: 1m #1m30s
@@ -168,8 +168,8 @@ services:
       - "discovery.type=single-node"
     volumes:
       - elastic-volume.vol:/usr/share/elasticsearch/data              # Persistence data
-      depends_on:
-        - swarm-visualize
+    depends_on:
+      - swarm-visualize
     deploy:
       placement:
         constraints:
