@@ -155,6 +155,11 @@ services:
       replicas: 1
       restart_policy:
         condition: on-failure
+    healthcheck:
+        test: ["CMD", "curl", "-f", "http://config-server:8888/actuator"]
+        interval: 30s
+        timeout: 10s
+        retries: 5 
 
   #Centralized Logging ELastic tack
   elasticsearch:
@@ -285,6 +290,11 @@ services:
       replicas: 1
       restart_policy:
         condition: on-failure
+    healthcheck:
+          test: ["CMD", "curl", "-f", "http://hello-service:8080/actuator"]
+          interval: 30s
+          timeout: 10s
+          retries: 5 
     # deploy:
     #   replicas: 2
 
@@ -311,6 +321,11 @@ services:
       replicas: 1
       restart_policy:
         condition: on-failure
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://zuul-proxy:8080/actuator"]
+      interval: 30s
+      timeout: 10s
+      retries: 5     
   
   session-service:
     image: private.registry.io/session-service:latest
@@ -333,6 +348,11 @@ services:
       replicas: 1
       restart_policy:
         condition: on-failure
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://session-service:8080/actuator"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   graph-service:
     image: private.registry.io/graph-api
@@ -354,6 +374,11 @@ services:
       replicas: 1
       restart_policy:
         condition: on-failure
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://graph-service:8999/actuator"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   #Python Service
   python-service:
@@ -379,6 +404,11 @@ services:
       replicas: 1
       restart_policy:
         condition: on-failure
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://python-service:5001/api/info"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   #hello Client
   hello-client:
@@ -401,3 +431,8 @@ services:
       replicas: 1
       restart_policy:
         condition: on-failure
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://hello-client:9000/actuator"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
