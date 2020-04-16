@@ -40,7 +40,7 @@ services:
     build:
       context: ./python-service-model
       dockerfile: Dockerfile
-    image: micro-env/python-api:latest
+    image: private.registry.io/python-api:latest
     restart: on-failure
     #internal-links
     links:
