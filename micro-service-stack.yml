@@ -135,11 +135,11 @@ services:
     image: private.registry.io/config-server:latest
     ports:
       - "8888:8888"
-    # healthcheck:
-    #     test: ["CMD", "curl", "-f", "http://localhost:8888/actuator"]
-    #     interval: 30s
-    #     timeout: 10s
-    #     retries: 5
+    healthcheck:
+        test: ["CMD", "curl", "-f", "http://localhost:8888/actuator"]
+        interval: 30s
+        timeout: 10s
+        retries: 5
     labels:
       collect_logs_with_filebeat: "false"
       decode_log_event_to_json_object: "false"
@@ -155,11 +155,7 @@ services:
       replicas: 1
       restart_policy:
         condition: on-failure
-    healthcheck:
-        test: ["CMD", "curl", "-f", "http://config-server:8888/actuator"]
-        interval: 30s
-        timeout: 10s
-        retries: 5 
+
 
   #Centralized Logging ELastic tack
   elasticsearch:
@@ -291,10 +287,10 @@ services:
       restart_policy:
         condition: on-failure
     healthcheck:
-          test: ["CMD", "curl", "-f", "http://hello-service:8080/actuator"]
-          interval: 30s
-          timeout: 10s
-          retries: 5 
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator"]
+      interval: 30s
+      timeout: 10s
+      retries: 5 
     # deploy:
     #   replicas: 2
 
@@ -322,7 +318,7 @@ services:
       restart_policy:
         condition: on-failure
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://zuul-proxy:8080/actuator"]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator"]
       interval: 30s
       timeout: 10s
       retries: 5     
@@ -349,7 +345,7 @@ services:
       restart_policy:
         condition: on-failure
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://session-service:8080/actuator"]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -375,7 +371,7 @@ services:
       restart_policy:
         condition: on-failure
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://graph-service:8999/actuator"]
+      test: ["CMD", "curl", "-f", "http://localhost:8999/actuator"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -405,7 +401,7 @@ services:
       restart_policy:
         condition: on-failure
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://python-service:5001/api/info"]
+      test: ["CMD", "curl", "-f", "http://localhost:5001/api/info"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -432,7 +428,7 @@ services:
       restart_policy:
         condition: on-failure
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://hello-client:9000/actuator"]
+      test: ["CMD", "curl", "-f", "http://localhost:9000/actuator"]
       interval: 30s
       timeout: 10s
       retries: 5
