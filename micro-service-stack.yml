@@ -78,6 +78,8 @@ services:
      - mysql.vol:/var/lib/mysql
     networks:
       - micro-nework-backend
+    depends_on:
+      - swarm-visualize
     # restart: on-failure 
     deploy:
         placement:
@@ -93,7 +95,15 @@ services:
       MYSQL_DATABASE: sessionDB
       MYSQL_USER: root
       MYSQL_PASSWORD: root
+      # Check for mysql connection
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost"]
+    #   interval: 1m #1m30s
+    #   timeout: 10s
+    #   retries: 3
+    #   start_period: 40s
 
+    
   # Rabbit MQ Server 
   rabbit-server:
     image: rabbitmq:3-management
@@ -110,6 +120,8 @@ services:
       - "4369:4369" 
     networks:
       - micro-nework-frontend
+    depends_on:
+      - swarm-visualize
     deploy:
       placement:
         constraints:
@@ -135,6 +147,7 @@ services:
       - micro-nework-frontend
     depends_on:
       - rabbit-server
+      - swarm-visualize
     deploy:
       placement:
         constraints:
@@ -155,8 +168,8 @@ services:
       - "discovery.type=single-node"
     volumes:
       - elastic-volume.vol:/usr/share/elasticsearch/data              # Persistence data
-    # depends_on:
-      # - config-server
+      depends_on:
+        - swarm-visualize
     deploy:
       placement:
         constraints:
