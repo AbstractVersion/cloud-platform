@@ -481,7 +481,7 @@ services:
 
   #Kafka Services
   producer-service:
-    image: private.registry.io/library-producer:latest
+    image: private.registry.io/producer-service:latest
     networks:
       - micro-nework-frontend
       - kafka-broker-network
