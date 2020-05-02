@@ -13,7 +13,7 @@ mkdir /nfsdata
 ## Change the ip to the ip of the NFS server host
 docker run --rm -itd --name nfs \
   --privileged \
-  --network=host
+  --network=host \
   -v /nfsdata/:/nfs.1 \
   -e SHARED_DIRECTORY=/nfs.1 \
   -p 192.168.2.5:2049:2049 \

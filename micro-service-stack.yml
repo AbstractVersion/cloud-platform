@@ -1,11 +1,13 @@
 version: '3.7'
-#Netorks
+#Netork Initialization
 networks:
   micro-nework-frontend:
     driver: overlay
   micro-nework-backend:
     driver: overlay
   elastic-stack-network:
+    driver: overlay
+  kafka-broker-network:
     driver: overlay
 
 # Be sure that you have configure the remote volumes with NFS
@@ -54,7 +56,7 @@ volumes:
 services:
 
   swarm-visualize:
-    image: dockersamples/visualizer
+    image: private.registry.io/visualizer:latest
     ports:
       - "8090:8080"
     networks:
@@ -71,6 +73,20 @@ services:
       restart_policy:
         condition: on-failure  
 
+  zookeeper:
+    image: private.registry.io/zookeeper:latest
+    networks:
+      - kafka-broker-network
+    deploy:
+      placement:
+        constraints:
+          - "node.role==manager"
+      replicas: 1
+    expose:
+      - "2181"
+    restart_policy:
+        condition: on-failure    
+  
   generalRDBMS:
     # container_name: generalRDBMS
     image: mariadb:latest
@@ -102,8 +118,8 @@ services:
     #   timeout: 10s
     #   retries: 3
     #   start_period: 40s
-
-    
+  # Message Brokers
+  
   # Rabbit MQ Server 
   rabbit-server:
     image: rabbitmq:3-management
@@ -215,7 +231,7 @@ services:
         condition: on-failure
 
   # Beats will be installed on the workers and it will scale as one container per worker
-  # due to that we need to scale it externalyy depending on the number of workers we have (docker service update --replicas-max-per-node=20 your_service_name)
+  # due to that we need to scale it externalyy depending on the number of workers we have (docker service update --replicas-max-per-node=1 local_filebeat)
   filebeat:
     image: docker.elastic.co/beats/filebeat:7.2.0
     networks:

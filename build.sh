@@ -2,6 +2,7 @@
 # This is a comment!
 echo -------------------configuring essential things------------------
 
+
 echo Creating directory volumes ...
 mkdir -p ./elk-template/filebeat/data
 mkdir -p ./elk-template/elasticsearch/data

@@ -29,7 +29,7 @@
         <maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
         <dockerfile-maven-plugin.version>1.4.10</dockerfile-maven-plugin.version>
 
-        <docker.image.prefix>micro-env</docker.image.prefix>
+        <docker.image.prefix>private.registry.io</docker.image.prefix>
     </properties>
 
     <dependencies>
