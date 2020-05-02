@@ -77,14 +77,14 @@ services:
     image: private.registry.io/zookeeper:latest
     networks:
       - kafka-broker-network
+    expose:
+      - "2181"
     deploy:
       placement:
         constraints:
           - "node.role==manager"
       replicas: 1
-    expose:
-      - "2181"
-    restart_policy:
+      restart_policy:
         condition: on-failure    
   
   generalRDBMS:
