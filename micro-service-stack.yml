@@ -157,6 +157,8 @@ services:
         published: 9094
         protocol: tcp
         mode: host
+    networks:
+      - kafka-broker-network
     environment:
       HOSTNAME_COMMAND: "docker info | grep ^Name: | cut -d' ' -f 2"
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
@@ -480,6 +482,9 @@ services:
   #Kafka Services
   producer-service:
     image: private.registry.io/library-producer:latest
+    networks:
+      - micro-nework-frontend
+      - kafka-broker-network
     ports:
       - "8089:8080"
     depends_on:
