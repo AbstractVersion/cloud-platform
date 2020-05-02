@@ -18,13 +18,13 @@ volumes:
     driver: nfs
     driver_opts:
       # Here you should replace this ip with the NFS server IP, the directory /mysql exists on the root folder of NFS shared + /mysql
-      share: 192.168.2.4:/mysql
+      share: nfs.server.io:/mysql
   # Elsatic search volume, this volume will be shared among the registered & Configured managers.
   elastic-volume.vol:
     driver: nfs
     driver_opts:
       # Here you should replace this ip with the NFS server IP, the directory /mysql exists on the root folder of NFS shared + /mysql
-      share: 192.168.2.4:/elastic-volume
+      share: nfs.server.io:/elastic-volume
   
   # This volume must be created externally in order to configure the data persists correctely.
   # By mounting this volume directely on the local filesystem, no matter which container run will have the information of the previus beats running.
@@ -89,7 +89,7 @@ services:
   
   generalRDBMS:
     # container_name: generalRDBMS
-    image: mariadb:latest
+    image: private.registry.io/mariadb:latest
     volumes:
      - mysql.vol:/var/lib/mysql
     networks:
@@ -122,7 +122,7 @@ services:
   
   # Rabbit MQ Server 
   rabbit-server:
-    image: rabbitmq:3-management
+    image: private.registry.io/rabbitmq:3-management
     hostname: "rabbit-server"
     environment:
       RABBITMQ_DEFAULT_USER: "abstract"
@@ -202,7 +202,7 @@ services:
 
   #Centralized Logging ELastic tack
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.2.0
+    image: private.registry.io/elasticsearch:latest
     user: root
     networks:
       - elastic-stack-network
@@ -223,7 +223,7 @@ services:
         condition: on-failure
     
   logstash:
-    image: docker.elastic.co/logstash/logstash:7.2.0
+    image: private.registry.io/logstash:latest
     networks:
       - elastic-stack-network
     ports:
@@ -242,7 +242,7 @@ services:
         condition: on-failure
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:7.2.0
+    image: private.registry.io/kibana:latest
     networks:
       - elastic-stack-network
     ports:
@@ -260,7 +260,7 @@ services:
   # Beats will be installed on the workers and it will scale as one container per worker
   # due to that we need to scale it externalyy depending on the number of workers we have (docker service update --replicas-max-per-node=1 local_filebeat)
   filebeat:
-    image: docker.elastic.co/beats/filebeat:7.2.0
+    image: private.registry.io/beats:latest
     networks:
       - elastic-stack-network
     volumes:

@@ -24,6 +24,31 @@ docker image pull mongo:latest
 docker image tag mongo:latest $registry_ip/mongo:latest
 docker image push $registry_ip/mongo:latest
 
+docker image pull mariadb:latest
+docker image tag mariadb:latest $registry_ip/mariadb:latest
+docker image push $registry_ip/mariadb:latest
+
+docker image pull rabbitmq:3-management
+docker image tag rabbitmq:3-management $registry_ip/rabbitmq:3-management
+docker image push $registry_ip/rabbitmq:3-management
+
+docker image pull docker.elastic.co/elasticsearch/elasticsearch:7.2.0
+docker image tag docker.elastic.co/elasticsearch/elasticsearch:7.2.0 $registry_ip/elasticsearch:latest
+docker image push $registry_ip/elasticsearch:latest
+
+
+
+docker image pull docker.elastic.co/logstash/logstash:7.2.0
+docker image tag docker.elastic.co/logstash/logstash:7.2.0 $registry_ip/logstash:latest
+docker image push $registry_ip/logstash:latest
+
+docker image pull docker.elastic.co/kibana/kibana:7.2.0
+docker image tag docker.elastic.co/kibana/kibana:7.2.0 $registry_ip/kibana:latest
+docker image push $registry_ip/kibana:latest
+
+docker image pull docker.elastic.co/beats/filebeat:7.2.0
+docker image tag docker.elastic.co/beats/filebeat:7.2.0 $registry_ip/beats:latest
+docker image push $registry_ip/beats:latest
 
 # Cloud config build
 echo Cloud config build
