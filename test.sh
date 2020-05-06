@@ -74,4 +74,4 @@
 
 #echo 'please provide the NFS server ip :'
 #    read input
-#    echo $input
+    echo $input
