@@ -10,8 +10,7 @@ app = Flask(__name__)
 
 @app.route('/service-status')
 def status():
-    json = {"status": "up"}
-    return json
+    return {"status": "up"}
 
 @app.route('/add/<int:param1>/<int:param2>')
 def add(param1,param2):
