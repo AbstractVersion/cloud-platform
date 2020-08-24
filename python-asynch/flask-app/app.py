@@ -9,7 +9,7 @@ env=os.environ
 app = Flask(__name__)
 
 @app.route('/service-status')
-def add(param1,param2):
+def status():
     json = {"status": "up"}
     return json
 
