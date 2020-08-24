@@ -19,10 +19,10 @@ public class GatewayApiZuulApplication {
         SpringApplication.run(GatewayApiZuulApplication.class, args);
     }
     
-  @Bean
-  public PreRequestFilter preRequestFilter() {
-    return new PreRequestFilter();
-  }
+//  @Bean
+//  public PreRequestFilter preRequestFilter() {
+//    return new PreRequestFilter();
+//  }
   @Bean
   public PostConstractRequestFilter postRequestFilter() {
     return new PostConstractRequestFilter();

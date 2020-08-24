@@ -77,7 +77,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     private static final String[] AUTH_WHITELIST = {
-        "/session-service/session/register",
-        "/actuator"
+        "/session-service/session/register"
     };
 }

@@ -17,6 +17,7 @@ import com.micro.env.repository.remote.GraphServiceImpl;
 import com.micro.env.repository.remote.dataModel.MicrosoftTeamsUser;
 import com.micro.env.repository.remote.temlates.request.UserToken;
 import com.micro.env.templates.request.TockenRequestModel;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +62,7 @@ public class SessionManagment {
         if (obj.getStatusCode() == HttpStatus.OK) {
             user = mapper.convertValue(obj.getBody(), MicrosoftTeamsUser.class);
         }
- 
+
         return manageSession(user, auth_model);
     }
 
@@ -89,6 +90,27 @@ public class SessionManagment {
         // That way the self signed token will always expire before the microsoft one
         //so as to trigger silent authentication on the client side
         session.setExpiring(Integer.parseInt(auth_model.getExpires_in()) - 100);
+        return session;
+    }
+    
+    //ANONYMOUS LOGIN REMOVE IN PRODUCTION
+
+    public SessionInfo getAnonymousToken() {
+        SessionInfo session = new SessionInfo(
+                UUID.randomUUID().toString(),
+                "Anonymous",
+                "N/A",
+                "N/A",
+                32000
+        );
+        this.sessionRepo.createSession(session);
+        session.setAccessToken(
+                tokeUtil.generateToken(
+                        session,
+                        32000
+                )
+        );
+        session.setExpiring(32000);
         return session;
     }
 

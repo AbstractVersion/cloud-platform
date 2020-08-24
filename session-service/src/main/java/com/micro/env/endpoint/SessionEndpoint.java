@@ -61,4 +61,13 @@ public class SessionEndpoint {
                 sessionService.register_user_by_AAD_token(session)
         );
     }
+    
+    //ANONYMOUS LOGIN REMOVE IN PRODUCTION
+    // @RequestMapping(method = RequestMethod.POST, path = "/register-anonymoys", consumes = "application/json", produces = "application/json")
+    // public ResponseEntity<Object> anonymoys_registration() throws SessionAlreadyExists, AADAuthenticationInformationNonSetException, JsonProcessingException {
+    //     log.info("Register request has been triggered.");
+    //     return ResponseEntity.ok(
+    //             sessionService.getAnonymousToken()
+    //     );
+    // }
 }

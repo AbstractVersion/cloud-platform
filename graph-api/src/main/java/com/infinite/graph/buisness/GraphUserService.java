@@ -42,4 +42,9 @@ public class GraphUserService extends Graph {
         return user;
     }
 
+    public MicrosoftTeamsUser getUserInfo(UserToken tokenDetails, String userPrincipal) throws UserTokenExpiredException, UnknownHostException {
+        MicrosoftTeamsUser user = new MicrosoftTeamsUser(this.graph.getUser(tokenDetails.getUserToken(), userPrincipal), serviceUUID);
+        return user;
+    }
+
 }

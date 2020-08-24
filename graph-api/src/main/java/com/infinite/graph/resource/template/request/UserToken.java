@@ -24,4 +24,8 @@ public class UserToken {
     public UserToken() {
     }
 
+    public UserToken(String userToken) {
+        this.userToken = userToken;
+    }
+
 }

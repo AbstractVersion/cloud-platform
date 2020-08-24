@@ -33,7 +33,6 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
 
-    
     @Autowired
     private JwtUserDetailsService jwtUserDetailsService;
     @Autowired
@@ -55,10 +54,12 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         // JWT Token is in the form "Bearer token". Remove Bearer word and get
         // only the Token
         log.info("Decoding jwt token && extracting information");
-        if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {   
+        if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
             jwtToken = requestTokenHeader.substring(7);
             try {
                 username = jwtTokenUtil.getUsernameFromToken(jwtToken);
+                
+//                response.setHeader("user-session-id", username);
             } catch (IllegalArgumentException e) {
                 log.warn("Unable to get JWT Token");
             } catch (ExpiredJwtException e) {

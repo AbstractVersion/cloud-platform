@@ -15,8 +15,6 @@
     <description>Gateway API of microservice ecosystem</description>
 
     <properties>
-        <!-- <java.version>1.8</java.version> -->
-        <spring-cloud.version>Hoxton.SR1</spring-cloud.version>
 
         <!-- Source encoding -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

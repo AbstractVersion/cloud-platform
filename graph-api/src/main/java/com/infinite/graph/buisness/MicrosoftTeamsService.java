@@ -14,6 +14,7 @@ import com.infinite.graph.dataModel.MicrosoftTeamsUser;
 import com.infinite.graph.exception.UserTokenExpiredException;
 import com.infinite.graph.service.Teams_Endpoint;
 import com.microsoft.graph.models.extensions.Site;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -52,7 +53,6 @@ public class MicrosoftTeamsService {
         return temp;
     }
 
-
     public List<?> list_team_members(String accessToken, UUID team_id) throws UserTokenExpiredException {
         return castData(teams_endpoint.listTeamUsers(accessToken, team_id).getAsJsonArray("value").deepCopy(), MicrosoftTeamsUser.class);
     }
@@ -61,4 +61,11 @@ public class MicrosoftTeamsService {
         return teams_endpoint.findGroupCoprespondingSite(accessToken, team_id);
     }
 
+    public boolean addUserToTeam(String accessToken, String teamId, String userId) throws UserTokenExpiredException, IOException {
+        return teams_endpoint.addUserToTeam(accessToken, teamId, userId);
+    }
+
+    public boolean deleteUserFromTeam(String accessToken, UUID team_id, UUID userId) throws UserTokenExpiredException {
+        return teams_endpoint.deleteUserFromteam(accessToken, team_id, userId);
+    }
 }

@@ -55,6 +55,19 @@ if [ "$RESP" = "y" ]; then
 else
     echo "Ok then proceeding with the initialization..."
 fi
+
+
+read -p "Build & Push  session-db ? (y/n) " RESP
+if [ "$RESP" = "y" ]; then
+    
+    echo Building Session DB
+    docker build -t $registry_ip/session-db:production ./maria-db/session-db
+    docker image push $registry_ip/session-db:production
+
+else
+    echo "Ok then proceeding with the initialization..."
+fi
+
     
 # Cloud config build
 read -p "Build & Push  CLOUD-CONFIG ? (y/n) " RESP

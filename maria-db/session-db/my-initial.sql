@@ -1,14 +1,10 @@
---
--- Database: `sessionDB`
---
 
--- --------------------------------------------------------
+create database sessionDB;
 
---
--- Table structure for table `session_info`
---
-CREATE Database sessionDB;
-USE sessionDB;
+GRANT ALL PRIVILEGES ON sessionDB.* TO 'root'@'%' IDENTIFIED BY 'root';
+GRANT ALL PRIVILEGES ON sessionDB.* TO 'root'@'localhost' IDENTIFIED BY 'root';
+USE sessionDB
+
 
 CREATE TABLE `session_info` (
   `id` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
