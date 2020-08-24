@@ -25,4 +25,4 @@ def process(self , json):
     self.update_state(state='STARTED')
     time.sleep(20) # lets sleep for a while before doing the gigantic addition task!
     self.update_state(state='SUCCESS')
-    return json
+    return "OK"
