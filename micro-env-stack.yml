@@ -189,7 +189,7 @@ services:
     volumes:
       # For the beats configuration volume we need to find a way to share the config file git, nfs etc.
       # here we mount configuration files from the nfs to this directory
-      - /mnt/local-nfs/filebeat/filebeat.docker.yml:/usr/share/filebeat/filebeat.yml:ro # Configuration file
+      - /nfs/micor-env/config/filebeat/filebeat.docker.yml:/usr/share/filebeat/filebeat.yml:ro # Configuration file
       - /var/lib/docker/containers:/var/lib/docker/containers:ro           # Docker logs
       - /var/run/docker.sock:/var/run/docker.sock:ro                       # Additional information about containers
       - filebeat.prod.ext.vol:/usr/share/filebeat/data:rw                        # Persistence data
