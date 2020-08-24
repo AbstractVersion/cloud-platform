@@ -202,7 +202,7 @@ services:
         constraints: 
           - node.role != manager
         #   - "node.labels.proxy!=true"
-      replicas: 1
+      replicas: 2
       restart_policy:
         condition: on-failure
 
