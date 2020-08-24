@@ -1,0 +1,34 @@
+version: '2'
+services:
+  rabbit-server:
+    image: private.registry.io/rabbitmq:3-management
+    hostname: "rabbit-server"
+    environment:
+      RABBITMQ_DEFAULT_USER: "abstract"
+      RABBITMQ_DEFAULT_PASS: "admin"
+      RABBITMQ_DEFAULT_VHOST: "/"
+    ports:
+      - "15672:15672" 
+      - "5672:5672" 
+      - "15671:15671" 
+      - "5671:5671" 
+      - "4369:4369" 
+
+        
+  web:
+    build:
+      context: ./flask-app
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+     - "5000:5000"
+    depends_on:
+      - rabbit-server
+      
+  worker:
+    build:
+      context: ./flask-celery
+      dockerfile: Dockerfile
+    depends_on:
+      - rabbit-server
+  

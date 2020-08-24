@@ -392,3 +392,53 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
+
+  python-service:
+    image: private.registry.io/python-service:production
+    networks:
+      - micro-nework-frontend
+    links:
+        - "discovery-service:discovery-service"
+        - "config-server:config-server"  
+    labels:
+        collect_logs_with_filebeat: "true"
+        decode_log_event_to_json_object: "true"
+    deploy:
+        placement:
+          constraints:
+            - "node.role!=manager"
+        replicas: 1
+        restart_policy:
+            condition: on-failure
+    depends_on:
+        - rabbit-server
+        - config-server
+        - discovery-service
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/actuator"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  celery-worker:
+    image: private.registry.io/celery-worker:production
+    networks:
+      - micro-nework-frontend
+    links:
+        - "discovery-service:discovery-service"
+        - "config-server:config-server"  
+    labels:
+        collect_logs_with_filebeat: "true"
+        decode_log_event_to_json_object: "true"
+    deploy:
+        placement:
+          constraints:
+            - "node.role!=manager"
+        replicas: 1
+        restart_policy:
+            condition: on-failure
+    depends_on:
+        - rabbit-server
+        - config-server
+        - discovery-service
+        - python-service

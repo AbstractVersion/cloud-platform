@@ -1,0 +1,5 @@
+Flask==1.0.3
+# https://stackoverflow.com/questions/50444988/celery-attributeerror-async-error
+celery==4.1.1
+Werkzeug==0.16.1
+requests
