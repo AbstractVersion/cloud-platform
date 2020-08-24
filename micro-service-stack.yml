@@ -18,13 +18,13 @@ volumes:
     driver: nfs
     driver_opts:
       # Here you should replace this ip with the NFS server IP, the directory /mysql exists on the root folder of NFS shared + /mysql
-      share: swarmNfs.server.io:/mysql
+      share: swarmNfs.server.io/mysql
   # Elsatic search volume, this volume will be shared among the registered & Configured managers.
   elastic-volume.vol:
     driver: nfs
     driver_opts:
       # Here you should replace this ip with the NFS server IP, the directory /mysql exists on the root folder of NFS shared + /mysql
-      share: swarmNfs.server.io:/elastic-volume
+      share: swarmNfs.server.io/elastic-volume
   
   # This volume must be created externally in order to configure the data persists correctely.
   # By mounting this volume directely on the local filesystem, no matter which container run will have the information of the previus beats running.

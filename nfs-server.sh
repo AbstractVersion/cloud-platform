@@ -62,3 +62,7 @@ volumes:
       share: 10.0.2.15:/nginx_web
 
       docker stack deploy -c docker-compose.yml app
+
+
+
+      docker run -i -t --volume-driver=nfs --rm -v swarmNfs.server.io:/mysql:/test alpine /bin/bash
