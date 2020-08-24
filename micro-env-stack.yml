@@ -205,6 +205,24 @@ services:
       replicas: 2
       restart_policy:
         condition: on-failure
+  # Swarm Visualizer
+  swarm-visualize:
+    image: private.registry.io/visualizer:latest
+    ports:
+      - "8090:8080"
+    networks:
+      - micro-nework-frontend
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    deploy:
+      placement:
+        constraints:
+          - "node.role==manager"
+        #Number of replicas
+      replicas: 1
+      # Configure stack update
+      restart_policy:
+        condition: on-failure 
 
   # Discovery service 
   discovery-service:
@@ -317,3 +335,60 @@ services:
       timeout: 10s
       retries: 5
 
+  #Hello Service
+  hello-service:
+    image: private.registry.io/hello-service
+    # ports:
+    #     - "8080:8080"
+    #internal-links
+    networks:
+      - micro-nework-frontend
+    links:
+        - "discovery-service:discovery-service"  
+    labels:
+        collect_logs_with_filebeat: "true"
+        decode_log_event_to_json_object: "true"
+    depends_on:
+      - config-server
+      - discovery-service
+    deploy:
+      placement:
+        constraints:
+          - "node.role!=manager"
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator"]
+      interval: 30s
+      timeout: 10s
+      retries: 5 
+    # deploy:
+    #   replicas: 2
+
+  #hello Client
+  hello-client:
+    image: private.registry.io/hello-client:latest
+    networks:
+      - micro-nework-frontend
+    links:
+        - "discovery-service:discovery-service"
+        - "config-server:config-server"  
+    labels:
+        collect_logs_with_filebeat: "true"
+        decode_log_event_to_json_object: "true"
+    depends_on:
+      - config-server
+      - discovery-service
+    deploy:
+      placement:
+        constraints:
+          - "node.role!=manager"
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/actuator"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
