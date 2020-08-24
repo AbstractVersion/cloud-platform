@@ -395,6 +395,8 @@ services:
 
   python-service:
     image: private.registry.io/python-service:production
+    ports:
+        - "5000:5000"
     networks:
       - micro-nework-frontend
     links:
