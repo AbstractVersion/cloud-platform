@@ -417,7 +417,7 @@ services:
         - config-server
         - discovery-service
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5000/actuator"]
+      test: ["CMD", "curl", "-f", "http://localhost:5000/service-status"]
       interval: 30s
       timeout: 10s
       retries: 5
