@@ -12,6 +12,8 @@ import b3
 from elk_logger import logger_init
 import  logging, sys, json_logging
 from worker import celery
+import json_logging
+json_logging.ENABLE_JSON_LOGGING = True
 
 
 os.environ.setdefault('FORKED_BY_MULTIPROCESSING', '1')
