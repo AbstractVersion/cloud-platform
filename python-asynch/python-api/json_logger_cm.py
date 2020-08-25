@@ -10,7 +10,7 @@ import sleuth
 import b3
 
 json_logging.ENABLE_JSON_LOGGING = True
-
+os.environ["ENABLE_JSON_LOGGING"] = "1"
 
 def extra(**kw):
     '''Add the required nested props layer'''

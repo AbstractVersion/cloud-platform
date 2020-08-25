@@ -15,7 +15,7 @@ from json_logger_cm import CustomJSONLog
 
 
 os.environ.setdefault('FORKED_BY_MULTIPROCESSING', '1')
-os.environ.setdefault('ENABLE_JSON_LOGGING', '1')
+os.environ["ENABLE_JSON_LOGGING"] = "1"
 
 serviceId = uuid.uuid1()
 serviceHost = socket.gethostname()
