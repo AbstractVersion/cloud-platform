@@ -18,7 +18,7 @@ WORKDIR /app
 RUN pip install -r requirements.txt
 
 # expose the app port
-EXPOSE 5000
+EXPOSE 5001
 
 # run the app server
-CMD ["./wait_from_cloud_config.sh", "python3",  "app.py"]
+CMD ["./wait_from_cloud_config.sh", "gunicorn", "-c", "gunicorn_config.py", "wsgi:app"]

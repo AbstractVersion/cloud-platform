@@ -1,10 +1,9 @@
 import os
 import py_eureka_client.eureka_client as eureka_client
-from flask import Flask
-from flask import  url_for, jsonify, request, make_response
-from worker import celery
-from celery.result import AsyncResult
+from flask import Flask, url_for, jsonify, request, make_response
+from celery import Celery, states
 import celery.states as states
+from flask_cors import CORS, cross_origin
 import uuid , json
 import socket
 import sleuth
@@ -12,9 +11,6 @@ import b3
 from elk_logger import logger_init
 import  logging, sys, json_logging
 from worker import celery
-import json_logging
-json_logging.ENABLE_JSON_LOGGING = True
-
 
 os.environ.setdefault('FORKED_BY_MULTIPROCESSING', '1')
 
@@ -22,14 +18,21 @@ os.environ.setdefault('FORKED_BY_MULTIPROCESSING', '1')
 serviceId = uuid.uuid1()
 serviceHost = socket.gethostname()
 
+
+# https://github.com/thangbn/json-logging-python
+# hello = flask.Flask(__name__)
+app_name = "python-service"
+
+# app = Flask(__name__)
+# CORS(app)
+
 # # init the logger as usual
 logger_init()
 logger = logging.getLogger("werkzeug")
 logger.setLevel(logging.DEBUG)
 logger.addHandler(logging.StreamHandler(sys.stdout))
 
-env=os.environ
-app_name = "python-service"
+
 
 # Create some test data for our catalog in the form of a list of dictionaries.
 info = {'servicID': serviceId,
@@ -45,18 +48,33 @@ eureka_client.init(eureka_server="http://abstract:admin@discovery-service:8761/e
            app_name=app_name,
 		   ha_strategy=eureka_client.HA_STRATEGY_STICK)
 
-@app.route('/service-status')
-def status():
+
+@app.route('/', methods=['GET'])
+def home():
+    return {"endpoint-description" : "infinite-dmu-replicator", "clone-procedure" : "asynch", "version" : "1.0"}
+
+# A route to return all of the available entries in our catalog.
+@app.route('/api/info', methods=['GET'])
+def api_all():
+    #https://github.com/davidcarboni/B3-Propagation
+    # logger = logging.getLogger("werkzeug")
+    # logger.setLevel(logging.DEBUG)
+    b3.start_span()
+            
+    # logger.debug(b3.values()['X-B3-TraceId'], extra = {'props' : {'extra_property' : 'extra_value'}})
+    # logger.info("Custom Logger message Python API", extra = buildTraceInfo(app_name,b3.values()['X-B3-TraceId']) )
+    halloLog()
+    b3.end_span()
     return jsonify(info)
 
-@app.route('/add/<int:param1>/<int:param2>')
+@app.route('/api/add/<int:param1>/<int:param2>')
 def add(param1,param2):
     json = {"hi": "yes"}
     task = celery.send_task('mytasks.add', args=[param1, param2, json], kwargs={})
     return "<a href='{url}'>check status of {id} </a>".format(id=task.id,
                 url=url_for('check_task',id=task.id,_external=True))
 
-@app.route('/longTask', methods=['POST'])
+@app.route('/api/longTask', methods=['POST'])
 def longTask():
     b3.start_span()
     json = request.json
@@ -66,19 +84,25 @@ def longTask():
     return "<a href='{url}'>check status of {id} </a>".format(id=task.id,
                 url=url_for('check_task',id=task.id,_external=True))
 
-@app.route('/check/<string:id>')
-def check_task(id):
-    res = celery.AsyncResult(id)
+
+# Asynch Request status endpoint
+@app.route('/api/status/<string:task_id>', methods=['GET'])
+def check_task(task_id):
+    res = celery.AsyncResult(task_id)
     if res.state==states.RECEIVED:
         return res.state
     elif res.state==states.STARTED:
         return res.state
     else:
         return str(res.result)
+
+
+
+def halloLog():
+    logger.info('Connector is up & running.')
+
 if __name__ == '__main__':
+    app = create_app()
     app.before_request(b3.start_span)
     app.after_request(b3.end_span)
-    app.run(debug=env.get('DEBUG',True),
-            port=int(env.get('PORT',5000)),
-            host=env.get('HOST','0.0.0.0')
-    )
+    app.run(host='0.0.0.0')

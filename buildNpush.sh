@@ -127,7 +127,7 @@ read -p "Build & Push Python-Service ? (y/n) " RESP
 if [ "$RESP" = "y" ]; then
     # zuul-gateway 
     echo -------------------------python-service--------------------------
-    cd python-asynch/flask-app/ && docker build -t $registry_ip/python-service:production .
+    cd python-asynch/python-api/ && docker build -t $registry_ip/python-service:production .
     # push the image to a local repo
     docker push $registry_ip/python-service:production
     cd ../..
@@ -139,7 +139,7 @@ read -p "Build & Push Celery-Worker ? (y/n) " RESP
 if [ "$RESP" = "y" ]; then
     # zuul-gateway 
     echo -------------------------python-service--------------------------
-    cd python-asynch/flask-celery/ && docker build -t $registry_ip/celery-worker:production .
+    cd python-asynch/celery-worker/ && docker build -t $registry_ip/celery-worker:production .
     # push the image to a local repo
     docker push $registry_ip/celery-worker:production
     cd ../..
