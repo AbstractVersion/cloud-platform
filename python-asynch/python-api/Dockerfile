@@ -10,7 +10,7 @@ ENV HOST 0.0.0.0
 ENV DEBUG true
 # copy source code
 COPY . /app
-RUN chmod +x /app/wait_from_cloud_config.sh
+RUN chmod +x /app/prestart.sh
 
 WORKDIR /app
 
@@ -21,4 +21,4 @@ RUN pip install -r requirements.txt
 EXPOSE 5001
 
 # run the app server
-CMD ["./wait_from_cloud_config.sh", "gunicorn", "-c", "gunicorn_config.py", "wsgi:app"]
+CMD ["./prestart.sh", "gunicorn", "-c", "gunicorn_config.py", "wsgi:app"]
