@@ -9,9 +9,10 @@ ENV C_FORCE_ROOT true
 
 ENV HOST 0.0.0.0
 
-# install requirements
-RUN pip install -r /app/requirements.txt
 
 
 COPY . /app
 RUN chmod +x /app/prestart.sh
+
+# install requirements
+RUN pip install -r /app/requirements.txt
