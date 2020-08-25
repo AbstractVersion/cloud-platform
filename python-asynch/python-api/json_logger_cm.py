@@ -8,7 +8,7 @@ import json_logging
 import sys
 import sleuth
 import b3
-
+import os
 json_logging.ENABLE_JSON_LOGGING = True
 os.environ["ENABLE_JSON_LOGGING"] = "1"
 
