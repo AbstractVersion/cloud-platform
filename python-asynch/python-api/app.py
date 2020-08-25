@@ -71,8 +71,7 @@ def api_all():
 def add(param1,param2):
     json = {"hi": "yes"}
     task = celery.send_task('mytasks.add', args=[param1, param2, json], kwargs={})
-    return "<a href='{url}'>check status of {id} </a>".format(id=task.id,
-                url=url_for('check_task',id=task.id,_external=True))
+    return jsonify({"task_id" : task.id, "URL" : url_for('check_task',id=task.id,_external=True)})
 
 @app.route('/api/longTask', methods=['POST'])
 def longTask():
@@ -81,8 +80,7 @@ def longTask():
     logger.info("Recieved project : " + json.dumps(jsonRequest))
     task = celery.send_task('mytasks.longtask', args=[json], kwargs={})
     b3.end_span()
-    return "<a href='{url}'>check status of {id} </a>".format(id=task.id,
-                url=url_for('check_task',id=task.id,_external=True))
+    return jsonify({"task_id" : task.id, "URL" : url_for('check_task',id=task.id,_external=True)})
 
 
 # Asynch Request status endpoint
