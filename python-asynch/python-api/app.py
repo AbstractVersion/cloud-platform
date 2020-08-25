@@ -76,8 +76,7 @@ def add(param1,param2):
 @app.route('/api/longTask', methods=['POST'])
 def longTask():
     b3.start_span()
-    json = request.json
-    logger.info("Recieved project : " + json)
+    logger.info("Recieved project : " + str(request.json))
     task = celery.send_task('mytasks.longtask', args=[json], kwargs={})
     b3.end_span()
     return jsonify({"task_id" : task.id, "URL" : url_for('check_task',id=task.id,_external=True)})
