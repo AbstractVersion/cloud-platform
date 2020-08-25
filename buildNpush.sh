@@ -147,11 +147,11 @@ else
     echo "Ok then proceeding with the initialization..."
 fi
 
-read -p "Build & Push tiangolo-pyton-service ? (y/n) " RESP
+read -p "Build & Push python-test ? (y/n) " RESP
 if [ "$RESP" = "y" ]; then
     # zuul-gateway 
     echo -------------------------python-service--------------------------
-    cd python-asynch/tiangolo-pyton-service/ && docker build -t $registry_ip/python-service:production .
+    cd python-asynch/python-test/ && docker build -t $registry_ip/python-service:production .
     # push the image to a local repo
     docker push $registry_ip/python-service:production
     cd ../..
