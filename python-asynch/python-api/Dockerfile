@@ -19,7 +19,8 @@ RUN pip install -r requirements.txt
 
 # expose the app port
 EXPOSE 5001
+COPY logging.conf /logging.conf
 
 # run the app server
-CMD ["./prestart.sh", "gunicorn", "-c", "gunicorn_config.py", "--log-config", "./logging.conf", "wsgi:app"]
+CMD ["./prestart.sh", "gunicorn", "-c", "gunicorn_config.py",  "--log-config", "/logging.conf", "wsgi:app"]
 # CMD ["./prestart.sh", "python3", "app.py"]
