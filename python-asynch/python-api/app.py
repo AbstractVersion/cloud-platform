@@ -37,7 +37,7 @@ app_name = "python-service"
 # You would normally import logger_init and setup the logger in your main module - e.g.
 # main.py
 json_logging.ENABLE_JSON_LOGGING = True
-json_logging.init_non_web(custom_formatter=CustomJSONLog)
+json_logging.__init(custom_formatter=CustomJSONLog)
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
