@@ -41,7 +41,7 @@ json_logging.init_non_web(custom_formatter=CustomJSONLog)
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
-logger.addHandler(logging.StreamHandler(sys.stderr))
+logger.addHandler(logging.StreamHandler(sys.stdout))
 
 # Create some test data for our catalog in the form of a list of dictionaries.
 info = {'servicID': serviceId,
