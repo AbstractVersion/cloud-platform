@@ -8,7 +8,7 @@ import uuid , json
 import socket
 import sleuth
 import b3
-from elk_logger import logger_init
+# from elk_logger import logger_init
 import  logging, sys, json_logging
 from worker import celery
 
@@ -27,10 +27,10 @@ app_name = "python-service"
 # CORS(app)
 
 # # init the logger as usual
-logger_init()
-logger = logging.getLogger("werkzeug")
-logger.setLevel(logging.DEBUG)
-logger.addHandler(logging.StreamHandler(sys.stdout))
+# logger_init()
+# logger = logging.getLogger("werkzeug")
+# logger.setLevel(logging.DEBUG)
+# logger.addHandler(logging.StreamHandler(sys.stdout))
 
 
 
@@ -41,6 +41,14 @@ info = {'servicID': serviceId,
 
 app = Flask(__name__)
 CORS(app)
+json_logging.init_flask(enable_json=True)
+
+json_logging.init_request_instrument(app, exclude_url_patterns=[r'/exclude_from_request_instrumentation'])
+
+# init the logger as usual
+logger = logging.getLogger("test logger")
+logger.setLevel(logging.DEBUG)
+logger.addHandler(logging.StreamHandler(sys.stdout))
 
 #Configure Eurika client
 eureka_client.init(eureka_server="http://abstract:admin@discovery-service:8761/eureka",
@@ -62,8 +70,7 @@ def api_all():
     b3.start_span()
             
     # logger.debug(b3.values()['X-B3-TraceId'], extra = {'props' : {'extra_property' : 'extra_value'}})
-    # logger.info("Custom Logger message Python API", extra = buildTraceInfo(app_name,b3.values()['X-B3-TraceId']) )
-    halloLog()
+    logger.info("Custom Logger message Python API", extra = buildTraceInfo())
     b3.end_span()
     return jsonify(info)
 
@@ -94,7 +101,12 @@ def check_task(task_id):
         return str(res.result)
 
 
-
+def buildTraceInfo():
+    return json_log_object ['trace'] ={
+            "trace_id":b3.values()['X-B3-TraceId'],
+            "span_id":b3.values()['X-B3-TraceId'],
+            "exportable":"false"
+    }
 def halloLog():
     logger.info('Connector is up & running.')
 
