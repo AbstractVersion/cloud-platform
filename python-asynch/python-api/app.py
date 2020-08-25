@@ -39,7 +39,7 @@ app_name = "python-service"
 json_logging.ENABLE_JSON_LOGGING = True
 json_logging.__init(custom_formatter=CustomJSONLog)
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("werkzeug")
 logger.setLevel(logging.DEBUG)
 logger.addHandler(logging.StreamHandler(sys.stdout))
 

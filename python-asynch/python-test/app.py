@@ -8,9 +8,9 @@ import uuid , json
 import socket
 import sleuth
 import b3
-from elk_logger import logger_init
-import  logging, sys, json_logging
+import  logging, sys
 from worker import celery
+from pythonjsonlogger import jsonlogger
 
 os.environ.setdefault('FORKED_BY_MULTIPROCESSING', '1')
 
