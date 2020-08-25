@@ -70,7 +70,7 @@ def api_all():
     b3.start_span()
             
     # logger.debug(b3.values()['X-B3-TraceId'], extra = {'props' : {'extra_property' : 'extra_value'}})
-    logger.info("Custom Logger message Python API", extra = buildTraceInfo())
+    logger.info("Custom Logger message Python API", extra = {'trace': buildTraceInfo()} )
     b3.end_span()
     return jsonify(info)
 
@@ -102,11 +102,11 @@ def check_task(task_id):
 
 
 def buildTraceInfo():
-    return json_log_object ['trace'] ={
+    return {
             "trace_id":b3.values()['X-B3-TraceId'],
             "span_id":b3.values()['X-B3-TraceId'],
             "exportable":"false"
-    }
+        }
 def halloLog():
     logger.info('Connector is up & running.')
 
