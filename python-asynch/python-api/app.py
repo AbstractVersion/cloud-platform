@@ -11,6 +11,8 @@ import b3
 # from elk_logger import logger_init
 import  logging, sys, json_logging
 from worker import celery
+from json_logger_cm import CustomJSONLog
+
 
 os.environ.setdefault('FORKED_BY_MULTIPROCESSING', '1')
 
@@ -32,7 +34,14 @@ app_name = "python-service"
 # logger.setLevel(logging.DEBUG)
 # logger.addHandler(logging.StreamHandler(sys.stdout))
 
+# You would normally import logger_init and setup the logger in your main module - e.g.
+# main.py
 
+json_logging.init_non_web(custom_formatter=CustomJSONLog)
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+logger.addHandler(logging.StreamHandler(sys.stderr))
 
 # Create some test data for our catalog in the form of a list of dictionaries.
 info = {'servicID': serviceId,
@@ -41,14 +50,7 @@ info = {'servicID': serviceId,
 
 app = Flask(__name__)
 CORS(app)
-json_logging.init_flask(enable_json=True)
 
-json_logging.init_request_instrument(app, exclude_url_patterns=[r'/exclude_from_request_instrumentation'])
-
-# init the logger as usual
-logger = logging.getLogger("test logger")
-logger.setLevel(logging.DEBUG)
-logger.addHandler(logging.StreamHandler(sys.stdout))
 
 #Configure Eurika client
 eureka_client.init(eureka_server="http://abstract:admin@discovery-service:8761/eureka",
@@ -68,9 +70,13 @@ def api_all():
     # logger = logging.getLogger("werkzeug")
     # logger.setLevel(logging.DEBUG)
     b3.start_span()
-            
+    logger.info('Starting')
+    try:
+        1 / 0
+    except:  # noqa pylint: disable=bare-except
+        logger.exception('You can\'t divide by zero')     
     # logger.debug(b3.values()['X-B3-TraceId'], extra = {'props' : {'extra_property' : 'extra_value'}})
-    logger.info("Custom Logger message Python API", extra = {'trace': buildTraceInfo()} )
+    # logger.info("Custom Logger message Python API", extra = {'trace': buildTraceInfo()} )
     b3.end_span()
     return jsonify(info)
 
@@ -101,12 +107,12 @@ def check_task(task_id):
         return str(res.result)
 
 
-def buildTraceInfo():
-    return {
-            "trace_id":b3.values()['X-B3-TraceId'],
-            "span_id":b3.values()['X-B3-TraceId'],
-            "exportable":"false"
-        }
+# def buildTraceInfo():
+#     return {
+#             "trace_id":b3.values()['X-B3-TraceId'],
+#             "span_id":b3.values()['X-B3-TraceId'],
+#             "exportable":"false"
+#         }
 def halloLog():
     logger.info('Connector is up & running.')
 
