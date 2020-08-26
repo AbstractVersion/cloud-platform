@@ -12,7 +12,7 @@ logger = logging.getLogger("test-logger")
 logger.setLevel(logging.DEBUG)
 json_handler = logging.StreamHandler()
 formatter = jsonlogger.JsonFormatter(
-        fmt='%(asctime)s %(levelname)s %(name)s %(message)s'
+        fmt='%(asctime)s %(levelname)s %(name)s %(message)s %(application_name)s'
     )
 json_handler.setFormatter(formatter)
 logger.addHandler(json_handler)
@@ -39,7 +39,7 @@ def api_all():
     logger.info("Yes Please")
     # logger.debug(b3.values()['X-B3-TraceId'], extra = {'props' : {'extra_property' : 'extra_value'}})
     # logger.info("Custom Logger message Python API", extra = buildTraceInfo(app_name,b3.values()['X-B3-TraceId']) )
-    logger.info("test log statement", extra = {'trace' : {
+    logger.info("test log statement", application_name = "python-service" , extra = {'trace' : {
             "trace_id":b3.values()['X-B3-TraceId'],
             "span_id":b3.values()['X-B3-TraceId'],
             "exportable":"false"
