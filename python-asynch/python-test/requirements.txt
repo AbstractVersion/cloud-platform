@@ -12,4 +12,4 @@ requests
 py_eureka_client
 Flask-B3
 Flask-Sleuth
-python-json-logger
+json_logging

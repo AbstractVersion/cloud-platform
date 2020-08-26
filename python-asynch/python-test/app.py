@@ -8,44 +8,25 @@ import uuid , json
 import socket
 import sleuth
 import b3
-import  logging, sys
+import  logging, sys , json_logging
 from worker import celery
-from pythonjsonlogger import jsonlogger
+# from pythonjsonlogger import jsonlogger
 
-os.environ.setdefault('FORKED_BY_MULTIPROCESSING', '1')
+app = flask.Flask(__name__)
+json_logging.ENABLE_JSON_LOGGING = True
+json_logging.init(framework_name='flask')
+json_logging.init_request_instrument(app)
 
+CORS(app)
 
-serviceId = uuid.uuid1()
-serviceHost = socket.gethostname()
-
-
-# https://github.com/thangbn/json-logging-python
-# hello = flask.Flask(__name__)
-app_name = "replication-service"
-
-# app = Flask(__name__)
-# CORS(app)
-
-# # init the logger as usual
-logger_init()
-logger = logging.getLogger("werkzeug")
+logger = logging.getLogger("test-logger")
 logger.setLevel(logging.DEBUG)
 logger.addHandler(logging.StreamHandler(sys.stdout))
-
-
-
-# Create some test data for our catalog in the form of a list of dictionaries.
-info = {'servicID': serviceId,
-     'serviceHost': serviceHost,
-     'title': 'Python API v.01'}
-
-app = Flask(__name__)
-CORS(app)
 
 #Configure Eurika client
 eureka_client.init(eureka_server="http://abstract:admin@discovery-service:8761/eureka",
 		   instance_port=5001,
-           app_name=app_name,
+           app_name="test-application",
 		   ha_strategy=eureka_client.HA_STRATEGY_STICK)
 
 
@@ -63,9 +44,14 @@ def api_all():
     logger.info("Yes Please")
     # logger.debug(b3.values()['X-B3-TraceId'], extra = {'props' : {'extra_property' : 'extra_value'}})
     # logger.info("Custom Logger message Python API", extra = buildTraceInfo(app_name,b3.values()['X-B3-TraceId']) )
+    logger.info("test log statement", extra = {'trace' : {
+            "trace_id":b3.values()['X-B3-TraceId'],
+            "span_id":b3.values()['X-B3-TraceId'],
+            "exportable":"false"
+        }})
     halloLog()
     b3.end_span()
-    return jsonify(info)
+    return "SUccess"
 
 
 
