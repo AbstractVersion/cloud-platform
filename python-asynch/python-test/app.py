@@ -7,10 +7,12 @@ from pythonjsonlogger import jsonlogger
 import sleuth, b3
 
 app = flask.Flask(__name__)
+app_name = 'test-application'
 
 class CustomJsonFormatter(jsonlogger.JsonFormatter):
     def add_fields(self, log_record, record, message_dict):
         super(CustomJsonFormatter, self).add_fields(log_record, record, message_dict)
+        log_record['application_name'] = app_name
         if not log_record.get('timestamp'):
             # this doesn't use record.created, so it is slightly off
             now = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%fZ')
@@ -23,7 +25,7 @@ class CustomJsonFormatter(jsonlogger.JsonFormatter):
 logger = logging.getLogger("test-logger")
 logger.setLevel(logging.DEBUG)
 json_handler = logging.StreamHandler()
-formatter = CustomJsonFormatter('(timestamp) (level) (name) (message)')
+formatter = CustomJsonFormatter('(timestamp) (application_name) (level) (name) (message) (trace)')
 json_handler.setFormatter(formatter)
 logger.addHandler(json_handler)
 
@@ -31,7 +33,7 @@ logger.addHandler(json_handler)
 #Configure Eurika client
 eureka_client.init(eureka_server="http://abstract:admin@discovery-service:8761/eureka",
 		   instance_port=5001,
-           app_name="test-application",
+           app_name = app_name,
 		   ha_strategy=eureka_client.HA_STRATEGY_STICK)
 
 @app.route('/')
