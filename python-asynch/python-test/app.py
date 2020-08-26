@@ -13,6 +13,11 @@ class CustomJsonFormatter(jsonlogger.JsonFormatter):
     def add_fields(self, log_record, record, message_dict):
         super(CustomJsonFormatter, self).add_fields(log_record, record, message_dict)
         log_record['application_name'] = app_name
+        log_record['trace'] = {
+            "trace_id": b3.values()['X-B3-TraceId'],
+            "span_id": b3.values()['X-B3-TraceId'],
+            "exportable":"false"
+        } 
         if not log_record.get('timestamp'):
             # this doesn't use record.created, so it is slightly off
             now = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%fZ')
@@ -51,11 +56,7 @@ def api_all():
     logger.info("Yes Please")
     # logger.debug(b3.values()['X-B3-TraceId'], extra = {'props' : {'extra_property' : 'extra_value'}})
     # logger.info("Custom Logger message Python API", extra = buildTraceInfo(app_name,b3.values()['X-B3-TraceId']) )
-    logger.info("test log statement", extra = {'trace' : {
-            "trace_id":b3.values()['X-B3-TraceId'],
-            "span_id":b3.values()['X-B3-TraceId'],
-            "exportable":"false"
-        }})
+    logger.info("test log statement")
     # halloLog()
     b3.end_span()
     return "SUccess"
