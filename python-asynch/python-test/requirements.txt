@@ -4,12 +4,13 @@ itsdangerous==1.1.0
 Jinja2==2.10.1
 MarkupSafe==1.1.1
 # https://stackoverflow.com/questions/50444988/celery-attributeerror-async-error
-celery==4.1.1
+# celery==4.1.1
 Werkzeug==0.16.1
-flask_cors
+# flask_cors
 gunicorn
 requests
 py_eureka_client
 Flask-B3
-Flask-Sleuth
-json_logging
+# Flask-Sleuth
+json-logging
+
