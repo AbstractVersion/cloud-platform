@@ -26,7 +26,7 @@ eureka_client.init(eureka_server="http://abstract:admin@discovery-service:8761/e
 
 @app.route('/')
 def home():
-        .info("test log statement")
+    logger.info("test log statement")
     logger.info("test log statement with extra props", extra={'props': {"extra_property": 'extra_value'}})
     return "Hello world : " + str(datetime.datetime.now())
 
