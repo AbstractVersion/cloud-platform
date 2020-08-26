@@ -2,13 +2,14 @@ import os
 import py_eureka_client.eureka_client as eureka_client
 from flask import Flask, url_for, jsonify, request, make_response
 import datetime, logging, sys, json_logging, flask, json
+import sleuth, b3
 
 app = flask.Flask(__name__)
 json_logging.init_flask(enable_json=True)
 json_logging.init_request_instrument(app)
 
 # init the logger as usual
-logger = logging.getLogger("test-logger")
+logger = logging.getLogger("werkzeug")
 logger.setLevel(logging.DEBUG)
 logger.addHandler(logging.StreamHandler(sys.stdout))
 
@@ -34,11 +35,11 @@ def api_all():
     logger.info("Yes Please")
     # logger.debug(b3.values()['X-B3-TraceId'], extra = {'props' : {'extra_property' : 'extra_value'}})
     # logger.info("Custom Logger message Python API", extra = buildTraceInfo(app_name,b3.values()['X-B3-TraceId']) )
-    # logger.info("test log statement", extra = {'trace' : {
-    #         "trace_id":b3.values()['X-B3-TraceId'],
-    #         "span_id":b3.values()['X-B3-TraceId'],
-    #         "exportable":"false"
-    #     }})
+    logger.info("test log statement", extra = {'trace' : {
+            "trace_id":b3.values()['X-B3-TraceId'],
+            "span_id":b3.values()['X-B3-TraceId'],
+            "exportable":"false"
+        }})
     # halloLog()
     # b3.end_span()
     return "SUccess"

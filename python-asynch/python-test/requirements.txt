@@ -11,6 +11,6 @@ gunicorn
 requests
 py_eureka_client
 Flask-B3
-# Flask-Sleuth
+Flask-Sleuth
 json-logging
 
