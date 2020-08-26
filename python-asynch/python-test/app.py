@@ -9,9 +9,16 @@ import sleuth, b3
 app = flask.Flask(__name__)
 logger = logging.getLogger()
 logHandler = logging.StreamHandler()
-formatter = jsonlogger.JsonFormatter()
+
+def json_translate(obj):
+    if isinstance(obj, MyClass):
+        return {"special": obj.special}
+
+formatter = jsonlogger.JsonFormatter(json_default=json_translate,
+                                     json_encoder=json.JSONEncoder)
 logHandler.setFormatter(formatter)
-logger.addHandler(logHandler)
+
+logger.info("classic message", extra={"special": "value", "run": 12})
 
 #Configure Eurika client
 eureka_client.init(eureka_server="http://abstract:admin@discovery-service:8761/eureka",
