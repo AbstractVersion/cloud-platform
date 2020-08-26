@@ -7,18 +7,18 @@ from pythonjsonlogger import jsonlogger
 import sleuth, b3
 
 app = flask.Flask(__name__)
-logger = logging.getLogger()
-logHandler = logging.StreamHandler()
 
-def json_translate(obj):
-    if isinstance(obj, MyClass):
-        return {"special": obj.special}
+def setup_logging(log_level):
+    logger = logging.getLogger(__name__)
+    logger.setLevel(log_level)
+    json_handler = logging.StreamHandler()
+    formatter = jsonlogger.JsonFormatter(
+        fmt='%(asctime)s %(levelname)s %(name)s %(message)s'
+    )
+    json_handler.setFormatter(formatter)
+    logger.addHandler(json_handler)
 
-formatter = jsonlogger.JsonFormatter(json_default=json_translate,
-                                     json_encoder=json.JSONEncoder)
-logHandler.setFormatter(formatter)
-
-logger.info("classic message", extra={"special": "value", "run": 12})
+setup_logging()
 
 #Configure Eurika client
 eureka_client.init(eureka_server="http://abstract:admin@discovery-service:8761/eureka",
@@ -30,7 +30,6 @@ eureka_client.init(eureka_server="http://abstract:admin@discovery-service:8761/e
 def home():
     logger.info("test log statement")
     logger.info("test log statement with extra props", extra={'props': {"extra_property": 'extra_value'}})
-    correlation_id = json_logging.get_correlation_id()
     return "Hello world : " + str(datetime.datetime.now())
 
 @app.route('/api/info', methods=['GET'])
