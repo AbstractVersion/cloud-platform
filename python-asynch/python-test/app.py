@@ -28,10 +28,6 @@ class CustomJsonFormatter(jsonlogger.JsonFormatter):
             log_record['level'] = log_record['level'].upper()
         else:
             log_record['level'] = record.levelname
-            
-    @app_name.setter
-    def app_name(self, value):
-        self._app_name = value
 
 logger = logging.getLogger("test-logger")
 logger.setLevel(logging.DEBUG)
