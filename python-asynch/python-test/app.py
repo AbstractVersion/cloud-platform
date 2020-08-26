@@ -1,17 +1,17 @@
 import os
 import py_eureka_client.eureka_client as eureka_client
 from flask import Flask, url_for, jsonify, request, make_response
-import datetime, logging, sys, json_logging, flask, json
+import datetime, sys, flask, json
+import logging
+from pythonjsonlogger import jsonlogger
 import sleuth, b3
 
 app = flask.Flask(__name__)
-json_logging.init_flask(enable_json=True)
-json_logging.init_request_instrument(app)
-
-# init the logger as usual
-logger = logging.getLogger("werkzeug")
-logger.setLevel(logging.DEBUG)
-logger.addHandler(logging.StreamHandler(sys.stdout))
+logger = logging.getLogger()
+logHandler = logging.StreamHandler()
+formatter = jsonlogger.JsonFormatter()
+logHandler.setFormatter(formatter)
+logger.addHandler(logHandler)
 
 #Configure Eurika client
 eureka_client.init(eureka_server="http://abstract:admin@discovery-service:8761/eureka",
