@@ -10,6 +10,7 @@ import sleuth
 import b3
 import  logging, sys , json_logging
 from worker import celery
+import flask
 # from pythonjsonlogger import jsonlogger
 
 app = flask.Flask(__name__)
