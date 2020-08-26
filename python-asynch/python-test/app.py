@@ -11,13 +11,32 @@ from elk_logger import CustomJsonFormatter
 app = flask.Flask(__name__)
 app_name = 'test-application'
 
-
+class CustomJsonFormatter(jsonlogger.JsonFormatter):
+    def add_fields(self, log_record, record, message_dict):
+        super(CustomJsonFormatter, self).add_fields(log_record, record, message_dict)
+        log_record['application_name'] = app_name
+        log_record['trace'] = {
+            "trace_id": b3.values()['X-B3-TraceId'],
+            "span_id": b3.values()['X-B3-TraceId'],
+            "exportable":"false"
+        } 
+        if not log_record.get('timestamp'):
+            # this doesn't use record.created, so it is slightly off
+            now = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+            log_record['timestamp'] = now
+        if log_record.get('level'):
+            log_record['level'] = log_record['level'].upper()
+        else:
+            log_record['level'] = record.levelname
+            
+    @app_name.setter
+    def app_name(self, value):
+        self._app_name = value
 
 logger = logging.getLogger("test-logger")
 logger.setLevel(logging.DEBUG)
 json_handler = logging.StreamHandler()
 formatter = CustomJsonFormatter('(timestamp) (application_name) (level) (name) (message) (trace)')
-formatter.app_name(app_name)
 json_handler.setFormatter(formatter)
 logger.addHandler(json_handler)
 
