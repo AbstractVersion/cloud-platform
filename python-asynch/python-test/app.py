@@ -18,7 +18,7 @@ def setup_logging(log_level):
     json_handler.setFormatter(formatter)
     logger.addHandler(json_handler)
 
-setup_logging()
+setup_logging(INFO)
 
 #Configure Eurika client
 eureka_client.init(eureka_server="http://abstract:admin@discovery-service:8761/eureka",
