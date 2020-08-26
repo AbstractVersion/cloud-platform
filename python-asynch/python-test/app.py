@@ -5,7 +5,6 @@ import datetime, sys, flask, json
 import logging
 from pythonjsonlogger import jsonlogger
 import sleuth, b3
-from elk_logger import CustomJsonFormatter
 
 
 app = flask.Flask(__name__)
