@@ -8,7 +8,7 @@ import sleuth, b3
 
 app = flask.Flask(__name__)
 
-logger = loggi.getLogger("test-logger")
+logger = logging.getLogger("test-logger")
 logger.setLevel(logging.DEBUG)
 json_handler = logging.StreamHandler()
 formatter = jsonlogger.JsonFormatter(
@@ -26,7 +26,7 @@ eureka_client.init(eureka_server="http://abstract:admin@discovery-service:8761/e
 
 @app.route('/')
 def home():
-    logger.info("test log statement")
+        .info("test log statement")
     logger.info("test log statement with extra props", extra={'props': {"extra_property": 'extra_value'}})
     return "Hello world : " + str(datetime.datetime.now())
 
