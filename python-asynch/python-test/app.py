@@ -8,17 +8,15 @@ import sleuth, b3
 
 app = flask.Flask(__name__)
 
-def setup_logging(log_level):
-    logger = logging.getLogger(__name__)
-    logger.setLevel(log_level)
-    json_handler = logging.StreamHandler()
-    formatter = jsonlogger.JsonFormatter(
+logger = loggi.getLogger("test-logger")
+logger.setLevel(logging.DEBUG)
+json_handler = logging.StreamHandler()
+formatter = jsonlogger.JsonFormatter(
         fmt='%(asctime)s %(levelname)s %(name)s %(message)s'
     )
-    json_handler.setFormatter(formatter)
-    logger.addHandler(json_handler)
+json_handler.setFormatter(formatter)
+logger.addHandler(json_handler)
 
-setup_logging(logging.INFO)
 
 #Configure Eurika client
 eureka_client.init(eureka_server="http://abstract:admin@discovery-service:8761/eureka",
