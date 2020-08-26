@@ -17,7 +17,7 @@ logger = logging.getLogger("test-logger")
 logger.setLevel(logging.DEBUG)
 json_handler = logging.StreamHandler()
 formatter = CustomJsonFormatter('(timestamp) (application_name) (level) (name) (message) (trace)')
-formatter.ste_application_name(app_name)
+formatter.app_name(app_name)
 json_handler.setFormatter(formatter)
 logger.addHandler(json_handler)
 
