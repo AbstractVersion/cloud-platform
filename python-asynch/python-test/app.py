@@ -35,7 +35,7 @@ def api_all():
     #https://github.com/davidcarboni/B3-Propagation
     # logger = logging.getLogger("werkzeug")
     # logger.setLevel(logging.DEBUG)
-    # b3.start_span()
+    b3.start_span()
     logger.info("Yes Please")
     # logger.debug(b3.values()['X-B3-TraceId'], extra = {'props' : {'extra_property' : 'extra_value'}})
     # logger.info("Custom Logger message Python API", extra = buildTraceInfo(app_name,b3.values()['X-B3-TraceId']) )
@@ -45,7 +45,7 @@ def api_all():
             "exportable":"false"
         }})
     # halloLog()
-    # b3.end_span()
+    b3.end_span()
     return "SUccess"
 
 if __name__ == "__main__":
