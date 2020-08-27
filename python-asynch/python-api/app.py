@@ -70,13 +70,13 @@ def api_all():
     #https://github.com/davidcarboni/B3-Propagation
     # logger = logging.getLogger("werkzeug")
     # logger.setLevel(logging.DEBUG)
-    # b3.start_span()
-    logger.info("Yes Please")
+    b3.start_span()
+    # logger.info("Yes Please")
     # logger.debug(b3.values()['X-B3-TraceId'], extra = {'props' : {'extra_property' : 'extra_value'}})
     # logger.info("Custom Logger message Python API", extra = buildTraceInfo(app_name,b3.values()['X-B3-TraceId']) )
-    logger.info("test log statement")
+    logger.info("Status check Request recieved.")
     # halloLog()
-    # b3.end_span()
+    b3.end_span()
     return "SUccess"
 
 
@@ -86,7 +86,7 @@ def longTask():
     logger.info("Recieved long-task request. Excecuting asynch.")
     task = celery.send_task('mytasks.longtask', args=[request.json], kwargs={})
     b3.end_span()
-    return jsonify({"task_id" : task.task_id, "URL" : url_for('check_task',id=task.task_id,_external=True)})
+    return jsonify({"task_id" : task.task_id, "URL" : url_for('check_task',task_id=task.task_id,_external=True)})
 
 
 # Asynch Request status endpoint
