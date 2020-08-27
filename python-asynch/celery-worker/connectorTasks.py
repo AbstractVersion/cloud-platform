@@ -49,6 +49,7 @@ def add(x, y, json):
 
 @celery.task(name='mytasks.longtask', bind=True)
 def process(self , json):
+    b3.start_span()
     logger.info('Asynch Task recieved.')
     self.update_state(state='RECEIVED')
     time.sleep(20) # lets sleep for a while before doing the gigantic addition task!
@@ -57,4 +58,5 @@ def process(self , json):
     time.sleep(20) # lets sleep for a while before doing the gigantic addition task!
     self.update_state(state='SUCCESS')
     logger.info('Finished Excecution of Asynch Task.')
+    b3.end_span()
     return "OK"
