@@ -7,11 +7,18 @@ networks:
     driver: overlay
   elastic-stack-network:
     driver: overlay
+  kafka-broker-network:
+    driver: overlay
 
 
 # Be sure that you have configure the remote volumes with NFS
 # https://sysadmins.co.za/docker-swarm-persistent-storage-with-nfs/
 volumes:
+  mongodb_data:
+    driver: nfs
+    driver_opts:
+      # Here you should replace this ip with the NFS server IP, the directory /mysql exists on the root folder of NFS shared + /mysql
+      share: swarmNfs.server.io:/mongo-db
   # Elsatic search volume, this volume will be shared among the registered & Configured managers.
   session.db.vol:
     driver: nfs
@@ -444,3 +451,85 @@ services:
         - config-server
         - discovery-service
         - python-service
+
+  zookeeper:
+    image: private.registry.io/zookeeper:latest
+    networks:
+      - kafka-broker-network
+    expose:
+      - "2181:2181"
+    deploy:
+      placement:
+        constraints:
+          - "node.role==manager"
+      replicas: 1
+      restart_policy:
+        condition: on-failure    
+
+  kafka:
+    image: private.registry.io/kafka:latest
+    deploy:
+      replicas: 3
+      restart_policy:
+        condition: on-failure
+    ports:
+      - target: 9094
+        published: 9094
+        protocol: tcp
+        mode: host
+    networks:
+      - kafka-broker-network
+    environment:
+      HOSTNAME_COMMAND: "docker info | grep ^Name: | cut -d' ' -f 2"
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://:9092,OUTSIDE://_{HOSTNAME_COMMAND}:9094
+      KAFKA_LISTENERS: INSIDE://:9092,OUTSIDE://:9094
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - zookeeper
+    healthcheck:
+      test:
+        ["CMD", "kafka-topics.sh", "--list", "--zookeeper", "zookeeper:2181"]
+      interval: 30s
+      timeout: 10s
+      retries: 4
+
+  mongodb:
+    image: private.registry.io/mongo:latest
+    ports:
+    - 27017-27019:27017-27019
+    # command: --smallfiles
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: admin
+      MONGO_INITDB_DATABASE: test
+    volumes:
+      - 'mongodb_data:/bitnami/mongodb'
+
+  #Kafka Services
+  producer-service:
+    image: private.registry.io/producer-service:latest
+    networks:
+      - micro-nework-frontend
+      - kafka-broker-network
+    ports:
+      - "8089:8080"
+    depends_on:
+      - zookeeper
+      - kafka
+      # - mongodb
+    deploy:
+      placement:
+        constraints:
+          - "node.role!=manager"
+      replicas: 1
+      # restart_policy:
+      #   condition: on-failure
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator"]
+      interval: 30s
+      timeout: 10s
+      retries: 5 
