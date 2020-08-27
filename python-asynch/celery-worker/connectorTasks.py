@@ -4,7 +4,8 @@ from pythonjsonlogger import jsonlogger
 import sleuth, b3
 #General Imports
 import time, datetime, sys, flask, json , socket, uuid, logging, os
-#
+
+app_name = 'celery-worker'
 
 env=os.environ
 CELERY_BROKER_URL=env.get('CELERY_BROKER_URL','pyamqp://abstract:admin@rabbit-server/'),
