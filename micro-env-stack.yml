@@ -537,6 +537,9 @@ services:
       - zookeeper
       - kafka
       # - mongodb
+    labels:
+      collect_logs_with_filebeat: "true"
+      decode_log_event_to_json_object: "true"
     deploy:
       placement:
         constraints:
@@ -563,6 +566,9 @@ services:
       - kafka
       - mongodb
       - producer-service
+    labels:
+      collect_logs_with_filebeat: "true"
+      decode_log_event_to_json_object: "true"
     deploy:
       placement:
         constraints:
