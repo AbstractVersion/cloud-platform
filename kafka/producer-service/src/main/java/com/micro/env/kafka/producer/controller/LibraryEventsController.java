@@ -30,7 +30,7 @@ public class LibraryEventsController {
 
     @PostMapping("/v1/libraryevent")
     public ResponseEntity<LibraryEvent> postLibraryEvent(@RequestBody @Valid LibraryEvent libraryEvent) throws JsonProcessingException, ExecutionException, InterruptedException {
-
+        log.info("Producing new Insertion Event : " + libraryEvent.toString() );
         //invoke kafka producer
         libraryEvent.setLibraryEventType(LibraryEventType.NEW);
         libraryEventProducer.sendLibraryEvent_Approach2(libraryEvent);
