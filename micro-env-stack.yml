@@ -499,6 +499,8 @@ services:
 
   mongodb:
     image: private.registry.io/mongo:latest
+    networks:
+      - micro-nework-backend
     ports:
     - 27017-27019:27017-27019
     # command: --smallfiles
@@ -508,6 +510,20 @@ services:
       MONGO_INITDB_DATABASE: test
     volumes:
       - 'mongodb_data:/bitnami/mongodb'
+
+  mongo-express:
+    image: private.registry.io/mongo-express:latest
+    networks:
+      - micro-nework-backend
+    restart: always
+    depends_on:
+      - mongodb
+    ports:
+      - 9999:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: admin
+      ME_CONFIG_MONGODB_SERVER: mongodb
 
   #Kafka Services
   producer-service:
@@ -533,3 +549,29 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5 
+
+  mongo-consumer-service:
+    image: private.registry.io/mongo-comsumer:latest
+    networks:
+      - micro-nework-frontend
+      - kafka-broker-network
+      - micro-nework-backend
+    # ports:
+    #   - "8082:8080"
+    depends_on:
+      - zookeeper
+      - kafka
+      - mongodb
+      - producer-service
+    deploy:
+      placement:
+        constraints:
+          - "node.role!=manager"
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
