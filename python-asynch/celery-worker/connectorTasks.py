@@ -19,11 +19,6 @@ class CustomJsonFormatter(jsonlogger.JsonFormatter):
     def add_fields(self, log_record, record, message_dict):
         super(CustomJsonFormatter, self).add_fields(log_record, record, message_dict)
         log_record['application_name'] = app_name
-        log_record['trace'] = {
-            "trace_id": b3.values()['X-B3-TraceId'],
-            "span_id": b3.values()['X-B3-TraceId'],
-            "exportable":"false"
-        } 
         if not log_record.get('timestamp'):
             # this doesn't use record.created, so it is slightly off
             now = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%fZ')
@@ -33,7 +28,7 @@ class CustomJsonFormatter(jsonlogger.JsonFormatter):
         else:
             log_record['level'] = record.levelname
 
-logger = logging.getLogger("test-logger")
+logger = logging.getLogger("worker-logger")
 logger.setLevel(logging.DEBUG)
 json_handler = logging.StreamHandler()
 formatter = CustomJsonFormatter('(timestamp) (application_name) (level) (name) (message) (trace)')
@@ -48,15 +43,14 @@ def add(x, y, json):
     return x + y
 
 @celery.task(name='mytasks.longtask', bind=True)
-def process(self , json):
-    b3.start_span()
-    logger.info('Asynch Task recieved.')
+def process(self , json, trace):
+    print(json)
+    logger.info('Asynch Task recieved.', extra = trace)
     self.update_state(state='RECEIVED')
     time.sleep(20) # lets sleep for a while before doing the gigantic addition task!
-    logger.info('Begin Excecution of Asynch Task.')
+    logger.info('Begin Excecution of Asynch Task.', extra = trace)
     self.update_state(state='STARTED')
     time.sleep(20) # lets sleep for a while before doing the gigantic addition task!
     self.update_state(state='SUCCESS')
-    logger.info('Finished Excecution of Asynch Task.')
-    b3.end_span()
+    logger.info('Finished Excecution of Asynch Task.', extra = trace)
     return "OK"

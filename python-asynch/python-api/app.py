@@ -84,7 +84,7 @@ def api_all():
 def longTask():
     b3.start_span()
     logger.info("Recieved long-task request. Excecuting asynch.")
-    task = celery.send_task('mytasks.longtask', args=[request.json], kwargs={})
+    task = celery.send_task('mytasks.longtask', args=[info, buildTraceInfo() ], kwargs={})
     b3.end_span()
     return jsonify({"task_id" : task.task_id, "URL" : url_for('check_task',task_id=task.task_id,_external=True)})
 
@@ -100,6 +100,13 @@ def check_task(task_id):
     else:
         return str(res.result)
 
+def buildTraceInfo():
+    return {'trace' : {
+            "trace_id": b3.values()['X-B3-TraceId'],
+            "span_id": b3.values()['X-B3-TraceId'],
+            "exportable":"false"
+            }
+        }
 if __name__ == "__main__":
     app.before_request(b3.start_span)
     app.after_request(b3.end_span)
