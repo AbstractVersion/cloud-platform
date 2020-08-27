@@ -1,6 +1,8 @@
 version: '3.8'
 #Netork Initialization
 networks:
+  proxy-gateway-network:
+    driver: overlay
   micro-nework-frontend:
     driver: overlay
   micro-nework-backend:
@@ -52,6 +54,19 @@ volumes:
 
 
 services:
+  nginx:
+    image: private.registry.io/nginx:alpine
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx-proxy/conf.d/:/etc/nginx/conf.d/
+      - ./nginx-proxy/ssl/:/etc/nginx/ssl/
+    networks:
+      - proxy-gateway-network
+
   session:
     # container_name: generalRDBMS
     image: private.registry.io/session-db:production
@@ -262,6 +277,7 @@ services:
     #internal-links
     networks:
       - micro-nework-frontend
+      - proxy-gateway-network
     links:
         - "discovery-service:discovery-service"  
     labels:
