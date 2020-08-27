@@ -1,90 +1,84 @@
-import os
 import py_eureka_client.eureka_client as eureka_client
+#Flask Imports
 from flask import Flask, url_for, jsonify, request, make_response
-from celery import Celery, states
-import celery.states as states
 from flask_cors import CORS, cross_origin
-import uuid , json
-import socket
-import sleuth
-import b3
-# from elk_logger import logger_init
-import  logging, sys, json_logging
+#General Imports
+import datetime, sys, flask, json , socket, uuid, logging, os
+# Json Logger
+from pythonjsonlogger import jsonlogger
+import sleuth, b3
+#Celery Imports
+import celery.states as states
 from worker import celery
-from json_logger_cm import CustomJSONLog
-
 
 os.environ.setdefault('FORKED_BY_MULTIPROCESSING', '1')
-os.environ["ENABLE_JSON_LOGGING"] = "1"
 
-serviceId = uuid.uuid1()
-serviceHost = socket.gethostname()
+app = flask.Flask(__name__)
+CORS(app)
+app_name = 'python-service'
 
-
-# https://github.com/thangbn/json-logging-python
-# hello = flask.Flask(__name__)
-app_name = "python-service"
-
-# app = Flask(__name__)
-# CORS(app)
-
-# # init the logger as usual
-# logger_init()
-# logger = logging.getLogger("werkzeug")
-# logger.setLevel(logging.DEBUG)
-# logger.addHandler(logging.StreamHandler(sys.stdout))
-
-# You would normally import logger_init and setup the logger in your main module - e.g.
-# main.py
-json_logging.ENABLE_JSON_LOGGING = True
-json_logging.__init(custom_formatter=CustomJSONLog)
-
-logger = logging.getLogger("werkzeug")
-logger.setLevel(logging.DEBUG)
-logger.addHandler(logging.StreamHandler(sys.stdout))
-
-# Create some test data for our catalog in the form of a list of dictionaries.
-info = {'servicID': serviceId,
-     'serviceHost': serviceHost,
+info = {'servicID': uuid.uuid1(),
+     'serviceHost': socket.gethostname(),
      'title': 'Python API v.01'}
 
-app = Flask(__name__)
-CORS(app)
+class CustomJsonFormatter(jsonlogger.JsonFormatter):
+    def add_fields(self, log_record, record, message_dict):
+        super(CustomJsonFormatter, self).add_fields(log_record, record, message_dict)
+        log_record['application_name'] = app_name
+        log_record['trace'] = {
+            "trace_id": b3.values()['X-B3-TraceId'],
+            "span_id": b3.values()['X-B3-TraceId'],
+            "exportable":"false"
+        } 
+        if not log_record.get('timestamp'):
+            # this doesn't use record.created, so it is slightly off
+            now = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+            log_record['timestamp'] = now
+        if log_record.get('level'):
+            log_record['level'] = log_record['level'].upper()
+        else:
+            log_record['level'] = record.levelname
+
+logger = logging.getLogger("test-logger")
+logger.setLevel(logging.DEBUG)
+json_handler = logging.StreamHandler()
+formatter = CustomJsonFormatter('(timestamp) (application_name) (level) (name) (message) (trace)')
+json_handler.setFormatter(formatter)
+logger.addHandler(json_handler)
 
 
 #Configure Eurika client
 eureka_client.init(eureka_server="http://abstract:admin@discovery-service:8761/eureka",
 		   instance_port=5001,
-           app_name=app_name,
+           app_name = app_name,
 		   ha_strategy=eureka_client.HA_STRATEGY_STICK)
 
-
-@app.route('/', methods=['GET'])
-def home():
-    return {"endpoint-description" : "infinite-dmu-replicator", "clone-procedure" : "asynch", "version" : "1.0"}
-
 # A route to return all of the available entries in our catalog.
+@app.route('/api/throw-exception', methods=['GET'])
+def api_all():
+    b3.start_span()
+    logger.info('Trowing Test Exception')
+    try:
+        1 / 0
+    except:  # noqa pylint: disable=bare-except
+        logger.exception('You can\'t divide by zero')     
+    b3.end_span()
+    return "Done"
+
 @app.route('/api/info', methods=['GET'])
 def api_all():
     #https://github.com/davidcarboni/B3-Propagation
     # logger = logging.getLogger("werkzeug")
     # logger.setLevel(logging.DEBUG)
-    b3.start_span()
-    logger.info('Starting')
-    try:
-        1 / 0
-    except:  # noqa pylint: disable=bare-except
-        logger.exception('You can\'t divide by zero')     
+    # b3.start_span()
+    logger.info("Yes Please")
     # logger.debug(b3.values()['X-B3-TraceId'], extra = {'props' : {'extra_property' : 'extra_value'}})
-    # logger.info("Custom Logger message Python API", extra = {'trace': buildTraceInfo()} )
-    b3.end_span()
-    return jsonify(info)
+    # logger.info("Custom Logger message Python API", extra = buildTraceInfo(app_name,b3.values()['X-B3-TraceId']) )
+    logger.info("test log statement")
+    # halloLog()
+    # b3.end_span()
+    return "SUccess"
 
-@app.route('/api/add/<int:param1>/<int:param2>')
-def add(param1,param2):
-    json = {"hi": "yes"}
-    task = celery.send_task('mytasks.add', args=[param1, param2, json], kwargs={})
-    return jsonify({"task_id" : task.id, "URL" : url_for('check_task',id=task.id,_external=True)})
 
 @app.route('/api/longTask', methods=['POST'])
 def longTask():
@@ -106,18 +100,7 @@ def check_task(task_id):
     else:
         return str(res.result)
 
-
-# def buildTraceInfo():
-#     return {
-#             "trace_id":b3.values()['X-B3-TraceId'],
-#             "span_id":b3.values()['X-B3-TraceId'],
-#             "exportable":"false"
-#         }
-def halloLog():
-    logger.info('Connector is up & running.')
-
-if __name__ == '__main__':
-    app = create_app()
+if __name__ == "__main__":
     app.before_request(b3.start_span)
     app.after_request(b3.end_span)
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', port=int(5001), use_reloader=False)

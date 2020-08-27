@@ -24,6 +24,3 @@ class CustomJsonFormatter(jsonlogger.JsonFormatter):
         else:
             log_record['level'] = record.levelname
             
-    @app_name.setter
-    def app_name(self, value):
-        self._app_name = value

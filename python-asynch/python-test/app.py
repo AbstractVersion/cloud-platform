@@ -63,6 +63,8 @@ def api_all():
     return "SUccess"
 
 if __name__ == "__main__":
+    app.before_request(b3.start_span)
+    app.after_request(b3.end_span)
     app.run(host='0.0.0.0', port=int(5001), use_reloader=False)
 
 
