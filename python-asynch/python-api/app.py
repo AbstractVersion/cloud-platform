@@ -55,7 +55,7 @@ eureka_client.init(eureka_server="http://abstract:admin@discovery-service:8761/e
 
 # A route to return all of the available entries in our catalog.
 @app.route('/api/throw-exception', methods=['GET'])
-def api_all():
+def throw_exception():
     b3.start_span()
     logger.info('Trowing Test Exception')
     try:
