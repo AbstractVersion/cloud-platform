@@ -234,7 +234,7 @@ services:
         max_replicas_per_node: 1
         constraints: 
           - node.role != manager
-      replicas: 1
+      replicas: 2
       restart_policy:
         condition: on-failure
   # Swarm Visualizer
