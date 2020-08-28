@@ -33,11 +33,6 @@ volumes:
     driver_opts:
       # Here you should replace this ip with the NFS server IP, the directory /mysql exists on the root folder of NFS shared + /mysql
       share: swarmNfs.server.io:/elastic-volume
-  # logstash-pipeline.vol:
-  #   driver: nfs
-  #   driver_opts:
-  #     # Here you should replace this ip with the NFS server IP, the directory /mysql exists on the root folder of NFS shared + /mysql
-  #     share: swarmNfs.server.io:/logstash-conf/pipeline.1
   nginx-proxy-ssl.vol:
     driver: nfs
     driver_opts:
@@ -69,6 +64,7 @@ volumes:
 
 
 services:
+
   nginx:
     image: private.registry.io/nginx:alpine
     restart: unless-stopped
@@ -189,7 +185,7 @@ services:
       - "25826:25826"
       - "5044:5044"
     volumes:
-      - /nfs/micor-env/config/logstash/pipeline/:/usr/share/logstash/pipeline:ro              # Pipeline configuration
+      - /mnt/local-nfs/logstash-conf/pipeline:/usr/share/logstash/pipeline:ro                # Pipeline configuration
     depends_on:
       - elasticsearch
     deploy:
@@ -211,11 +207,11 @@ services:
     deploy:
       placement:
         constraints:
-            -  "node.role==manager"
-            #- "node.labels.proxy==true"
+          - "node.role==manager"
       replicas: 1
       restart_policy:
         condition: on-failure
+
 
   # Beats will be installed on the workers and it will scale as one container per worker
   # due to that we need to scale it externalyy depending on the number of workers we have (docker service update --replicas-max-per-node=1 local_filebeat)
@@ -226,21 +222,19 @@ services:
     volumes:
       # For the beats configuration volume we need to find a way to share the config file git, nfs etc.
       # here we mount configuration files from the nfs to this directory
-      - /nfs/micor-env/config/filebeat/filebeat.docker.yml:/usr/share/filebeat/filebeat.docker.yml:ro # Configuration file
+      - /mnt/local-nfs/filebeat/filebeat.docker.yml:/usr/share/filebeat/filebeat.yml:ro # Configuration file
       - /var/lib/docker/containers:/var/lib/docker/containers:ro           # Docker logs
       - /var/run/docker.sock:/var/run/docker.sock:ro                       # Additional information about containers
       - filebeat.prod.ext.vol:/usr/share/filebeat/data:rw                        # Persistence data
     user: root                                                             # Allow access to log files and docker.sock
     depends_on:
-      - elasticsearch
       - logstash
     deploy:
       placement:
         max_replicas_per_node: 1
         constraints: 
           - node.role != manager
-        #   - "node.labels.proxy!=true"
-      replicas: 2
+      replicas: 1
       restart_policy:
         condition: on-failure
   # Swarm Visualizer
