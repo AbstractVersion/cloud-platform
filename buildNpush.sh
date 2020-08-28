@@ -55,6 +55,10 @@ if [ "$RESP" = "y" ]; then
     docker image tag nginx:alpine $registry_ip/nginx:alpine
     docker image push $registry_ip/nginx:alpine
 
+    docker image pull mongo-express
+    docker image tag mongo-express $registry_ip/mongo-express
+    docker image push $registry_ip/mongo-express
+
 
 else
     echo "Ok then proceeding with the initialization..."
@@ -190,6 +194,32 @@ if [ "$RESP" = "y" ]; then
     docker tag $registry_ip/mongo-comsumer:latest $registry_ip/mongo-comsumer:production
     docker push $registry_ip/mongo-comsumer:production
     cd ../..
+else
+    echo "Ok then proceeding with the initialization..."
+fi
+
+read -p "Build & Push hello-service ? (y/n) " RESP
+if [ "$RESP" = "y" ]; then
+    # zuul-gateway 
+    echo -------------------------hello-service--------------------------
+    cd hello-service && mvn clean install -DskipTests
+    # push the image to a local repo
+    docker tag $registry_ip/hello-service:latest $registry_ip/hello-service:production
+    docker push $registry_ip/hello-service:production
+    cd ..
+else
+    echo "Ok then proceeding with the initialization..."
+fi
+
+read -p "Build & Push hello-client ? (y/n) " RESP
+if [ "$RESP" = "y" ]; then
+    # zuul-gateway 
+    echo -------------------------hello-client--------------------------
+    cd hello-client && mvn clean install -DskipTests
+    # push the image to a local repo
+    docker tag $registry_ip/hello-client:latest $registry_ip/hello-client:production
+    docker push $registry_ip/hello-client:production
+    cd ..
 else
     echo "Ok then proceeding with the initialization..."
 fi
