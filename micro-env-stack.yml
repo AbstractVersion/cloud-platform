@@ -189,7 +189,7 @@ services:
       - "25826:25826"
       - "5044:5044"
     volumes:
-      - /nfs/micor-env/config/pipeline.1/pipeline.1:/usr/share/logstash/pipeline:ro              # Pipeline configuration
+      - /nfs/micor-env/config/logstash/pipeline.1:/usr/share/logstash/pipeline:ro              # Pipeline configuration
     depends_on:
       - elasticsearch
     deploy:
