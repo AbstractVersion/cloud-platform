@@ -38,11 +38,11 @@ volumes:
     driver_opts:
       # Here you should replace this ip with the NFS server IP, the directory /mysql exists on the root folder of NFS shared + /mysql
       share: swarmNfs.server.io:/logstash-conf/pipeline
-  filebeat-config.vol:
+  nginx-proxy.vol:
     driver: nfs
     driver_opts:
       # Here you should replace this ip with the NFS server IP, the directory /mysql exists on the root folder of NFS shared + /mysql
-      share: swarmNfs.server.io:/filebeat-conf
+      share: swarmNfs.server.io:/nginx-proxy
 
   # mysql.init.vol:
   #   driver: nfs
@@ -72,8 +72,8 @@ services:
       # - "80:80"
       - "443:443"
     volumes:
-      - ./nginx-proxy/conf.d/:/etc/nginx/conf.d/
-      - ./nginx-proxy/ssl/:/etc/nginx/ssl/
+      - nginx-proxy.vol/conf.d/:/etc/nginx/conf.d/
+      - nginx-proxy.vol/ssl/:/etc/nginx/ssl/
     networks:
       - proxy-gateway-network
 
@@ -371,7 +371,7 @@ services:
 
   #Hello Service
   hello-service:
-    image: private.registry.io/hello-service
+    image: private.registry.io/hello-service:production
     # ports:
     #     - "8080:8080"
     #internal-links
@@ -402,7 +402,7 @@ services:
 
   #hello Client
   hello-client:
-    image: private.registry.io/hello-client:latest
+    image: private.registry.io/hello-client:production
     networks:
       - micro-nework-frontend
     links:
