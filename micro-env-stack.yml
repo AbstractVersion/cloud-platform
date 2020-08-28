@@ -33,11 +33,11 @@ volumes:
     driver_opts:
       # Here you should replace this ip with the NFS server IP, the directory /mysql exists on the root folder of NFS shared + /mysql
       share: swarmNfs.server.io:/elastic-volume
-  logstash-pipeline.vol:
-    driver: nfs
-    driver_opts:
-      # Here you should replace this ip with the NFS server IP, the directory /mysql exists on the root folder of NFS shared + /mysql
-      share: swarmNfs.server.io:/logstash-conf/pipeline.1
+  # logstash-pipeline.vol:
+  #   driver: nfs
+  #   driver_opts:
+  #     # Here you should replace this ip with the NFS server IP, the directory /mysql exists on the root folder of NFS shared + /mysql
+  #     share: swarmNfs.server.io:/logstash-conf/pipeline.1
   nginx-proxy-ssl.vol:
     driver: nfs
     driver_opts:
@@ -189,7 +189,7 @@ services:
       - "25826:25826"
       - "5044:5044"
     volumes:
-      - logstash-pipeline.vol:/usr/share/logstash/pipeline:ro              # Pipeline configuration
+      - /nfs/micor-env/config/logstash/pipeline/:/usr/share/logstash/pipeline:ro              # Pipeline configuration
     depends_on:
       - elasticsearch
     deploy:
