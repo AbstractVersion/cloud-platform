@@ -35,6 +35,27 @@ if [ "$RESP" = "y" ]; then
     docker image tag docker.elastic.co/beats/filebeat:7.2.0 $registry_ip/beats:production
     docker image push $registry_ip/beats:production
 
+    docker image pull wurstmeister/zookeeper:latest
+    docker image tag wurstmeister/zookeeper:latest $registry_ip/zookeeper:latest
+    docker image push $registry_ip/zookeeper:latest
+
+    docker image pull dockersamples/visualizer
+    docker image tag dockersamples/visualizer $registry_ip/visualizer:latest
+    docker image push $registry_ip/visualizer:latest
+
+    docker image pull wurstmeister/kafka:latest
+    docker image tag wurstmeister/kafka:latest $registry_ip/kafka:latest
+    docker image push $registry_ip/kafka:latest
+
+    docker image pull mongo:latest
+    docker image tag mongo:latest $registry_ip/mongo:latest
+    docker image push $registry_ip/mongo:latest
+
+    docker image pull nginx:alpine
+    docker image tag nginx:alpine $registry_ip/nginx:alpine
+    docker image push $registry_ip/nginx:alpine
+
+
 else
     echo "Ok then proceeding with the initialization..."
 fi
@@ -147,13 +168,27 @@ else
     echo "Ok then proceeding with the initialization..."
 fi
 
-read -p "Build & Push python-test ? (y/n) " RESP
+read -p "Build & Push kafka-producer ? (y/n) " RESP
 if [ "$RESP" = "y" ]; then
     # zuul-gateway 
     echo -------------------------python-service--------------------------
-    cd python-asynch/python-test/ && docker build -t $registry_ip/python-service:production .
+    cd kafka/producer-service/ && mvn clean install -DskipTests
     # push the image to a local repo
-    docker push $registry_ip/python-service:production
+    docker tag $registry_ip/producer-service:latest $registry_ip/producer-service:production
+    docker push $registry_ip/producer-service:production
+    cd ../..
+else
+    echo "Ok then proceeding with the initialization..."
+fi
+
+read -p "Build & Push kafka-producer ? (y/n) " RESP
+if [ "$RESP" = "y" ]; then
+    # zuul-gateway 
+    echo -------------------------python-service--------------------------
+    cd kafka/mongo-consumer/ && mvn clean install -DskipTests
+    # push the image to a local repo
+    docker tag $registry_ip/mongo-comsumer:latest $registry_ip/mongo-comsumer:production
+    docker push $registry_ip/mongo-comsumer:production
     cd ../..
 else
     echo "Ok then proceeding with the initialization..."

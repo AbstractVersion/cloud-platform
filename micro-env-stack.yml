@@ -33,6 +33,16 @@ volumes:
     driver_opts:
       # Here you should replace this ip with the NFS server IP, the directory /mysql exists on the root folder of NFS shared + /mysql
       share: swarmNfs.server.io:/elastic-volume
+  logstash-pipeline.vol:
+    driver: nfs
+    driver_opts:
+      # Here you should replace this ip with the NFS server IP, the directory /mysql exists on the root folder of NFS shared + /mysql
+      share: swarmNfs.server.io:/logstash-conf/pipeline
+  filebeat-config.vol:
+    driver: nfs
+    driver_opts:
+      # Here you should replace this ip with the NFS server IP, the directory /mysql exists on the root folder of NFS shared + /mysql
+      share: swarmNfs.server.io:/filebeat-conf
 
   # mysql.init.vol:
   #   driver: nfs
@@ -174,7 +184,7 @@ services:
       - "25826:25826"
       - "5044:5044"
     volumes:
-      - /mnt/local-nfs/logstash-conf/pipeline:/usr/share/logstash/pipeline:ro                # Pipeline configuration
+      - logstash-pipeline.vol:/usr/share/logstash/pipeline:ro                # Pipeline configuration
     depends_on:
       - elasticsearch
     deploy:
@@ -211,12 +221,13 @@ services:
     volumes:
       # For the beats configuration volume we need to find a way to share the config file git, nfs etc.
       # here we mount configuration files from the nfs to this directory
-      - /nfs/micor-env/config/filebeat/filebeat.docker.yml:/usr/share/filebeat/filebeat.yml:ro # Configuration file
+      - filebeat-config.vol:/usr/share/filebeat:ro # Configuration file
       - /var/lib/docker/containers:/var/lib/docker/containers:ro           # Docker logs
       - /var/run/docker.sock:/var/run/docker.sock:ro                       # Additional information about containers
       - filebeat.prod.ext.vol:/usr/share/filebeat/data:rw                        # Persistence data
     user: root                                                             # Allow access to log files and docker.sock
     depends_on:
+      - elasticsearch
       - logstash
     deploy:
       placement:
@@ -543,7 +554,7 @@ services:
 
   #Kafka Services
   producer-service:
-    image: private.registry.io/producer-service:latest
+    image: private.registry.io/producer-service:production
     networks:
       - micro-nework-frontend
       - kafka-broker-network
@@ -570,7 +581,7 @@ services:
       retries: 5 
 
   mongo-consumer-service:
-    image: private.registry.io/mongo-comsumer:latest
+    image: private.registry.io/mongo-comsumer:production
     networks:
       - micro-nework-frontend
       - kafka-broker-network
