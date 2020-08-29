@@ -1,0 +1,12 @@
+## YAML Template.
+---
+spring:
+  cloud:
+    config:
+        uri: http://localhost:8888
+  application:
+    name: library-producer
+  profiles:
+    active: local
+server:
+  port: 8080

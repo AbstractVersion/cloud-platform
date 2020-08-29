@@ -198,6 +198,19 @@ else
     echo "Ok then proceeding with the initialization..."
 fi
 
+read -p "Build & Push library-producer ? (y/n) " RESP
+if [ "$RESP" = "y" ]; then
+    # zuul-gateway 
+    echo -------------------------library-producer--------------------------
+    cd kafka/library-producer/ && mvn clean install -DskipTests
+    # push the image to a local repo
+    docker tag $registry_ip/library-producer:latest $registry_ip/library-producer:production
+    docker push $registry_ip/library-producer:production
+    cd ../..
+else
+    echo "Ok then proceeding with the initialization..."
+fi
+
 read -p "Build & Push hello-service ? (y/n) " RESP
 if [ "$RESP" = "y" ]; then
     # zuul-gateway 
