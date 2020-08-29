@@ -616,6 +616,7 @@ services:
     #internal-links
     networks:
       - micro-nework-frontend
+      - kafka-broker-network
     links:
         - "discovery-service:discovery-service"  
     labels:
