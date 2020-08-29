@@ -32,4 +32,6 @@ spring:
   application:
     name: producer-service
   profiles: docker
+server:
+  port: 8080
   
