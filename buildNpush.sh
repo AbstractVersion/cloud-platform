@@ -172,23 +172,10 @@ else
     echo "Ok then proceeding with the initialization..."
 fi
 
-read -p "Build & Push kafka-producer ? (y/n) " RESP
+read -p "Build & Push mongo-consumer ? (y/n) " RESP
 if [ "$RESP" = "y" ]; then
     # zuul-gateway 
-    echo -------------------------python-service--------------------------
-    cd kafka/producer-service/ && mvn clean install -DskipTests
-    # push the image to a local repo
-    docker tag $registry_ip/producer-service:latest $registry_ip/producer-service:production
-    docker push $registry_ip/producer-service:production
-    cd ../..
-else
-    echo "Ok then proceeding with the initialization..."
-fi
-
-read -p "Build & Push kafka-producer ? (y/n) " RESP
-if [ "$RESP" = "y" ]; then
-    # zuul-gateway 
-    echo -------------------------python-service--------------------------
+    echo -------------------------mongo-consumer--------------------------
     cd kafka/mongo-consumer/ && mvn clean install -DskipTests
     # push the image to a local repo
     docker tag $registry_ip/mongo-comsumer:latest $registry_ip/mongo-comsumer:production
