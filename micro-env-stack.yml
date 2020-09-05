@@ -438,6 +438,12 @@ services:
     labels:
         collect_logs_with_filebeat: "true"
         decode_log_event_to_json_object: "true"
+    environment:
+      - CONFIGSERVER_ADDRESS=http://config-server:8888
+      - BRANCH=master
+      - PROFILE=docker
+      - APP_NAME=python-service # field required
+      - CONFIG_FAIL_FAST=True
     deploy:
         placement:
           constraints:

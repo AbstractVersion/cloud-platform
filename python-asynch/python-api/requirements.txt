@@ -13,3 +13,4 @@ py_eureka_client
 Flask-B3
 Flask-Sleuth
 python-json-logger
+config-client

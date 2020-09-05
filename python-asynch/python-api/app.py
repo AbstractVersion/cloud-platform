@@ -10,12 +10,17 @@ import sleuth, b3
 #Celery Imports
 import celery.states as states
 from worker import celery
+from config.spring import ConfigClient
+from config.ext.flask import FlaskConfig
 
 os.environ.setdefault('FORKED_BY_MULTIPROCESSING', '1')
 
 app = flask.Flask(__name__)
+# CORS Headder 
 CORS(app)
-app_name = 'python-service'
+app_name = os.environ['APP_NAME']
+#Configuration of Cloud-config server
+FlaskConfig(app, ConfigClient(app_name=app_name, url="{address}/{branch}/{profile}-{app_name}.yaml"))
 
 info = {'servicID': uuid.uuid1(),
      'serviceHost': socket.gethostname(),
@@ -99,6 +104,15 @@ def check_task(task_id):
         return res.state
     else:
         return str(res.result)
+
+
+# Asynch Request status endpoint
+@app.route('/api/config', methods=['GET'])
+def retrieve_config():
+    logger.info('Configuration retrieval request, served.')
+    return jsonify(
+            config=app.config
+        )
 
 def buildTraceInfo():
     return {'trace' : {
