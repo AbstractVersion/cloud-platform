@@ -20,7 +20,7 @@ app = flask.Flask(__name__)
 CORS(app)
 app_name = os.environ['APP_NAME']
 #Configuration of Cloud-config server
-FlaskConfig(app, ConfigClient(app_name=app_name, url="{address}/{branch}/{profile}-{app_name}.yaml"))
+FlaskConfig(app, ConfigClient(app_name=app_name, url="{address}/{branch}/{app_name}-{profile}.yaml"))
 
 info = {'servicID': uuid.uuid1(),
      'serviceHost': socket.gethostname(),
@@ -110,6 +110,7 @@ def check_task(task_id):
 @app.route('/api/config', methods=['GET'])
 def retrieve_config():
     logger.info('Configuration retrieval request, served.')
+    print(config=app.config)
     return jsonify(
             config=app.config
         )
