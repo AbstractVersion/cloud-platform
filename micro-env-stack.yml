@@ -618,3 +618,28 @@ services:
       retries: 5 
     # deploy:
     #   replicas: 2
+
+#TEST SERVICE
+test-service:
+    image: private.registry.io/test:latest
+    networks:
+      - micro-nework-frontend
+    labels:
+        collect_logs_with_filebeat: "false"
+        decode_log_event_to_json_object: "false"
+    environment:
+      - CONFIGSERVER_ADDRESS=http://config-server:8888
+      - BRANCH=master
+      - PROFILE=docker
+      - APP_NAME=python-service # field required
+      - CONFIG_FAIL_FAST=True
+    deploy:
+        placement:
+          constraints:
+            - "node.role!=manager"
+        replicas: 1
+        restart_policy:
+            condition: on-failure
+    depends_on:
+        - rabbit-server
+        - config-server

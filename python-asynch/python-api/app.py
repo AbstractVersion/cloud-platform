@@ -9,7 +9,7 @@ from pythonjsonlogger import jsonlogger
 import sleuth, b3
 #Celery Imports
 import celery.states as states
-from worker import celery
+from worker import celery, set_up_celery
 from config.spring import ConfigClient
 from config.ext.flask import FlaskConfig
 
@@ -20,7 +20,14 @@ app = flask.Flask(__name__)
 CORS(app)
 app_name = os.environ['APP_NAME']
 #Configuration of Cloud-config server
-FlaskConfig(app, ConfigClient(app_name=app_name, url="{address}/{branch}/{app_name}-{profile}.yaml"))
+# FlaskConfig(app, ConfigClient(app_name=app_name, url="{address}/{branch}/{app_name}-{profile}.yaml"))
+
+#retrieve basic configurations
+eureka_config = app.config.get('eureka')
+spring_config = app.config.get('spring')
+print('seting up celery')
+print(spring_config)
+set_up_celery(spring_config)
 
 info = {'servicID': uuid.uuid1(),
      'serviceHost': socket.gethostname(),
@@ -53,7 +60,7 @@ logger.addHandler(json_handler)
 
 
 #Configure Eurika client
-eureka_client.init(eureka_server="http://abstract:admin@discovery-service:8761/eureka",
+eureka_client.init(eureka_server=eureka_config['client']['serviceUrl']['defaultZone'],
 		   instance_port=5001,
            app_name = app_name,
 		   ha_strategy=eureka_client.HA_STRATEGY_STICK)
@@ -107,12 +114,12 @@ def check_task(task_id):
 
 
 # Asynch Request status endpoint
-@app.route('/api/config', methods=['GET'])
-def retrieve_config():
+@app.route('/api/config/<string:config_name>', methods=['GET'])
+def retrieve_config(config_name):
     logger.info('Configuration retrieval request, served.')
-    print(config=app.config)
+    # print(config=app.config)
     return jsonify(
-            config=app.config
+            config=app.config.get(config_name)
         )
 
 def buildTraceInfo():
