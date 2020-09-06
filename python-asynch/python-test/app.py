@@ -28,7 +28,7 @@ class CustomJsonFormatter(jsonlogger.JsonFormatter):
         else:
             log_record['level'] = record.levelname
 
-logger = logging.getLogger("test-logger")
+logger = logging.getLogger("python-logger")
 logger.setLevel(logging.DEBUG)
 json_handler = logging.StreamHandler()
 formatter = CustomJsonFormatter('(timestamp) (application_name) (level) (name) (message) (trace)')

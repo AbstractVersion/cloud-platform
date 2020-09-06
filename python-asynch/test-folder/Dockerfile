@@ -17,4 +17,4 @@ ENV PROFILE=docker
 ENV APP_NAME=python-service 
 ENV CONFIG_FAIL_FAST=True
 # run the app server
-CMD ["python3" , "config-client.py"]
+CMD ["python3" , "./config-client.py"]

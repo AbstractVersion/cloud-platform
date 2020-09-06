@@ -2,8 +2,8 @@ FROM python:3.6-stretch
 MAINTAINER GEORGIOS FIOTAKIS <GEORGIOS.FIOTAKIS@AKKA.EU>
 
 
-ENV CELERY_BROKER_URL pyamqp://abstract:admin@rabbit-server/
-ENV CELERY_RESULT_BACKEND rpc://abstract:admin@rabbit-server/
+# ENV CELERY_BROKER_URL pyamqp://abstract:admin@rabbit-server/
+# ENV CELERY_RESULT_BACKEND rpc://abstract:admin@rabbit-server/
 ENV C_FORCE_ROOT true
 
 ENV HOST 0.0.0.0

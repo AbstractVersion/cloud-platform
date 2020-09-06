@@ -8,7 +8,7 @@ import datetime
 from celery import Celery
 
 
-os.environ["CONFIGSERVER_ADDRESS"] = 'http://swarm-worker-1:8888/'
+os.environ["CONFIGSERVER_ADDRESS"] = 'http://config-server:8888/'
 os.environ["PROFILE"] = "docker"
 os.environ["APP_NAME"] = "python-service"
 os.environ["CONFIG_FAIL_FAST"] = "True"
@@ -28,23 +28,23 @@ def setUpConfigClient():
     # Set up config client 
     return SpringConfigClient(config)
 
-def getGlobalConfigurations():
+def getGlobalConfigurations(config_client):
     return json.dumps(config_client.get_config())
 
-def getEurikaRegistrationURI():
-    json_buffer = json.loads(getGlobalConfigurations())
+def getEurikaRegistrationURI(config_client):
+    json_buffer = json.loads(getGlobalConfigurations(config_client))
     return json_buffer['eureka']['client']['serviceUrl']['defaultZone']
 
-def getEurikaRegistrationInformation():
-    json_buffer = json.loads(getGlobalConfigurations())
+def getEurikaRegistrationInformation(config_client):
+    json_buffer = json.loads(getGlobalConfigurations(config_client))
     return json_buffer['eureka']
 
-def getRabbitMQRegistrationInformation():
-    json_buffer = json.loads(getGlobalConfigurations())
+def getRabbitMQRegistrationInformation(config_client):
+    json_buffer = json.loads(getGlobalConfigurations(config_client))
     return json_buffer['spring']['rabbitmq']
 
-def set_up_celery():
-    rabbit_mq_configs = getRabbitMQRegistrationInformation()
+def set_up_celery(config_client):
+    rabbit_mq_configs = getRabbitMQRegistrationInformation(config_client)
     CELERY_BROKER_URL = 'pyamqp://' + rabbit_mq_configs['username']+':'+rabbit_mq_configs['password'] +'@'+ rabbit_mq_configs['host'] + '/'
     CELERY_RESULT_BACKEND = 'rpc://'+ rabbit_mq_configs['username']+':'+rabbit_mq_configs['password'] +'@'+ rabbit_mq_configs['host'] + '/'
     return Celery(os.environ["CELERY_TASK_LIST"],
@@ -52,16 +52,16 @@ def set_up_celery():
                     backend=CELERY_RESULT_BACKEND)
 
 
-config_client = setUpConfigClient()
-print("Config server connection : success.")
+# config_client = setUpConfigClient()
+# print("Config server connection : success.")
 
-celery = set_up_celery()
-print("Celery configuration : success.")
+# celery = set_up_celery()
+# print("Celery configuration : success.")
 
 
 
-# print(j)
-print (getEurikaRegistrationURI())
-print (getRabbitMQRegistrationInformation())
-print (getEurikaRegistrationInformation())
-set_up_celery()
+# # print(j)
+# print (getEurikaRegistrationURI(config_client))
+# print (getRabbitMQRegistrationInformation(config_client))
+# print (getEurikaRegistrationInformation(config_client))
+# set_up_celery(config_client)
