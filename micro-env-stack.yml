@@ -79,6 +79,7 @@ services:
       - proxy-gateway-network
     depends_on:
       - zuul-proxy
+      
   session:
     # container_name: generalRDBMS
     image: private.registry.io/session-db:production
