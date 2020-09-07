@@ -201,6 +201,7 @@ services:
     image: private.registry.io/kibana:production
     networks:
       - elastic-stack-network
+      - micro-nework-frontend
     ports:
       - "5601:5601"
     depends_on:
