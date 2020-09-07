@@ -77,7 +77,8 @@ services:
       - nginx-proxy-ssl.vol:/etc/nginx/ssl/
     networks:
       - proxy-gateway-network
-
+    depends_on:
+      - zuul-proxy
   session:
     # container_name: generalRDBMS
     image: private.registry.io/session-db:production
@@ -444,6 +445,7 @@ services:
       - PROFILE=docker
       - APP_NAME=python-service # field required
       - CONFIG_FAIL_FAST=True
+      - CELERY_TASK_LIST=tasks
     deploy:
         placement:
           constraints:
