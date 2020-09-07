@@ -79,7 +79,7 @@ services:
       - proxy-gateway-network
     depends_on:
       - zuul-proxy
-      
+
   session:
     # container_name: generalRDBMS
     image: private.registry.io/session-db:production
@@ -202,7 +202,7 @@ services:
     image: private.registry.io/kibana:production
     networks:
       - elastic-stack-network
-      - micro-nework-frontend
+      - proxy-gateway-network
     ports:
       - "5601:5601"
     depends_on:
