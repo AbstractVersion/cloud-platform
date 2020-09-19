@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.eureka.server</groupId>
     <artifactId>discovery-service</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>production</version>
     <name>discovery-service</name>
     <description>Demo project for Spring Boot</description>
 
@@ -154,6 +154,7 @@
                 <version>${dockerfile-maven-plugin.version}</version>
                 <configuration>
                     <repository>${docker.image.prefix}/${project.artifactId}</repository>
+                    <tag>${project.version}</tag>
                 </configuration>
                 <executions>
                     <execution>

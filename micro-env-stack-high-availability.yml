@@ -1,0 +1,649 @@
+version: '3.8'
+#Netork Initialization
+networks:
+  proxy-gateway-network:
+    driver: overlay
+  micro-nework-frontend:
+    driver: overlay
+  micro-nework-backend:
+    driver: overlay
+  elastic-stack-network:
+    driver: overlay
+  kafka-broker-network:
+    driver: overlay
+
+
+# Be sure that you have configure the remote volumes with NFS
+# https://sysadmins.co.za/docker-swarm-persistent-storage-with-nfs/
+volumes:
+  mongodb_data:
+    driver: nfs
+    driver_opts:
+      # Here you should replace this ip with the NFS server IP, the directory /mysql exists on the root folder of NFS shared + /mysql
+      share: swarmNfs.server.io:/mongo-db
+  # Elsatic search volume, this volume will be shared among the registered & Configured managers.
+  session.db.vol:
+    driver: nfs
+    driver_opts:
+      # Here you should replace this ip with the NFS server IP, the directory /mysql exists on the root folder of NFS shared + /mysql
+      share: swarmNfs.server.io:/mysql/session
+  # Elsatic search volume, this volume will be shared among the registered & Configured managers.
+  elastic-volume.vol:
+    driver: nfs
+    driver_opts:
+      # Here you should replace this ip with the NFS server IP, the directory /mysql exists on the root folder of NFS shared + /mysql
+      share: swarmNfs.server.io:/elastic-volume
+  nginx-proxy-ssl.vol:
+    driver: nfs
+    driver_opts:
+      # Here you should replace this ip with the NFS server IP, the directory /mysql exists on the root folder of NFS shared + /mysql
+      share: swarmNfs.server.io:/nginx-proxy/ssl
+  nginx-proxy-conf.d.vol:
+    driver: nfs
+    driver_opts:
+      # Here you should replace this ip with the NFS server IP, the directory /mysql exists on the root folder of NFS shared + /mysql
+      share: swarmNfs.server.io:/nginx-proxy/conf.d
+
+  # mysql.init.vol:
+  #   driver: nfs
+  #   driver_opts:
+  #     # Here you should replace this ip with the NFS server IP, the directory /mysql exists on the root folder of NFS shared + /mysql
+  #     share: nfs.server.io:/mysql-config
+  # This volume must be created externally in order to configure the data persists correctely.
+  # By mounting this volume directely on the local filesystem, no matter which container run will have the information of the previus beats running.
+  # COnfigure each worker to have a volume like this in order to gather logs per worker Machine 
+  # Run to create the volume :
+  # docker volume create --driver local \
+  #   --opt type=none \
+  #   --opt device=/volumes/beats \
+  #   --opt o=bind filebeat.prod.ext.vol
+  filebeat.prod.ext.vol: 
+    external: true
+    name: filebeat.prod.ext.vol
+  
+
+
+services:
+
+  nginx:
+    image: private.registry.io/nginx:alpine
+    restart: unless-stopped
+    tty: true
+    ports:
+      # - "80:80"
+      - "443:443"
+    volumes:
+      - nginx-proxy-conf.d.vol:/etc/nginx/conf.d/
+      - nginx-proxy-ssl.vol:/etc/nginx/ssl/
+    networks:
+      - proxy-gateway-network
+    depends_on:
+      - zuul-proxy
+
+  session:
+    # container_name: generalRDBMS
+    image: private.registry.io/session-db:production
+    volumes:
+     - session.db.vol:/var/lib/mysql:rw
+    #  - mysql.init.vol:/filesystem-schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+    networks:
+      - micro-nework-backend
+    deploy:
+        placement:
+            constraints:
+              - "node.role==manager"
+      #Number of replicas
+        replicas: 1
+      # Configure stack update
+        restart_policy:
+          condition: on-failure
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      # MYSQL_DATABASE: sessionDB
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+  
+    # Message Brokers
+  
+  # Rabbit MQ Server 
+  rabbit-server:
+    image: private.registry.io/rabbitmq:production
+    hostname: "rabbit-server"
+    environment:
+      RABBITMQ_DEFAULT_USER: "abstract"
+      RABBITMQ_DEFAULT_PASS: "admin"
+      RABBITMQ_DEFAULT_VHOST: "/"
+    ports:
+      - "15672:15672" 
+      - "5672:5672" 
+      - "15671:15671" 
+      - "5671:5671" 
+      - "4369:4369" 
+    networks:
+      - micro-nework-frontend
+    depends_on:
+      - swarm-visualize
+    deploy:
+      placement:
+        constraints:
+          - "node.role==manager"
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+  # Cloud COnfig server
+  config-server:
+    image: private.registry.io/config-server:production
+    ports:
+      - "8888:8888"
+    healthcheck:
+        test: ["CMD", "curl", "-f", "http://localhost:8888/actuator"]
+        interval: 30s
+        timeout: 10s
+        retries: 5
+    labels:
+      collect_logs_with_filebeat: "false"
+      decode_log_event_to_json_object: "false"
+    networks:
+      - micro-nework-frontend
+    depends_on:
+      - rabbit-server
+      - swarm-visualize
+    deploy:
+      placement:
+        constraints:
+          - "node.role==manager"
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+  #Centralized Logging ELastic tack
+  elasticsearch:
+    image: private.registry.io/elasticsearch:production
+    user: root
+    networks:
+      - elastic-stack-network
+    ports:
+      - "9200:9200"
+    environment:
+      - "discovery.type=single-node"
+    volumes:
+      - elastic-volume.vol:/usr/share/elasticsearch/data              # Persistence data
+    depends_on:
+      - swarm-visualize
+    deploy:
+      placement:
+        constraints:
+          - "node.role==manager"
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    
+  logstash:
+    image: private.registry.io/logstash:production
+    networks:
+      - elastic-stack-network
+    ports:
+      - "25826:25826"
+      - "5044:5044"
+    volumes:
+      - /mnt/local-nfs/logstash-conf/pipeline:/usr/share/logstash/pipeline:ro                # Pipeline configuration
+    depends_on:
+      - elasticsearch
+    deploy:
+      placement:
+        constraints:
+          - "node.role==manager"
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+  kibana:
+    image: private.registry.io/kibana:production
+    networks:
+      - elastic-stack-network
+      - proxy-gateway-network
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+    deploy:
+      placement:
+        constraints:
+          - "node.role==manager"
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+
+  # Beats will be installed on the workers and it will scale as one container per worker
+  # due to that we need to scale it externalyy depending on the number of workers we have (docker service update --replicas-max-per-node=1 local_filebeat)
+  filebeat:
+    image: private.registry.io/beats:production
+    networks:
+      - elastic-stack-network
+    volumes:
+      # For the beats configuration volume we need to find a way to share the config file git, nfs etc.
+      # here we mount configuration files from the nfs to this directory
+      - /mnt/local-nfs/filebeat/filebeat.docker.yml:/usr/share/filebeat/filebeat.yml:ro # Configuration file
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro           # Docker logs
+      - /var/run/docker.sock:/var/run/docker.sock:ro                       # Additional information about containers
+      - filebeat.prod.ext.vol:/usr/share/filebeat/data:rw                        # Persistence data
+    user: root                                                             # Allow access to log files and docker.sock
+    depends_on:
+      - logstash
+    deploy:
+      placement:
+        max_replicas_per_node: 1
+        constraints: 
+          - node.role != manager
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+  # Swarm Visualizer
+  swarm-visualize:
+    image: private.registry.io/visualizer:latest
+    ports:
+      - "8090:8080"
+    networks:
+      - micro-nework-frontend
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    deploy:
+      placement:
+        constraints:
+          - "node.role==manager"
+        #Number of replicas
+      replicas: 1
+      # Configure stack update
+      restart_policy:
+        condition: on-failure 
+
+  # Discovery service 
+  discovery-service-peer1:
+    image: private.registry.io/discovery-service-peer1:production
+    networks:
+      - micro-nework-frontend
+    ports:
+        - "80:8761"
+    healthcheck:
+        test: ["CMD", "curl", "-f", "http://abstract:admin@localhost:8761/actuator"]
+        interval: 30s
+        timeout: 10s
+        retries: 5 
+    labels:
+        collect_logs_with_filebeat: "false"
+        decode_log_event_to_json_object: "false"
+    depends_on:
+      - config-server
+    deploy:
+      placement:
+        constraints:
+            -  "node.role==manager"
+        #   - "node.labels.proxy==true"
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+  # Discovery service 
+  discovery-service-peer2:
+    image: private.registry.io/discovery-service-peer2:production
+    networks:
+      - micro-nework-frontend
+    healthcheck:
+        test: ["CMD", "curl", "-f", "http://abstract:admin@localhost:8761/actuator"]
+        interval: 30s
+        timeout: 10s
+        retries: 5 
+    labels:
+        collect_logs_with_filebeat: "false"
+        decode_log_event_to_json_object: "false"
+    depends_on:
+      - config-server
+    deploy:
+      placement:
+        constraints:
+            -  "node.role==manager"
+        #   - "node.labels.proxy==true"
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+  zuul-proxy:
+    image: private.registry.io/zuul-proxy:production
+    #internal-links
+    networks:
+      - micro-nework-frontend
+      - proxy-gateway-network
+    links:
+        - "discovery-service:discovery-service"  
+    labels:
+        collect_logs_with_filebeat: "true"
+        decode_log_event_to_json_object: "true"
+    depends_on:
+      - config-server
+      - discovery-service
+      - session-service
+    ports:
+      - "8080:8080"
+    deploy:
+      placement:
+        constraints:
+          - "node.role!=manager"
+        #   - "node.labels.proxy!=true"
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator"]
+      interval: 30s
+      timeout: 10s
+      retries: 5     
+  
+  session-service:
+    image: private.registry.io/session-service:production
+    networks:
+      - micro-nework-frontend
+      - micro-nework-backend
+    links:
+        - "discovery-service:discovery-service"  
+    labels:
+        collect_logs_with_filebeat: "true"
+        decode_log_event_to_json_object: "true"
+    depends_on:
+      - config-server
+      - discovery-service
+      - graph-service
+    deploy:
+      placement:
+        constraints:
+          - "node.role!=manager"
+        #   - "node.labels.proxy!=true"
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  graph-service:
+    image: private.registry.io/graph-api:production
+    #internal-links
+    networks:
+      - micro-nework-frontend
+    links:
+        - "discovery-service:discovery-service"  
+    labels:
+        collect_logs_with_filebeat: "true"
+        decode_log_event_to_json_object: "true"
+    depends_on:
+      - config-server
+      - discovery-service
+    deploy:
+      placement:
+        constraints:
+          - "node.role!=manager"
+        #   - "node.labels.proxy!=true"
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8999/actuator"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  #Hello Service
+  hello-service:
+    image: private.registry.io/hello-service:production
+    # ports:
+    #     - "8080:8080"
+    #internal-links
+    networks:
+      - micro-nework-frontend
+    links:
+        - "discovery-service:discovery-service"  
+    labels:
+        collect_logs_with_filebeat: "true"
+        decode_log_event_to_json_object: "true"
+    depends_on:
+      - config-server
+      - discovery-service
+    deploy:
+      placement:
+        constraints:
+          - "node.role!=manager"
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator"]
+      interval: 30s
+      timeout: 10s
+      retries: 5 
+    # deploy:
+    #   replicas: 2
+
+  #hello Client
+  hello-client:
+    image: private.registry.io/hello-client:production
+    networks:
+      - micro-nework-frontend
+    links:
+        - "discovery-service:discovery-service"
+        - "config-server:config-server"  
+    labels:
+        collect_logs_with_filebeat: "true"
+        decode_log_event_to_json_object: "true"
+    depends_on:
+      - config-server
+      - discovery-service
+    deploy:
+      placement:
+        constraints:
+          - "node.role!=manager"
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/actuator"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  python-service:
+    image: private.registry.io/python-service:production
+    ports:
+        - "5000:5000"
+    networks:
+      - micro-nework-frontend
+    links:
+        - "discovery-service:discovery-service"
+        - "config-server:config-server"  
+    labels:
+        collect_logs_with_filebeat: "true"
+        decode_log_event_to_json_object: "true"
+    environment:
+      - CONFIGSERVER_ADDRESS=http://config-server:8888
+      - BRANCH=master
+      - PROFILE=docker
+      - APP_NAME=python-service # field required
+      - CONFIG_FAIL_FAST=True
+      - CELERY_TASK_LIST=tasks
+    deploy:
+        placement:
+          constraints:
+            - "node.role!=manager"
+        replicas: 1
+        restart_policy:
+            condition: on-failure
+    depends_on:
+        - rabbit-server
+        - config-server
+        - discovery-service
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5001/api/info"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  celery-worker:
+    image: private.registry.io/celery-worker:production
+    networks:
+      - micro-nework-frontend
+    links:
+        - "discovery-service:discovery-service"
+        - "config-server:config-server"  
+    labels:
+        collect_logs_with_filebeat: "true"
+        decode_log_event_to_json_object: "true"
+    deploy:
+        placement:
+          constraints:
+            - "node.role!=manager"
+        replicas: 1
+        restart_policy:
+            condition: on-failure
+    depends_on:
+        - rabbit-server
+        - config-server
+        - discovery-service
+        - python-service
+
+  zookeeper:
+    image: private.registry.io/zookeeper:latest
+    networks:
+      - kafka-broker-network
+    expose:
+      - "2181:2181"
+    deploy:
+      placement:
+        constraints:
+          - "node.role==manager"
+      replicas: 1
+      restart_policy:
+        condition: on-failure    
+
+  kafka:
+    image: private.registry.io/kafka:latest
+    deploy:
+      replicas: 3
+      restart_policy:
+        condition: on-failure
+    ports:
+      - target: 9094
+        published: 9094
+        protocol: tcp
+        mode: host
+    networks:
+      - kafka-broker-network
+    environment:
+      HOSTNAME_COMMAND: "docker info | grep ^Name: | cut -d' ' -f 2"
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://:9092,OUTSIDE://_{HOSTNAME_COMMAND}:9094
+      KAFKA_LISTENERS: INSIDE://:9092,OUTSIDE://:9094
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - zookeeper
+    healthcheck:
+      test:
+        ["CMD", "kafka-topics.sh", "--list", "--zookeeper", "zookeeper:2181"]
+      interval: 30s
+      timeout: 10s
+      retries: 4
+
+  mongodb:
+    image: private.registry.io/mongo:latest
+    networks:
+      - micro-nework-backend
+    ports:
+    - 27017-27019:27017-27019
+    # command: --smallfiles
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: admin
+      MONGO_INITDB_DATABASE: test
+    volumes:
+      - 'mongodb_data:/bitnami/mongodb'
+
+  mongo-express:
+    image: private.registry.io/mongo-express:latest
+    networks:
+      - micro-nework-backend
+    restart: always
+    depends_on:
+      - mongodb
+    ports:
+      - 9999:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: admin
+      ME_CONFIG_MONGODB_SERVER: mongodb
+
+  mongo-consumer-service:
+    image: private.registry.io/mongo-comsumer:production
+    networks:
+      - micro-nework-frontend
+      - kafka-broker-network
+      - micro-nework-backend
+    # ports:
+    #   - "8082:8080"
+    depends_on:
+      - zookeeper
+      - kafka
+      - mongodb
+      - producer-service
+    labels:
+      collect_logs_with_filebeat: "true"
+      decode_log_event_to_json_object: "true"
+    deploy:
+      placement:
+        constraints:
+          - "node.role!=manager"
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+#Hello Service
+  library-producer:
+    image: private.registry.io/library-producer:production
+    # ports:
+    #     - "8080:8080"
+    #internal-links
+    networks:
+      - micro-nework-frontend
+      - kafka-broker-network
+    links:
+        - "discovery-service:discovery-service"  
+    labels:
+        collect_logs_with_filebeat: "true"
+        decode_log_event_to_json_object: "true"
+    depends_on:
+      - config-server
+      - discovery-service
+      - kafka
+    deploy:
+      placement:
+        constraints:
+          - "node.role!=manager"
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator"]
+      interval: 30s
+      timeout: 10s
+      retries: 5 
+    # deploy:
+    #   replicas: 2
+

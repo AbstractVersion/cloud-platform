@@ -90,19 +90,50 @@ else
     echo "Ok then proceeding with the initialization..."
 fi
 
-
-read -p "Build & Push DISCOVERY-SERVICE ? (y/n) " RESP
+read -p "Do you want to run Eurika under high availability mode ? (y/n) " RESP
 if [ "$RESP" = "y" ]; then
+    read -p "Build & Push DISCOVERY-SERVICE peer-1 node ? (y/n) " RESP
+    if [ "$RESP" = "y" ]; then
+        
+        # Eurika Server Build
+        echo Eurika Server-peer1 build
+        cd eurika-group/eureka-server-peer1/ && mvn clean install -DskipTests
+        # push the image to a local repo
+        # docker tag $registry_ip/discovery-service:latest $registry_ip/discovery-service:production
+        docker push $registry_ip/discovery-service-peer1:production
+        cd ../..
+    else
+        echo "Ok then proceeding with the initialization..."
+    fi
+
+    read -p "Build & Push DISCOVERY-SERVICE peer-2 node ? (y/n) " RESP
+    if [ "$RESP" = "y" ]; then
+        
+        # Eurika Server Build
+        echo Eurika Server-peer2 build
+        cd eurika-group/eureka-server-peer2/ && mvn clean install -DskipTests
+        # push the image to a local repo
+        # docker tag $registry_ip/discovery-service:latest $registry_ip/discovery-service:production
+        docker push $registry_ip/discovery-service-peer2:production
+        cd ../..
+    else
+        echo "Ok then proceeding with the initialization..."
+    fi
     
-    # Eurika Server Build
-    echo Eurika Server build
-    cd eureka-server && mvn clean install -DskipTests
-    # push the image to a local repo
-    docker tag $registry_ip/discovery-service:latest $registry_ip/discovery-service:production
-    docker push $registry_ip/discovery-service:production
-    cd ..
 else
-    echo "Ok then proceeding with the initialization..."
+    read -p "Build & Push DISCOVERY-SERVICE single node ? (y/n) " RESP
+    if [ "$RESP" = "y" ]; then
+        
+        # Eurika Server Build
+        echo Eurika Server build
+        cd eurika-group/eureka-server/ && mvn clean install -DskipTests
+        # push the image to a local repo
+        # docker tag $registry_ip/discovery-service:latest $registry_ip/discovery-service:production
+        docker push $registry_ip/discovery-service:production
+        cd ../..
+    else
+        echo "Ok then proceeding with the initialization..."
+    fi
 fi
 
 
