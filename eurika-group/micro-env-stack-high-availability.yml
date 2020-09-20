@@ -1,0 +1,114 @@
+version: '3.8'
+#Netork Initialization
+networks:
+  proxy-gateway-network:
+    driver: overlay
+  micro-nework-frontend:
+    driver: overlay
+
+
+services:
+
+    # Message Brokers
+  
+  # Rabbit MQ Server 
+  rabbit-server:
+    image: private.registry.io/rabbitmq:production
+    hostname: "rabbit-server"
+    environment:
+      RABBITMQ_DEFAULT_USER: "abstract"
+      RABBITMQ_DEFAULT_PASS: "admin"
+      RABBITMQ_DEFAULT_VHOST: "/"
+    ports:
+      - "15672:15672" 
+      - "5672:5672" 
+      - "15671:15671" 
+      - "5671:5671" 
+      - "4369:4369" 
+    networks:
+      - micro-nework-frontend
+    depends_on:
+      - swarm-visualize
+    deploy:
+      placement:
+        constraints:
+          - "node.role==manager"
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+  # Cloud COnfig server
+  config-server:
+    image: private.registry.io/config-server:production
+    ports:
+      - "8888:8888"
+    healthcheck:
+        test: ["CMD", "curl", "-f", "http://localhost:8888/actuator"]
+        interval: 30s
+        timeout: 10s
+        retries: 5
+    labels:
+      collect_logs_with_filebeat: "false"
+      decode_log_event_to_json_object: "false"
+    networks:
+      - micro-nework-frontend
+    depends_on:
+      - rabbit-server
+      - swarm-visualize
+    deploy:
+      placement:
+        constraints:
+          - "node.role==manager"
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+  # Discovery service 
+  discovery-service-peer1:
+    image: private.registry.io/discovery-service-peer1:production
+    networks:
+      - micro-nework-frontend
+    ports:
+        - "80:8761"
+    healthcheck:
+        test: ["CMD", "curl", "-f", "http://abstract:admin@localhost:8761/actuator"]
+        interval: 30s
+        timeout: 10s
+        retries: 5 
+    labels:
+        collect_logs_with_filebeat: "false"
+        decode_log_event_to_json_object: "false"
+    depends_on:
+      - config-server
+    deploy:
+      placement:
+        constraints:
+            -  "node.role==manager"
+        #   - "node.labels.proxy==true"
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+  # Discovery service 
+  discovery-service-peer2:
+    image: private.registry.io/discovery-service-peer2:production
+    networks:
+      - micro-nework-frontend
+    healthcheck:
+        test: ["CMD", "curl", "-f", "http://abstract:admin@localhost:8761/actuator"]
+        interval: 30s
+        timeout: 10s
+        retries: 5 
+    labels:
+        collect_logs_with_filebeat: "false"
+        decode_log_event_to_json_object: "false"
+    depends_on:
+      - config-server
+    deploy:
+      placement:
+        constraints:
+            -  "node.role==manager"
+        #   - "node.labels.proxy==true"
+      replicas: 1
+      restart_policy:
+        condition: on-failure
