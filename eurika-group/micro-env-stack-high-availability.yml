@@ -1,16 +1,11 @@
 version: '3.8'
 #Netork Initialization
 networks:
-  proxy-gateway-network:
-    driver: overlay
   micro-nework-frontend:
     driver: overlay
 
 
 services:
-
-    # Message Brokers
-  
   # Rabbit MQ Server 
   rabbit-server:
     image: private.registry.io/rabbitmq:production
@@ -27,8 +22,6 @@ services:
       - "4369:4369" 
     networks:
       - micro-nework-frontend
-    depends_on:
-      - swarm-visualize
     deploy:
       placement:
         constraints:
@@ -54,7 +47,6 @@ services:
       - micro-nework-frontend
     depends_on:
       - rabbit-server
-      - swarm-visualize
     deploy:
       placement:
         constraints:
@@ -70,11 +62,11 @@ services:
       - micro-nework-frontend
     ports:
         - "80:8761"
-    healthcheck:
-        test: ["CMD", "curl", "-f", "http://abstract:admin@localhost:8761/actuator"]
-        interval: 30s
-        timeout: 10s
-        retries: 5 
+    # healthcheck:
+    #     test: ["CMD", "curl", "-f", "http://abstract:admin@localhost:8761/actuator"]
+    #     interval: 30s
+    #     timeout: 10s
+    #     retries: 5 
     labels:
         collect_logs_with_filebeat: "false"
         decode_log_event_to_json_object: "false"
@@ -94,11 +86,11 @@ services:
     image: private.registry.io/discovery-service-peer2:production
     networks:
       - micro-nework-frontend
-    healthcheck:
-        test: ["CMD", "curl", "-f", "http://abstract:admin@localhost:8761/actuator"]
-        interval: 30s
-        timeout: 10s
-        retries: 5 
+    # healthcheck:
+    #     test: ["CMD", "curl", "-f", "http://abstract:admin@localhost:8761/actuator"]
+    #     interval: 30s
+    #     timeout: 10s
+    #     retries: 5 
     labels:
         collect_logs_with_filebeat: "false"
         decode_log_event_to_json_object: "false"
