@@ -13,6 +13,6 @@ COPY ${DEPENDENCY}/BOOT-INF/classes /app
 
 
 
-ENTRYPOINT ["/wait_from_cloud_config.sh", "java","-cp","app:app/lib/*","-Dspring.profiles.active=docker-peer1","com.eureka.server.demo.DemoApplication"]
+ENTRYPOINT ["/wait_from_cloud_config.sh", "java","-cp","app:app/lib/*","-Dspring.profiles.active=peer1","com.eureka.server.demo.DemoApplication"]
 
 

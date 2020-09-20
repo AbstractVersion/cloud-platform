@@ -18,7 +18,7 @@ spring:
       uri: http://config-server:8888
     #Active profiles
   profiles:
-    active: docker-peer2
+    active: peer2
   application:
     #App name
     name: discovery-service-peer2
