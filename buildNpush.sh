@@ -255,6 +255,18 @@ else
     echo "Ok then proceeding with the initialization..."
 fi
 
+read -p "Build & Push traffic-simulator-service ? (y/n) " RESP
+if [ "$RESP" = "y" ]; then
+    # zuul-gateway 
+    echo -------------------------traffic-simulator-service--------------------------
+    cd traffic-simulator-service && mvn clean install -DskipTests
+    # push the image to a local repo
+    docker tag $registry_ip/traffic-simulator-service:latest $registry_ip/traffic-simulator-service:production
+    docker push $registry_ip/htraffic-simulator-service:production
+    cd ..
+else
+    echo "Ok then proceeding with the initialization..."
+fi
 
 echo "The service build has finished you can now run the docker stack"
 

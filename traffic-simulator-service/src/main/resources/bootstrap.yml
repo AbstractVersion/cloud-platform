@@ -7,7 +7,7 @@ spring:
     config:
         uri: http://localhost:8888
   application:
-        name: traffic-simulator
+        name: traffic-simulator-service
 
 
     
