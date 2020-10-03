@@ -187,7 +187,7 @@ services:
       - "25826:25826"
       - "5044:5044"
     volumes:
-      - /mnt/local-nfs/logstash-conf/pipeline:/usr/share/logstash/pipeline:ro                # Pipeline configuration
+      - /mnt/local-nfs/logstash-conf/pipeline.1:/usr/share/logstash/pipeline:ro                # Pipeline configuration
     depends_on:
       - elasticsearch
     deploy:
@@ -207,6 +207,7 @@ services:
       - "5601:5601"
     depends_on:
       - elasticsearch
+      - logstash
     deploy:
       placement:
         constraints:
