@@ -173,6 +173,7 @@ services:
       - swarm-visualize
     deploy:
       placement:
+        max_replicas_per_node: 1
         constraints:
           - "node.role==manager"
       replicas: 1
@@ -277,8 +278,8 @@ services:
     depends_on:
       - config-server
     deploy:
-      max_replicas_per_node: 1
       placement:
+        max_replicas_per_node: 1
         constraints:
             -  "node.role==worker"
         #   - "node.labels.proxy==true"
