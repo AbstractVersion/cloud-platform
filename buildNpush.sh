@@ -262,7 +262,7 @@ if [ "$RESP" = "y" ]; then
     cd traffic-simulator-service && mvn clean install -DskipTests
     # push the image to a local repo
     docker tag $registry_ip/traffic-simulator-service:latest $registry_ip/traffic-simulator-service:production
-    docker push $registry_ip/htraffic-simulator-service:production
+    docker push $registry_ip/traffic-simulator-service:production
     cd ..
 else
     echo "Ok then proceeding with the initialization..."

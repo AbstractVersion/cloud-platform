@@ -164,7 +164,6 @@
                 <version>${dockerfile-maven-plugin.version}</version>
                 <configuration>
                     <repository>${docker.image.prefix}/${project.artifactId}</repository>
-                    <tag>dev</tag>
                 </configuration>
                 <executions>
                     <execution>
