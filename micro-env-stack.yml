@@ -89,7 +89,6 @@ services:
     networks:
       - micro-nework-backend
     deploy:
-        max_replicas_per_node: 1
         placement:
             constraints:
               - "node.role==manager"
@@ -173,7 +172,6 @@ services:
     depends_on:
       - swarm-visualize
     deploy:
-      max_replicas_per_node: 1
       placement:
         constraints:
           - "node.role==manager"
@@ -282,7 +280,7 @@ services:
       max_replicas_per_node: 1
       placement:
         constraints:
-            -  "node.role==manager"
+            -  "node.role==worker"
         #   - "node.labels.proxy==true"
       replicas: 1
       restart_policy:
