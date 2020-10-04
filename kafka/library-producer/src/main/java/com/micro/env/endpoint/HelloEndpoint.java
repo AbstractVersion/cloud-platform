@@ -36,7 +36,7 @@ public class HelloEndpoint {
 
     @GetMapping(value = "/", produces = "application/json")
     public ResponseEntity<?> hello() throws UnknownHostException {
-        log.info("Ta kataferame dikie mou {}", "skatoules");
+        logger.info("Ta kataferame dikie mou {}", "skatoules");
         return ResponseEntity.ok(
                 "ok"
         );

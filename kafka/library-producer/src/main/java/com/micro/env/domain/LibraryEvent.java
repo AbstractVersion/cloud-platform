@@ -1,6 +1,5 @@
-package com.micro.env.kafka.producer.domain;
+package com.micro.env.domain;
 
-import com.kafka.template.domain.LibraryEventType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

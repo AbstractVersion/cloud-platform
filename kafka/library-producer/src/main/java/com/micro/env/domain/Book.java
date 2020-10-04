@@ -1,4 +1,4 @@
-package com.micro.env.kafka.producer.domain;
+package com.micro.env.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -1,4 +1,4 @@
-package com.kafka.template.domain;
+package com.micro.env.domain;
 
 
 public enum LibraryEventType {
