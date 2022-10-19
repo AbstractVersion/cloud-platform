@@ -368,33 +368,6 @@ Each microservice is a Spring Boot application, exposing a HTTP API. As we inten
 
 And, for demonstration purposes, all data handled by the services is stored in memory and only `GET` requests are supported. When a representation of post is requested, the post service will perform a `GET` request to the comment service to get a representation of the comments for that post. The post service will aggregate the results and return a representation of the post with comments to the client.
 
-![Post and comment services][img.services]
-
-Let's see how to build the source code, spin up the Docker containers, produce some log data and then visualize the logs in Kibana.
-
-Before starting, ensure you at least Java 11, Maven 3.x and Docker set up. Then clone the [repository][repo] from GitHub:
-
-```bash
-git clone https://github.com/cassiomolin/log-aggregation-spring-boot-elastic-stack.git
-```
-
-### Building the applications and creating Docker images
-
-Both post and comment services use the [`dockerfile-maven`][dockerfile-maven] plugin from Spotify to make the Docker build process integrate with the Maven build process. So when we build a Spring Boot artifact, we'll also build a Docker image for it. For more details, check the `Dockerfile` and the `pox.xml` of each service.
-
-To build the Spring Boot applications and their Docker images:
-
-- Change to the `comment-service` folder: `cd comment-service`
-- Build the application and create a Docker image: `mvn clean install`
-- Change back to the parent folder: `cd ..`
-
-- Change to the `post-service` folder: `cd post-service`
-- Build the application and create a Docker image: `mvn clean install`
-- Change back to the parent folder: `cd ..`
-
-### Spinning up the containers
-
-In the root folder of our project, where the `docker-compose.yml` resides, spin up the Docker containers running `docker-compose up`.
 
 ### Visualizing logs in Kibana
 
@@ -402,56 +375,23 @@ In the root folder of our project, where the `docker-compose.yml` resides, spin 
 
 - In the first time you access Kibana, a welcome page will be displayed. Kibana comes with sample data in case we want to play with it. To explore the data generate by our applications, click the _Explore on my own_ link.
 
-![Welcome page][img.screenshot-01]
-
-- On the left hand side, click the _Discover_ icon.
-
-![Home][img.screenshot-02]
-
-- Kibana uses index patterns for retrieving data from Elasticsearch. As it's the first time we are using Kibana, we must create an index pattern to explore our data. We should see an index that has been created by Logstash. So create a pattern for matching the Logstash indexes using `logstash-*` and then click the _Next step_ button.
-
-- Kibana uses _index patterns_ for retrieving data from Elasticsearch. So, to get started, you must create an index pattern. In this page, you should see an index that has been created by Logstash. To create a pattern for matching this index, enter `logstash-*` and then click the _Next step_ button.
-
-![Creating index pattern][img.screenshot-03]
-
-- Then pick a field for filtering the data by time. Choose `@timestamp` and click the _Create index pattern_ button.
-
-![Picking a field for filtering data by time][img.screenshot-04]
-
-- The index pattern will be created. Click again in the _Discover_ icon and the log events of both post and comment services start up will be shown:
-
-![Viewing the log events][img.screenshot-05]
-
-- To filter log events from the post service, for example, enter `application_name : "post-service"` in the search box. Click the _Update_ button and now you'll see log events from the post service only.
-
-![Filtering logs by application name][img.screenshot-06]
-
-- Clean the filter input and click the _Update_ button to view all logs. 
-
-- Perform a `GET` request to `http://localhost:8001/posts/1` to generate some log data. Wait a few seconds and then click the _Refresh_ button. You will be able to see logs from the requests. The logs will contain tracing details, such as _trace.trace_id_ and _trace.span id_.
-
-- In the left-hand side, there's a list of fields available. Hover over the list of fields and an _Add_ button will be shown for each field. Add a few fields such as `application_name`, `trace.trace_id`, `trace.span_id` and `message`.
-
-- Now let's see how to trace a request. Pick a trace id from the logs and, in the filter box, input `trace.trace_id: "<value>"` where `<value>` is the trace id you want to use as filter criteria. Then click the _Update_ button and you will able to see logs that match that trace id. 
-
-- As can be seen in the image below, the trace id is the same for the entire operation, which started in the post service. And the log events resulted from a call to the comment service haven been assigned a different span id.
+- Below we have a real-time overview of our logs through a kibana dashboard.
 
 ![Filtering logs by trace id][img.screenshot-07]
 
 To stop the containers, use `docker-compose down`. It's important to highlight that both Elasticsearch indices and the Filebeat tracking data are stored in the host, under the `./elasticseach/data` and `./filebeat/data` folders. It means that, if you destroy the containers, the data will be lost.
 
+## System Overview
 
+
+
+  [img.overall]: ./img/elastic.png
   [img.services]: /misc/img/diagrams/services.png
-  [img.elastic-stack]: /misc/img/diagrams/elastic-stack.png
-  [img.elastic-stack-docker]: /misc/img/diagrams/services-and-elastic-stack.png
-  [img.logstash-pipeline]: /misc/img/diagrams/logstash-pipeline.png
-  [img.screenshot-01]: /misc/img/screenshots/01.png
-  [img.screenshot-02]: /misc/img/screenshots/02.png
-  [img.screenshot-03]: /misc/img/screenshots/03.png
-  [img.screenshot-04]: /misc/img/screenshots/04.png
-  [img.screenshot-05]: /misc/img/screenshots/05.png
-  [img.screenshot-06]: /misc/img/screenshots/06.png
-  [img.screenshot-07]: /misc/img/screenshots/07.png
+  [img.elastic-stack]: ./img/diagram-elastic-stack-1.png
+  [img.elastic-stack-docker]: ./img/services-and-elastic-stack.png
+  [img.logstash-pipeline]: ./img/diagram-logstash-pipeline.png
+
+  [img.screenshot-07]: ./img/screenshot-07.png
 
   [12factor]: https://12factor.net
   [12factor.logs]: https://12factor.net/logs

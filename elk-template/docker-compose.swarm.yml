@@ -1,0 +1,140 @@
+version: "3.9"
+# Cloud Config Service
+networks:
+  elastic-network-overlay:
+
+volumes:
+  elastic-volume:
+    driver: local
+    driver_opts:
+        type: "nfs4"
+        o: addr=${NFS_SERVER_ADDRESS},nolock,hard,intr,rw,vers=4.1
+        device: ":${NFS_CORE_PATH}/elasticsearch/"
+
+  # filebeat.ext.vol: 
+  #   driver: local
+  #   driver_opts:
+  #       type: "nfs4"
+  #       o: addr=${NFS_SERVER_ADDRESS},nolock,hard,intr,rw,vers=4.1
+  #       device: ":${NFS_CORE_PATH}/filebeat/data/"
+
+  logstash.pipeline: 
+    driver: local
+    driver_opts:
+        type: "nfs4"
+        o: addr=${NFS_SERVER_ADDRESS},nolock,hard,intr,rw,vers=4.1
+        device: ":${NFS_CORE_PATH}/logstash/pipeline.1/"
+
+
+services:
+  elasticsearch:
+    image: ${REGISTRY_URL}/elasticsearch:7.2.0
+    user: root
+    ports:
+      - "9200:9200"
+    networks: 
+      - elastic-network-overlay
+    environment:
+      - "discovery.type=single-node"
+    volumes:
+      - elastic-volume:/usr/share/elasticsearch/data
+    # restart: always
+    deploy:
+      placement:
+        constraints:
+          - "node.role==worker"
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      # resources:
+      #   limits:
+      #     cpus: '2'
+      #     memory: 1000M
+      #   reservations:
+      #     cpus: '1'
+      #     memory: 400M
+
+  logstash:
+    image: ${REGISTRY_URL}/logstash:7.2.0
+    ports:
+      - "25826:25826"
+      - "5044:5044"
+    networks: 
+      - elastic-network-overlay
+    volumes:
+      - logstash.pipeline:/usr/share/logstash/pipeline:ro                # Pipeline configuration
+    restart: always
+    depends_on:
+      - elasticsearch
+    deploy:
+      placement:
+        max_replicas_per_node: 1
+        constraints:
+          - "node.role==worker"
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      # resources:
+      #   limits:
+      #     cpus: '0.50'
+      #     memory: 200M
+      #   reservations:
+      #     cpus: '0.25'
+      #     memory: 100M
+
+  kibana:
+    image: ${REGISTRY_URL}/kibana:7.2.0
+    ports:
+      - "5601:5601"
+    networks: 
+      - elastic-network-overlay
+    restart: always
+    depends_on:
+      - elasticsearch
+    deploy:
+      placement:
+        max_replicas_per_node: 1
+        constraints:
+          - "node.role==worker"
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      # resources:
+      #   limits:
+      #     cpus: '0.50'
+      #     memory: 500M
+      #   reservations:
+      #     cpus: '0.25'
+      #     memory: 200M
+
+  filebeat:
+    image: ${REGISTRY_URL}/filebeat:7.2.0
+    networks: 
+      - elastic-network-overlay
+    volumes:
+      # - /mnt/datalake-nfs/elastic-stack/filebeat/config/filebeat.docker.yml:/usr/share/filebeat/filebeat.yml:ro # Configuration file
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro           # Docker logs
+      - /var/run/docker.sock:/var/run/docker.sock:ro                       # Additional information about containers
+      # - filebeat.ext.vol:/usr/share/filebeat/data:rw                        # Persistence data
+    user: root                                                             # Allow access to log files and docker.sock
+    # restart: always
+    depends_on:
+      - logstash
+    deploy:
+      mode: global
+      # placement:
+      #   max_replicas_per_node: 1
+        #constraints:
+        #  - "node.role==worker"
+      # replicas: 3
+      restart_policy:
+        condition: on-failure
+      # resources:
+      #   limits:
+      #     cpus: '0.50'
+      #     memory: 100M
+      #   reservations:
+      #     cpus: '0.25'
+      #     memory: 50M
+
+

@@ -1,0 +1,202 @@
+version: '3.9'
+networks:
+  elastic-stack-network-overlay:
+
+volumes:
+  elastic-data-1:
+    driver: local
+    driver_opts:
+        type: "nfs4"
+        o: addr=${NFS_SERVER_ADDRESS},nolock,soft,rw,vers=4.1
+        device: ":${NFS_CORE_PATH}/cluster/elk-1/"
+  elastic-data-2:
+    driver: local
+    driver_opts:
+        type: "nfs4"
+        o: addr=${NFS_SERVER_ADDRESS},nolock,soft,rw,vers=4.1
+        device: ":${NFS_CORE_PATH}/cluster/elk-2/"
+  elastic-data-3:
+    driver: local
+    driver_opts:
+        type: "nfs4"
+        o: addr=${NFS_SERVER_ADDRESS},nolock,soft,rw,vers=4.1
+        device: ":${NFS_CORE_PATH}/cluster/elk-3/"
+  logstash.pipeline: 
+    driver: local
+    driver_opts:
+        type: "nfs4"
+        o: addr=${NFS_SERVER_ADDRESS},nolock,hard,intr,rw,vers=4.1
+        device: ":${NFS_CORE_PATH}/cluster/logstash/pipeline/"
+
+services:
+  elasticsearch:
+    image: ${REGISTRY_URL}/elasticsearch:7.13.2
+    # container_name: elasticsearch
+    networks:
+      - elastic-stack-network-overlay
+    environment:
+     - cluster.name=docker-cluster
+     - node.name=elasticsearch
+     - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+     - xpack.monitoring.collection.enabled=true
+     - xpack.monitoring.exporters.remote.type=http
+     - xpack.monitoring.exporters.remote.host=monitor
+     - discovery.seed_hosts=elasticsearch,elasticsearch2,elasticsearch3
+     - cluster.initial_master_nodes=elasticsearch,elasticsearch2,elasticsearch3
+    volumes:
+      - elastic-data-1:/usr/share/elasticsearch/data
+    deploy:
+      placement:
+        constraints: 
+          - node.hostname == ${SERVER_1_PLACEMENT}
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    # ports:
+    #   - "19200:9200"
+
+  elasticsearch2:
+    image: ${REGISTRY_URL}/elasticsearch:7.13.2
+    # container_name: elasticsearch2
+    networks:
+      - elastic-stack-network-overlay
+    environment:
+     - cluster.name=docker-cluster
+     - node.name=elasticsearch2
+     - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+     - xpack.monitoring.collection.enabled=true
+     - xpack.monitoring.exporters.remote.type=http
+     - xpack.monitoring.exporters.remote.host=monitor
+     - discovery.seed_hosts=elasticsearch,elasticsearch2,elasticsearch3
+     - cluster.initial_master_nodes=elasticsearch,elasticsearch2,elasticsearch3
+    volumes:
+      - elastic-data-2:/usr/share/elasticsearch/data
+    deploy:
+      placement:
+        constraints: 
+          - node.hostname == ${SERVER_2_PLACEMENT}
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    # ports:
+    #   - "29200:9200"
+
+  elasticsearch3:
+    image: ${REGISTRY_URL}/elasticsearch:7.13.2
+    # container_name: elasticsearch3
+    networks:
+      - elastic-stack-network-overlay
+    environment:
+     - cluster.name=docker-cluster
+     - node.name=elasticsearch3
+     - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+     - xpack.monitoring.collection.enabled=true
+     - xpack.monitoring.exporters.remote.type=http
+     - xpack.monitoring.exporters.remote.host=monitor
+     - discovery.seed_hosts=elasticsearch,elasticsearch2,elasticsearch3
+     - cluster.initial_master_nodes=elasticsearch,elasticsearch2,elasticsearch3
+    volumes:
+      - elastic-data-3:/usr/share/elasticsearch/data
+    deploy:
+      placement:
+        constraints: 
+          - node.hostname == ${SERVER_3_PLACEMENT}
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    # ports:
+    #   - "39200:9200"
+
+  monitor:
+    image: ${REGISTRY_URL}/elasticsearch:7.13.2
+    # container_name: monitor
+    networks:
+      - elastic-stack-network-overlay
+    environment:
+     - cluster.name=docker-monitor-cluster
+     - node.name=monitor
+     - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+     - xpack.monitoring.collection.enabled=false
+     - discovery.seed_hosts=monitor
+     - cluster.initial_master_nodes=monitor
+    ports:
+      - "9201:9200"
+
+  kibana-devtools:
+    image: docker.elastic.co/kibana/kibana:7.13.2
+    # container_name: kibana-devtools
+    networks:
+      - elastic-stack-network-overlay
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch3:9200
+    ports:
+      - "15601:5601"
+
+  kibana-dashboard:
+    image: docker.elastic.co/kibana/kibana:7.13.2
+    # container_name: kibana-dashboard
+    networks:
+      - elastic-stack-network-overlay
+    environment:
+      ELASTICSEARCH_HOSTS: http://monitor:9200
+      # - ELASTICSEARCH_HOSTS=["http://elasticsearch:9200","http://elasticsearch2:9200","http://elasticsearch3:9200"]
+    ports:
+      - "25601:5601"
+
+  logstash:
+    image: ${REGISTRY_URL}/logstash:7.13.2
+    # ports:
+    #   - "25826:25826"
+    #   - "5044:5044"
+    networks:
+      - elastic-stack-network-overlay
+    volumes:
+      - logstash.pipeline:/usr/share/logstash/pipeline:ro                # Pipeline configuration
+    restart: always
+    depends_on:
+      - elasticsearch
+    deploy:
+      placement:
+        max_replicas_per_node: 1
+        constraints:
+          - "node.role==worker"
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      # resources:
+      #   limits:
+      #     cpus: '0.50'
+      #     memory: 200M
+      #   reservations:
+      #     cpus: '0.25'
+      #     memory: 100M
+
+  filebeat:
+    image: ${REGISTRY_URL}/filebeat:7.13.2
+    networks:
+      - elastic-stack-network-overlay
+    volumes:
+      # - /mnt/datalake-nfs/elastic-stack/filebeat/config/filebeat.docker.yml:/usr/share/filebeat/filebeat.yml:ro # Configuration file
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro           # Docker logs
+      - /var/run/docker.sock:/var/run/docker.sock:ro                       # Additional information about containers
+      # - filebeat.ext.vol:/usr/share/filebeat/data:rw                        # Persistence data
+    user: root                                                             # Allow access to log files and docker.sock
+    # restart: always
+    depends_on:
+      - logstash
+    deploy:
+      mode: global
+      # placement:
+      #   max_replicas_per_node: 1
+        #constraints:
+        #  - "node.role==worker"
+      # replicas: 3
+      restart_policy:
+        condition: on-failure
+      # resources:
+      #   limits:
+      #     cpus: '0.50'
+      #     memory: 100M
+      #   reservations:
+      #     cpus: '0.25'
+      #     memory: 50M
