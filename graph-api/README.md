@@ -145,12 +145,3 @@ URL-Prefix | endpoint| external-url (proxy) | Method | Model | Description
 
 
 
-## Author & Licence
-
-Original Author         :   [George Fiotakis](https://www.linkedin.com/in/george-fiotakis-320967159/). <br>
-Contact Information     :   georgios.FIOTAKIS@akka.eu <br>
-Contact Information     :   g.fiotakis@hotmail.com <br>
-
-*This document and it's sub components & documents are Confidential INFORMATION which belongs to the group of AKKA Technologies & REAL FUSIO. Any
-attempt of replication and distribution of this document without AKKA Technology's and REAL FUSIO's consent, will be persecuted legally.*
-
